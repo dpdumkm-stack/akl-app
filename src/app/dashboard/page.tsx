@@ -131,42 +131,41 @@ export default function DashboardPage() {
       {/* Top Nav */}
       <nav className="relative z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/40">
-              <Layers className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="text-gray-900 font-black text-lg tracking-tight">STUDIO AKL</span>
-              <p className="text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-none">Management System</p>
-            </div>
-          </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button className="relative p-2.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-colors">
-              <Bell className="w-4 h-4" />
-              {stats.pendingInvoices > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[9px] font-black flex items-center justify-center">
-                  {stats.pendingInvoices}
-                </span>
-              )}
-            </button>
-            <div className="flex items-center gap-2.5 bg-slate-800 rounded-xl px-3 py-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center text-[10px] font-black">
-                {session?.user?.name?.[0]?.toUpperCase() ?? "A"}
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/40">
+                <Layers className="w-5 h-5 text-white" />
               </div>
-              <span className="text-slate-300 text-xs font-bold hidden md:block">{session?.user?.name ?? "Admin"}</span>
+              <div>
+                <span className="text-gray-900 font-black text-lg tracking-tight">STUDIO AKL</span>
+                <p className="text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-none">Management System</p>
+              </div>
             </div>
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className="p-2.5 rounded-xl bg-slate-800 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
-              title="Logout"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+
+            <div className="flex items-center gap-3">
+              <button className="relative p-2.5 rounded-xl bg-gray-200 text-gray-600 hover:text-gray-900 transition-colors">
+                <Bell className="w-4 h-4" />
+                {stats.pendingInvoices > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[9px] font-black flex items-center justify-center">
+                    {stats.pendingInvoices}
+                  </span>
+                )}
+              </button>
+              <div className="flex items-center gap-2.5 bg-gray-200 rounded-xl px-3 py-2">
+                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-red-500 rounded-lg flex items-center justify-center text-[10px] font-black">
+                  {session?.user?.name?.[0]?.toUpperCase() ?? "A"}
+                </div>
+                <span className="text-gray-800 text-xs font-bold hidden md:block">{session?.user?.name ?? "Admin"}</span>
+              </div>
+              <button
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="p-2.5 rounded-xl bg-gray-200 text-gray-600 hover:text-red-400 hover:bg-red-100 transition-all"
+                title="Logout"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Welcome */}
