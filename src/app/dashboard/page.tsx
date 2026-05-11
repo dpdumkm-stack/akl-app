@@ -120,7 +120,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white font-sans">
+    <div className="min-h-screen bg-slate-50 text-gray-900 font-sans">
       {/* Ambient background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-violet-600/10 blur-[120px] rounded-full" />
@@ -129,16 +129,17 @@ export default function DashboardPage() {
       </div>
 
       {/* Top Nav */}
-      <nav className="relative z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 sticky top-0">
+      <nav className="relative z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-violet-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-900/40">
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/40">
               <Layers className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="text-white font-black text-lg tracking-tight">STUDIO AKL</span>
-              <p className="text-[9px] text-slate-500 font-bold uppercase tracking-[0.2em] leading-none">Management System</p>
+              <span className="text-gray-900 font-black text-lg tracking-tight">STUDIO AKL</span>
+              <p className="text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-none">Management System</p>
             </div>
+          </div>
           </div>
 
           <div className="flex items-center gap-3">
