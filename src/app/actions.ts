@@ -3,6 +3,12 @@
 import { prisma } from "@/lib/prisma";
 import { QuotationData } from "@/lib/types";
 
+// Fungsi Sanitasi Sederhana
+const sanitize = (str: string | null | undefined) => {
+    if (!str) return "";
+    return str.trim().replace(/[\x00-\x1F\x7F]/g, ""); // Hapus karakter kontrol non-printable
+};
+
 export async function saveQuotation(data: QuotationData, totalHarga: number) {
   try {
     console.log("[saveQuotation] START - Data:", { 
@@ -12,6 +18,10 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
         diskon: data.diskon,
         kenakanPPN: data.kenakanPPN
     });
+
+    if (!data.nomorSurat || !data.namaKlien) {
+        return { success: false, message: "Nomor Surat dan Nama Klien wajib diisi." };
+    }
 
     // Safe Mode: Recalculate total on server to prevent mismatches
     const calculatedSubtotal = (data.items || []).reduce((acc, i) => {
@@ -29,15 +39,15 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     console.log("[saveQuotation] Recalculated Total:", calculatedTotal);
 
     const payload = {
-      nomorSurat:           data.nomorSurat            ?? '',
+      nomorSurat:           sanitize(data.nomorSurat),
       nomorUrut:            data.nomorUrut              || 1,
-      tanggal:              data.tanggal               ?? '',
-      namaKlien:            data.namaKlien             ?? '',
-      up:                   data.up                    ?? '',
-      lokasi:               data.lokasi                ?? '',
-      namaPenandatangan:    data.namaPenandatangan     ?? '',
-      jabatanPenandatangan: data.jabatanPenandatangan  ?? '',
-      phonePenandatangan:   data.phonePenandatangan    ?? '',
+      tanggal:              sanitize(data.tanggal),
+      namaKlien:            sanitize(data.namaKlien),
+      up:                   sanitize(data.up),
+      lokasi:               sanitize(data.lokasi),
+      namaPenandatangan:    sanitize(data.namaPenandatangan),
+      jabatanPenandatangan: sanitize(data.jabatanPenandatangan),
+      phonePenandatangan:   sanitize(data.phonePenandatangan),
       ttdStempelUrl:        data.ttdStempelUrl         ?? null,
       logoUrl:              data.logoUrl               ?? null,
       showLingkupKerja:     data.showLingkupKerja      ?? true,
@@ -264,6 +274,10 @@ export async function getNextQuotationNumber() {
 
 export async function saveInvoice(data: any) {
   try {
+    if (!data.invoiceNumber || !data.clientName) {
+      return { success: false, message: "Nomor Invoice dan Nama Klien wajib diisi." };
+    }
+
     const subtotal = (data.items || []).reduce((acc: number, i: any) => {
       const qty = Number(i.quantity) || 0;
       const price = Number(i.unitPrice) || 0;
@@ -278,16 +292,16 @@ export async function saveInvoice(data: any) {
     const total = invoiceType === "DP" ? downPayment : (grandTotal - downPayment);
 
     const payload = {
-      invoiceNumber: data.invoiceNumber ?? '',
+      invoiceNumber: sanitize(data.invoiceNumber),
       date: data.date ? new Date(data.date) : new Date(),
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
-      clientName: data.clientName ?? '',
-      clientAddress: data.clientAddress ?? '',
+      clientName: sanitize(data.clientName),
+      clientAddress: sanitize(data.clientAddress),
       taxApplied: data.taxApplied ?? false,
       taxRate: Number(data.taxRate) || 0.11,
       discountAmount: discountAmount,
       downPayment: downPayment,
-      notes: data.notes ?? null,
+      notes: sanitize(data.notes),
       subtotal,
       taxAmount,
       total,
