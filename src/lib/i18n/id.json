@@ -1,0 +1,7 @@
+// src/lib/i18n/id.json
+{
+  "downloadCombinedPdf": "Unduh PDF Gabungan",
+  "downloadSuccess": "PDF gabungan berhasil diunduh",
+  "downloadError": "Gagal mengunduh PDF gabungan",
+  "loading": "Mengunduh…"
+}

@@ -1,0 +1,34 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            # Masuk ke folder proyek (Anda harus membuat folder ini dulu di VPS)
+            # Contoh: cd /var/www/akl-app
+            cd /var/www/akl-app
+            
+            # Ambil kode terbaru
+            git pull origin main
+            
+            # Bangun ulang container (database tetap aman karena pakai volumes)
+            docker-compose up -d --build
+            
+            echo "Deployment Berhasil ke VPS!"

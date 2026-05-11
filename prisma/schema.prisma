@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+  name     String?
+}
+
+model Quotation {
+  id                    String   @id @default(uuid())
+  nomorSurat            String
+  nomorUrut             Int
+  tanggal               String
+  namaKlien             String
+  up                    String?
+  lokasi                String?
+  
+  // Penandatangan
+  namaPenandatangan     String
+  jabatanPenandatangan  String
+  phonePenandatangan    String?
+  ttdStempelUrl         String? // Base64 atau URL
+  logoUrl               String? // Base64 atau URL
+
+  // Pengaturan Tampilan & Harga
+  showLingkupKerja      Boolean  @default(true)
+  showSyaratGaransi     Boolean  @default(true)
+  isHargaSatuanMode     Boolean  @default(false)
+  isJasaBahanMode       Boolean  @default(false)
+  isMaterialOnlyMode    Boolean  @default(false)
+  kenakanPPN            Boolean  @default(false)
+  diskon                Float    @default(0)
+  totalHarga            Float    @default(0)
+
+  // Disimpan sebagai String JSON (karena SQLite tidak natively support String[])
+  termin                String   
+  lingkupKerja          String   
+  syaratGaransi         String   
+
+  // Relasi ke Item
+  items                 QuotationItem[]
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model QuotationItem {
+  id          String    @id @default(uuid())
+  quotationId String
+  quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  
+  deskripsi   String
+  bahan       String?
+  volume      Float     @default(0)
+  satuan      String    @default("m²")
+  harga       Float     @default(0)
+  hargaBahan  Float     @default(0)
+  hargaJasa   Float     @default(0)
+  
+  orderIndex  Int       @default(0) // Untuk mengurutkan item
+}
+
+model MasterItem {
+  id          String   @id @default(uuid())
+  deskripsi   String   @unique
+  bahan       String?
+  satuan      String   @default("m²")
+  harga       Float    @default(0)
+  hargaBahan  Float    @default(0)
+  hargaJasa   Float    @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GlobalSetting {
+  id          String   @id // Contoh: "LOGO", "CONTACTS"
+  value       String   // Isi data string/base64
+  updatedAt   DateTime @updatedAt
+}
+
+model Signatory {
+  id          String   @id @default(uuid())
+  nama        String   @unique
+  jabatan     String
+  phone       String?
+  ttdUrl      String?  // Base64
+  updatedAt   DateTime @updatedAt
+}
+
+model Invoice {
+  id                String        @id @default(uuid())
+  invoiceNumber     String        @unique
+  date              DateTime      @default(now())
+  dueDate           DateTime?
+  clientName        String
+  clientAddress     String
+  items             InvoiceItem[]
+  subtotal          Decimal       @default(0)
+  taxRate           Decimal       @default(0.11) // 11% PPN
+  taxApplied        Boolean       @default(false)
+  taxAmount         Decimal       @default(0)
+  discountAmount    Decimal       @default(0)   // total discount amount
+  downPayment       Decimal       @default(0)   // uang muka yang sudah dibayar
+  notes             String?       // catatan tambahan
+  paymentMethod     String        @default("CASH")
+  total             Decimal       @default(0)
+  invoiceType       String        @default("PELUNASAN") // "DP" or "PELUNASAN"
+  status            InvoiceStatus @default(PENDING)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+model InvoiceItem {
+  id           String   @id @default(uuid())
+  description  String
+  quantity     Int
+  unitPrice    Decimal
+  lineTotal    Decimal   @default(0)
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id])
+  invoiceId    String
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELLED
+}

@@ -1,26 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@400;700;900&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* SCSA Styling - Scrollbar Modern */
+::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+    border: 3px solid #f8fafc;
+}
+
+::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* SCSA FIX: Arsitektur A4 Presisi Mutlak B2B (794px x 1123px) */
+.a4-page {
+    width: 794px !important;
+    height: 1123px !important;
+    background: white;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    font-family: 'Arial', 'Helvetica', sans-serif !important;
+}
+
+/* Hilangkan margin/padding dari typography dasar agar terkontrol ketat */
+.a4-page p,
+.a4-page h1,
+.a4-page h2,
+.a4-page h3,
+.a4-page td,
+.a4-page th,
+.a4-page ul,
+.a4-page li {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+}
+
+/* Memastikan tabel proporsional mutlak dan tidak bisa tergencet */
+.fixed-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+
+.fixed-table td,
+.fixed-table th {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}
+
+.pdf-page-break {
+    page-break-before: always !important;
+    break-before: page !important;
+}
+
+.break-inside-avoid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+
+    body,
+    html {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    #print-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #print-area {
+        width: 794px !important;
+        transform: scale(1) !important;
+        height: auto !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .a4-page {
+        margin-bottom: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
 }
