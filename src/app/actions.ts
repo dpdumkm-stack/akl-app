@@ -102,8 +102,9 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     return { success: true, id: quotation.id };
   } catch (error: any) {
     console.error("Database Error [saveQuotation]:", error);
-    // Jika error.message undefined atau bukan string, berikan fallback
-    const msg = error?.message || "Unknown Database Error";
+    // Sanitasi error untuk pengguna (Production Friendly)
+    const isProd = process.env.NODE_ENV === 'production';
+    const msg = isProd ? "Terjadi kesalahan saat menyimpan data. Silakan cek koneksi atau hubungi admin." : (error?.message || "Unknown Database Error");
     return { success: false, message: msg };
   }
 }
@@ -116,7 +117,7 @@ export async function getQuotations() {
     });
     return { success: true, data: qs };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: "Terjadi kesalahan sistem saat mengambil data." };
   }
 }
 
@@ -125,7 +126,7 @@ export async function deleteQuotation(id: string) {
     await prisma.quotation.delete({ where: { id } });
     return { success: true };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: "Gagal menghapus data." };
   }
 }
 
@@ -136,7 +137,7 @@ export async function getMasterItems() {
     });
     return { success: true, data: items };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: "Gagal mengambil database master." };
   }
 }
 
@@ -156,24 +157,20 @@ export async function saveMasterItem(data: any) {
 
     let item;
     if (data.id) {
-        // Jika ada ID, kita update berdasarkan ID (memungkinkan rename deskripsi)
         item = await prisma.masterItem.update({
             where: { id: data.id },
             data: payload
         });
     } else {
-        // Jika tidak ada ID, gunakan upsert berdasarkan deskripsi (pola lama)
         item = await prisma.masterItem.upsert({
             where: { deskripsi: payload.deskripsi },
             update: payload,
             create: payload
         });
     }
-    console.log('[saveMasterItem] OK:', item.id, item.deskripsi);
     return { success: true, data: item };
   } catch (error: any) {
-    console.error('[saveMasterItem] ERROR:', error.message, '| data:', JSON.stringify(data));
-    return { success: false, message: error.message };
+    return { success: false, message: "Gagal menyimpan item master." };
   }
 }
 
@@ -182,7 +179,7 @@ export async function deleteMasterItem(id: string) {
     await prisma.masterItem.delete({ where: { id } });
     return { success: true };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: "Gagal menghapus item master." };
   }
 }
 
@@ -195,7 +192,7 @@ export async function saveGlobalSetting(id: string, value: string) {
         });
         return { success: true };
     } catch (error: any) {
-        return { success: false, message: error.message };
+        return { success: false, message: "Gagal menyimpan pengaturan." };
     }
 }
 
@@ -204,7 +201,7 @@ export async function getGlobalSettings() {
         const settings = await prisma.globalSetting.findMany();
         return { success: true, data: settings };
     } catch (error: any) {
-        return { success: false, message: error.message };
+        return { success: false, message: "Gagal memuat pengaturan." };
     }
 }
 
@@ -213,7 +210,7 @@ export async function getSignatories() {
         const data = await prisma.signatory.findMany({ orderBy: { nama: 'asc' } });
         return { success: true, data };
     } catch (error: any) {
-        return { success: false, message: error.message };
+        return { success: false, message: "Gagal mengambil daftar penandatangan." };
     }
 }
 
@@ -232,7 +229,7 @@ export async function saveSignatory(data: any) {
         });
         return { success: true, data: res };
     } catch (error: any) {
-        return { success: false, message: error.message };
+        return { success: false, message: "Gagal menyimpan data penandatangan." };
     }
 }
 
@@ -241,7 +238,7 @@ export async function deleteSignatory(id: string) {
         await prisma.signatory.delete({ where: { id } });
         return { success: true };
     } catch (error: any) {
-        return { success: false, message: error.message };
+        return { success: false, message: "Gagal menghapus penandatangan." };
     }
 }
 
@@ -261,14 +258,12 @@ export async function getNextQuotationNumber() {
         const nextUrut = (latest?.nomorUrut || 0) + 1;
         return { success: true, nextUrut };
     } catch (error: any) {
-        return { success: false, message: error.message };
+        return { success: false, message: "Gagal membuat nomor surat otomatis." };
     }
 }
 
 export async function saveInvoice(data: any) {
   try {
-    console.log('[saveInvoice] START', { id: data.id, invoiceNumber: data.invoiceNumber });
-    // Server‑side recalculation for safety
     const subtotal = (data.items || []).reduce((acc: number, i: any) => {
       const qty = Number(i.quantity) || 0;
       const price = Number(i.unitPrice) || 0;
@@ -322,7 +317,6 @@ export async function saveInvoice(data: any) {
     }
     return { success: true, id: invoice.id };
   } catch (error: any) {
-    console.error('[saveInvoice] ERROR', error);
-    return { success: false, message: error?.message || 'Unknown error' };
+    return { success: false, message: "Terjadi kesalahan saat menyimpan Invoice." };
   }
 }
