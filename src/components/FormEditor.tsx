@@ -158,49 +158,44 @@ export default function FormEditor({
     }, 0);
     const total = subTotal - Number(data.diskon || 0) + (data.kenakanPPN ? (subTotal - Number(data.diskon || 0)) * 0.11 : 0);
 
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, field: 'logoUrl' | 'ttdStempelUrl') => {
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logoUrl' | 'ttdStempelUrl') => {
         const file = e.target.files?.[0]; if (!file) return;
         showToast("Memproses gambar...");
-        const reader = new FileReader();
-        reader.onload = (event) => { 
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = field === 'logoUrl' ? 300 : 250; 
-                let width = img.width; let height = img.height;
-                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                canvas.width = width; canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                if (ctx) {
-                    ctx.drawImage(img, 0, 0, width, height);
-                    const compressedBase64 = canvas.toDataURL('image/png', 0.8);
-                    setData(prev => ({ ...prev, [field]: compressedBase64 })); 
-                    
-                    if (field === 'logoUrl') {
-                        // OTOMATIS: Hanya Logo yang permanen (Corporate Identity)
-                        saveGlobalSetting('LOGO', compressedBase64).then(res => {
-                            if (res.success) showToast("Logo diperbarui sebagai Identitas Korporat permanen!");
-                        });
-                    } else {
-                        // DINAMIS: Tanda Tangan tetap ditanya apakah ingin jadi default (opsional)
-                        setConfirmModal({
-                            title: "Simpan sebagai TTD Default?",
-                            message: "Apakah Anda ingin menyimpan tanda tangan ini sebagai default untuk penawaran baru berikutnya?",
-                            onConfirm: async () => {
-                                const res = await saveGlobalSetting('TTD', compressedBase64);
-                                if (res.success) showToast("TTD disimpan sebagai default baru!");
-                            },
-                            confirmText: "Simpan Default",
-                            type: 'primary'
-                        });
-                    }
+        
+        try {
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const base64 = event.target?.result as string;
+                const maxWidth = field === 'logoUrl' ? 400 : 300;
+                
+                // Gunakan utilitas kompresi baru (JPEG lebih ringan dari PNG)
+                const { compressImage } = await import("@/lib/image-utils");
+                const compressedBase64 = await compressImage(base64, maxWidth, 0.8);
+                
+                setData(prev => ({ ...prev, [field]: compressedBase64 }));
+
+                if (field === 'logoUrl') {
+                    saveGlobalSetting('LOGO', compressedBase64).then(res => {
+                        if (res.success) showToast("Logo diperbarui sebagai Identitas Korporat!");
+                    });
+                } else {
+                    setConfirmModal({
+                        title: "Simpan sebagai TTD Default?",
+                        message: "Gunakan tanda tangan ini sebagai default untuk penawaran baru?",
+                        onConfirm: async () => {
+                            const res = await saveGlobalSetting('TTD', compressedBase64);
+                            if (res.success) showToast("TTD disimpan sebagai default!");
+                        },
+                        confirmText: "Simpan Default",
+                        type: 'primary'
+                    });
                 }
-
-
             };
-            img.src = event.target?.result as string;
-        };
-        reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
+        } catch (error) {
+            console.error("Gagal memproses gambar:", error);
+            showToast("Gagal memproses gambar.", "error");
+        }
     };
 
     return (
