@@ -38,12 +38,12 @@ export async function renderPdfFromUrl(id: string): Promise<Buffer> {
       preferCSSPageSize: true,
     });
     
-    await page.close();
     return Buffer.from(pdfBuffer);
   } catch (err: any) {
     console.error(`[PDF-RENDERER] Fatal Error saat render PDF untuk ID ${id}:`, err.message);
     console.error(`[PDF-RENDERER] URL terakhir: ${page.url()}`);
-    await page.close();
     throw err;
+  } finally {
+    await page.close();
   }
 }

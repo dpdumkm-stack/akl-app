@@ -72,7 +72,7 @@ export default function InvoicePage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"list" | "form">("list");
-  const [form, setForm] = useState(emptyForm());
+  const [form, setForm] = useState<any>(emptyForm());
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -148,7 +148,7 @@ export default function InvoicePage() {
   const tax = form.taxApplied ? dpp * 0.11 : 0;
   const grandTotal = dpp + tax;
   const dp = Number(form.downPayment) || 0;
-  const total = form.invoiceType === "DP" ? dp : (grandTotal - dp);
+  const total = (form.invoiceType as string) === "DP" ? dp : (grandTotal - dp);
   const handleSave = async () => {
     if (!form.clientName.trim()) return showToast("Nama klien wajib diisi", "error");
     if (!form.invoiceNumber.trim()) return showToast("Nomor invoice wajib diisi", "error");

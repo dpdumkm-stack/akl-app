@@ -5,7 +5,7 @@ import { getNextInvoiceNumber } from '@/lib/invoice-number-service';
 
 export async function POST(request: Request) {
   const session = await getSession({ req: { headers: request.headers } as any });
-  if (!session?.user?.role?.includes('admin')) {
+  if (!(session?.user as any)?.role?.includes('admin')) {
     return new NextResponse('Forbidden', { status: 403 });
   }
   const data = await request.json();
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   // Calculate totals
   const subtotal = invoice.items.reduce((sum, i) => sum + i.quantity * Number(i.unitPrice), 0);
   const taxAmount = invoice.taxApplied ? subtotal * Number(invoice.taxRate) : 0;
-  const total = subtotal + taxAmount - invoice.discountAmount - invoice.downPayment;
+  const total = subtotal + taxAmount - Number(invoice.discountAmount) - Number(invoice.downPayment);
   await prisma.invoice.update({
     where: { id: invoice.id },
     data: { subtotal, taxAmount, total },

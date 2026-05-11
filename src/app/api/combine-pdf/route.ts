@@ -12,7 +12,7 @@ import { renderPdfFromUrl } from '@/lib/pdf-renderer';
  */
 export async function GET(req: NextRequest) {
   const session = await getSession({ req: { headers: req.headers } as any });
-  if (!session?.user?.role?.includes('admin')) {
+  if (!(session?.user as any)?.role?.includes('admin')) {
     return new NextResponse('Forbidden', { status: 403 });
   }
 
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     const inv = await prisma.invoice.findUnique({ where: { id: invoiceId } });
     const fileName = inv?.invoiceNumber ? `${inv.invoiceNumber}_full.pdf` : 'combined.pdf';
 
-    return new NextResponse(mergedPdf, {
+    return new NextResponse(mergedPdf as any, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${fileName}"`,

@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
     await page.close();
     console.timeEnd(`[PDF] Total Generation Time for ${id}`);
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBuffer as any, {
 
       headers: {
         'Content-Type': 'application/pdf',

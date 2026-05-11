@@ -2,12 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { InvoiceData, InvoiceItemData } from '@/lib/types';
 import { getNextInvoiceNumber } from '@/lib/invoice-number-service';
-import ItemRow from '@/components/editor/ItemRow';
+import InvoiceItemRow from '@/components/editor/InvoiceItemRow';
 import { saveInvoice } from '@/app/actions'; // assume action exists similar to saveQuotation
 
 export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
   const { data: session } = useSession();
-  const isAdmin = !!session?.user?.role?.includes('admin');
+  const isAdmin = !!(session?.user as any)?.role?.includes('admin');
 
   const [invoiceNumber, setInvoiceNumber] = useState<string>('');
   const [date, setDate] = useState<string>('');
@@ -110,7 +110,7 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
       <section className="mt-6">
         <h3 className="text-lg font-semibold mb-2 text-slate-800">Item</h3>
         {items.map((it, idx) => (
-          <ItemRow
+          <InvoiceItemRow
             key={it.id}
             index={idx}
             item={it}

@@ -2,27 +2,29 @@ import { NextResponse } from 'next/server';
 import { getSession } from 'next-auth/react';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getSession({ req: { headers: request.headers } as any });
-  if (!session?.user?.role?.includes('admin')) {
+  if (!(session?.user as any)?.role?.includes('admin')) {
     return new NextResponse('Forbidden', { status: 403 });
   }
   const invoice = await prisma.invoice.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { items: true },
   });
   if (!invoice) return new NextResponse('Not Found', { status: 404 });
   return NextResponse.json({ success: true, invoice });
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getSession({ req: { headers: request.headers } as any });
-  if (!session?.user?.role?.includes('admin')) {
+  if (!(session?.user as any)?.role?.includes('admin')) {
     return new NextResponse('Forbidden', { status: 403 });
   }
   const data = await request.json();
   const updated = await prisma.invoice.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       clientName: data.clientName,
       clientAddress: data.clientAddress,
@@ -32,7 +34,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       discountAmount: data.discountAmount ?? 0,
       downPayment: data.downPayment ?? 0,
       notes: data.notes ?? null,
-      // For simplicity we replace items fully
       items: {
         deleteMany: {},
         create: data.items?.map((item: any) => ({
@@ -44,10 +45,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     },
     include: { items: true },
   });
-  // Recalculate totals
   const subtotal = updated.items.reduce((sum, i) => sum + i.quantity * Number(i.unitPrice), 0);
   const taxAmount = updated.taxApplied ? subtotal * Number(updated.taxRate) : 0;
-  const total = subtotal + taxAmount - updated.discountAmount - updated.downPayment;
+  const total = subtotal + taxAmount - Number(updated.discountAmount) - Number(updated.downPayment);
   await prisma.invoice.update({
     where: { id: updated.id },
     data: { subtotal, taxAmount, total },
@@ -55,11 +55,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   return NextResponse.json({ success: true, invoice: { ...updated, subtotal, taxAmount, total } });
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getSession({ req: { headers: request.headers } as any });
-  if (!session?.user?.role?.includes('admin')) {
+  if (!(session?.user as any)?.role?.includes('admin')) {
     return new NextResponse('Forbidden', { status: 403 });
   }
-  await prisma.invoice.delete({ where: { id: params.id } });
+  await prisma.invoice.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }
