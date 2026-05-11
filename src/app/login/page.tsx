@@ -39,59 +39,59 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 blur-[120px] rounded-full"></div>
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-red-600/10 blur-[120px] rounded-full"></div>
             </div>
 
             <div className="w-full max-w-md relative z-10">
-                <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[40px] p-8 lg:p-12 shadow-2xl">
+                <div className="bg-white border border-slate-200 rounded-[40px] p-8 lg:p-12 shadow-2xl shadow-slate-200/50">
                     <div className="flex flex-col items-center mb-10">
-                        <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/20 mb-6 rotate-3 hover:rotate-0 transition-transform duration-500">
+                        <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/30 mb-6 rotate-3 hover:rotate-0 transition-transform duration-500">
                             <ShieldCheck className="w-10 h-10 text-white" />
                         </div>
-                        <h1 className="text-3xl font-black text-white tracking-tighter mb-2">STUDIO AKL</h1>
-                        <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Quotation Management System</p>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tighter mb-2">AKL STUDIO</h1>
+                        <p className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em]">PT. Apindo Karya Lestari</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Username</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Username</label>
                             <div className="relative group">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
                                     <User className="w-4 h-4" />
                                 </div>
                                 <input 
                                     type="text" 
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white font-bold outline-none focus:bg-white/10 focus:border-blue-500/50 transition-all"
-                                    placeholder="admin..."
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-slate-900 font-bold outline-none focus:bg-white focus:border-blue-600 transition-all placeholder:text-slate-300"
+                                    placeholder="Username admin"
                                     required
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Password</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
                             <div className="relative group">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
                                     <Lock className="w-4 h-4" />
                                 </div>
                                 <input 
                                     type={showPassword ? "text" : "password"} 
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white font-bold outline-none focus:bg-white/10 focus:border-blue-500/50 transition-all"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-12 text-slate-900 font-bold outline-none focus:bg-white focus:border-blue-600 transition-all placeholder:text-slate-300"
                                     placeholder="••••••••"
                                     required
                                 />
                                 <button 
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                 </button>
@@ -99,7 +99,7 @@ export default function LoginPage() {
                         </div>
 
                         {error && (
-                            <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold py-3 px-4 rounded-xl text-center">
+                            <div className="bg-red-50 text-red-600 text-xs font-bold py-3 px-4 rounded-xl text-center border border-red-100">
                                 {error}
                             </div>
                         )}
@@ -107,11 +107,11 @@ export default function LoginPage() {
                         <button 
                             type="submit" 
                             disabled={isLoading}
-                            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-500/20 flex items-center justify-center gap-2 group transition-all disabled:opacity-50"
+                            className="w-full bg-[#EE1D23] hover:bg-[#D11A1F] text-white font-black py-4 rounded-2xl shadow-xl shadow-red-500/30 flex items-center justify-center gap-2 group transition-all disabled:opacity-50"
                         >
                             {isLoading ? "Masuk..." : (
                                 <>
-                                    LOGIN KE STUDIO
+                                    LOGIN KE SISTEM
                                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </>
                             )}
@@ -119,12 +119,15 @@ export default function LoginPage() {
                     </form>
 
                     <div className="mt-12 text-center">
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
                             &copy; 2026 PT. APINDO KARYA LESTARI
                         </p>
                     </div>
                 </div>
             </div>
         </div>
+    );
+}
+</div>
     );
 }
