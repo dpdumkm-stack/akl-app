@@ -37,9 +37,17 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     const payloadSize = JSON.stringify(data).length;
     console.log(`[saveQuotation] START - ID: ${data.id}, Nomor: ${data.nomorSurat}, Payload Size: ${(payloadSize / 1024).toFixed(2)} KB`);
 
-    if (!data.namaKlien || data.namaKlien.trim() === "") {
-        return { success: false, message: "Nama Klien wajib diisi untuk menyimpan draf." };
+    // SCSA VALIDATION LOGIC: Minimal salah satu harus diisi
+    const company = data.companyName?.trim() || "";
+    const client = data.clientName?.trim() || "";
+
+    if (!company && !client) {
+        logActivity(`GAGAL simpan: Nama PT & Pribadi kosong`, 'ERROR');
+        return { success: false, message: "Mohon isi nama perusahaan atau nama pribadi" };
     }
+
+    // Gabungkan untuk namaKlien (sebagai fallback tampilan lama)
+    const displayClientName = company || client;
 
     const finalNomorSurat = (data.nomorSurat && data.nomorSurat.trim() !== "") 
         ? sanitize(data.nomorSurat) 
@@ -62,7 +70,9 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
       nomorSurat:           finalNomorSurat,
       nomorUrut:            Number(data.nomorUrut)      || 1,
       tanggal:              sanitize(data.tanggal),
-      namaKlien:            sanitize(data.namaKlien),
+      namaKlien:            sanitize(displayClientName),
+      companyName:          sanitize(company),
+      clientName:           sanitize(client),
       up:                   sanitize(data.up),
       lokasi:               sanitize(data.lokasi),
       namaPenandatangan:    sanitize(data.namaPenandatangan),

@@ -22,7 +22,9 @@ model Quotation {
   nomorSurat            String
   nomorUrut             Int
   tanggal               String
-  namaKlien             String
+  namaKlien             String?  // Gabungan atau Fallback
+  companyName           String?  // Nama PT
+  clientName            String?  // Nama Pribadi
   up                    String?
   lokasi                String?
   
@@ -136,4 +138,15 @@ enum InvoiceStatus {
   PENDING
   PAID
   CANCELLED
+}
+
+model Client {
+  id           String   @id @default(uuid())
+  companyName  String?  // Nama PT (Optional)
+  clientName   String?  // Nama Pribadi (Optional)
+  address      String?
+  phone        String?
+  email        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

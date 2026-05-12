@@ -16,6 +16,8 @@ export interface QuotationData {
   nomorSurat: string;
   tanggal: string;
   namaKlien: string;
+  companyName?: string;
+  clientName?: string;
   up: string;
   lokasi: string;
   logoUrl: string | null;
