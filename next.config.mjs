@@ -5,7 +5,7 @@ const nextConfig = {
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
   experimental: {
     serverActions: {
-      bodySizeLimit: '10mb',
+      bodySizeLimit: '25mb',
       allowedOrigins: ['app.apindoepoxy.co.id', 'apindoepoxy.co.id'],
     },
   },

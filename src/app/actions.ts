@@ -32,7 +32,8 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
   try {
     await checkAuth();
     
-    console.log("[saveQuotation] START", { id: data.id, nomorSurat: data.nomorSurat });
+    const payloadSize = JSON.stringify(data).length;
+    console.log(`[saveQuotation] START - ID: ${data.id}, Nomor: ${data.nomorSurat}, Payload Size: ${(payloadSize / 1024).toFixed(2)} KB`);
 
     if (!data.namaKlien || data.namaKlien.trim() === "") {
         return { success: false, message: "Nama Klien wajib diisi untuk menyimpan draf." };
