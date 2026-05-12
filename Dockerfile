@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y openssl python3 make g++ sqlite3 && rm 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
