@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import puppeteer, { Browser } from 'puppeteer';
+import { logActivity } from "@/lib/logger";
 
 let cachedBrowser: Browser | null = null;
 
@@ -40,6 +41,8 @@ export async function GET(req: NextRequest) {
   const id = searchParams.get('id');
 
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  
+  logActivity(`Memulai pembuatan PDF untuk ID: ${id}`, 'INFO');
 
   console.time(`[PDF] Total Generation Time for ${id}`);
   
@@ -109,6 +112,7 @@ export async function GET(req: NextRequest) {
 
 
     await page.close();
+    logActivity(`Berhasil membuat PDF untuk ID: ${id}`, 'SUCCESS');
     console.timeEnd(`[PDF] Total Generation Time for ${id}`);
 
     return new NextResponse(pdfBuffer as any, {
@@ -119,6 +123,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error: any) {
+    logActivity(`GAGAL membuat PDF untuk ID: ${id}. Error: ${error.message}`, 'ERROR');
     console.error("[PDF] Fatal Error:", error.message);
     // Jika browser crash, reset cache agar next request meluncurkan baru
     if (error.message.includes('browser') || error.message.includes('Target closed')) {

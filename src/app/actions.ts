@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { QuotationData } from "@/lib/types";
 import { getServerSession } from "next-auth/next";
+import { logActivity } from "@/lib/logger";
 
 /**
  * Memastikan objek murni (Plain Object) yang bisa diserialisasi oleh Next.js.
@@ -31,6 +32,7 @@ async function checkAuth() {
 export async function saveQuotation(data: QuotationData, totalHarga: number) {
   try {
     await checkAuth();
+    logActivity(`Memulai simpan Penawaran: ${data.nomorSurat || 'DRAFT'}`, 'INFO');
     
     const payloadSize = JSON.stringify(data).length;
     console.log(`[saveQuotation] START - ID: ${data.id}, Nomor: ${data.nomorSurat}, Payload Size: ${(payloadSize / 1024).toFixed(2)} KB`);
@@ -123,8 +125,10 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
       });
     }
 
+    logActivity(`Berhasil simpan Penawaran: ${quotation.nomorSurat} (ID: ${quotation.id})`, 'SUCCESS');
     return { success: true, id: quotation.id };
   } catch (error: any) {
+    logActivity(`GAGAL simpan Penawaran: ${error.message}`, 'ERROR');
     console.error("[saveQuotation] FATAL ERROR:", error);
     const isProd = process.env.NODE_ENV === 'production';
     const msg = isProd ? "Gagal menyimpan data ke server. Silakan coba lagi." : (error?.message || "Unknown Database Error");
@@ -305,6 +309,7 @@ export async function getNextQuotationNumber() {
 export async function saveInvoice(data: any) {
   try {
     await checkAuth();
+    logActivity(`Memulai simpan Invoice: ${data.invoiceNumber || 'DRAFT'}`, 'INFO');
     
     if (!data.invoiceNumber || !data.clientName) {
       return { success: false, message: "Nomor Invoice dan Nama Klien wajib diisi." };
@@ -370,8 +375,10 @@ export async function saveInvoice(data: any) {
         },
       });
     }
+    logActivity(`Berhasil simpan Invoice: ${invoice.invoiceNumber} (ID: ${invoice.id})`, 'SUCCESS');
     return { success: true, id: invoice.id };
   } catch (error: any) {
+    logActivity(`GAGAL simpan Invoice: ${error.message}`, 'ERROR');
     console.error("[saveInvoice] Error:", error);
     return { success: false, message: "Terjadi kesalahan saat menyimpan Invoice." };
   }
