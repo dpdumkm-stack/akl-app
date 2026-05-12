@@ -144,6 +144,10 @@ export default function ItemRow({
                                         <option value="Titik">Titik</option>
                                         <option value="Set">Set</option>
                                     </optgroup>
+                                    <optgroup label="Waktu">
+                                        <option value="Days">Days</option>
+                                        <option value="Hari">Hari</option>
+                                    </optgroup>
                                     <optgroup label="Satuan Barang">
                                         <option value="Pcs">Pcs</option>
                                         <option value="Ltr">Liter</option>
