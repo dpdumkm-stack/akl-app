@@ -34,7 +34,7 @@ export default async function PrintPage({ params }: { params: Promise<{ id: stri
   const settings = await getGlobalSettings();
   let globalLogo = null;
   let globalTTD = null;
-  if (settings.success && settings.data) {
+  if (settings.success && 'data' in settings) {
     globalLogo = settings.data.find((s: any) => s.id === 'LOGO')?.value || null;
     globalTTD = settings.data.find((s: any) => s.id === 'TTD')?.value || null;
   }

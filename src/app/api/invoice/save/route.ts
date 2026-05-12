@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const total = typeVal === "DP" ? dpVal : (grandTotal - dpVal);
 
     const itemsPayload = items.map((item: any) => ({
-      description: item.description,
+      description: item.description?.trim() || "",
       quantity: Number(item.quantity) || 1,
       unitPrice: Number(item.unitPrice) || 0,
       lineTotal: (Number(item.quantity) || 1) * (Number(item.unitPrice) || 0),
@@ -59,17 +59,17 @@ export async function POST(req: NextRequest) {
       invoice = await prisma.invoice.update({
         where: { id },
         data: {
-          invoiceNumber,
-          date: new Date(date),
+          invoiceNumber: invoiceNumber?.trim(),
+          date: date ? new Date(date) : new Date(),
           dueDate: dueDate ? new Date(dueDate) : null,
-          clientName,
-          clientAddress,
+          clientName: clientName?.trim(),
+          clientAddress: clientAddress?.trim(),
           subtotal,
           taxApplied: !!taxApplied,
           taxAmount,
           discountAmount: Number(discountAmount) || 0,
           downPayment: dpVal,
-          notes: notes || null,
+          notes: notes?.trim() || null,
           paymentMethod: paymentMethod || "CASH",
           invoiceType: typeVal,
           total,
@@ -80,17 +80,17 @@ export async function POST(req: NextRequest) {
     } else {
       invoice = await prisma.invoice.create({
         data: {
-          invoiceNumber,
-          date: new Date(date),
+          invoiceNumber: invoiceNumber?.trim(),
+          date: date ? new Date(date) : new Date(),
           dueDate: dueDate ? new Date(dueDate) : null,
-          clientName,
-          clientAddress,
+          clientName: clientName?.trim(),
+          clientAddress: clientAddress?.trim(),
           subtotal,
           taxApplied: !!taxApplied,
           taxAmount,
           discountAmount: Number(discountAmount) || 0,
           downPayment: dpVal,
-          notes: notes || null,
+          notes: notes?.trim() || null,
           paymentMethod: paymentMethod || "CASH",
           invoiceType: typeVal,
           total,
@@ -102,7 +102,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, id: invoice.id, invoiceNumber: invoice.invoiceNumber });
   } catch (err: any) {
-    console.error('[invoice/save]', err);
-    return NextResponse.json({ error: err.message || 'Gagal menyimpan invoice' }, { status: 500 });
+    console.error('[API ERROR][invoice/save]:', err);
+    const isProd = process.env.NODE_ENV === 'production';
+    const msg = isProd ? "Terjadi kesalahan sistem saat menyimpan invoice." : (err?.message || "Unknown error");
+    return NextResponse.json({ success: false, error: msg }, { status: 500 });
   }
 }

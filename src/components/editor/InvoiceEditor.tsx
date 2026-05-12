@@ -90,19 +90,10 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
       onClose?.();
     } else {
       if (typeof window !== 'undefined' && (window as any).showToast) {
-        (window as any).showToast('Gagal menyimpan: ' + res.message, 'error');
+        (window as any).showToast('Gagal menyimpan: ' + (res as any).message, 'error');
       } else {
-        alert('Gagal menyimpan: ' + res.message);
+        alert('Gagal menyimpan: ' + (res as any).message);
       }
-    }
-  };
-// Old handleSave implementation removed
-    const res = await saveInvoice(payload);
-    if (res.success) {
-      alert('Invoice berhasil disimpan');
-      onClose?.();
-    } else {
-      alert('Gagal menyimpan: ' + res.message);
     }
   };
 

@@ -50,7 +50,7 @@ export default function FormEditor({
     ];
 
     React.useEffect(() => {
-        getMasterItems().then(res => { if (res.success && res.data) setMasterItems(res.data) });
+        getMasterItems().then(res => { if (res.success && 'data' in res) setMasterItems(res.data) });
     }, []);
 
     const handleSaveToMaster = async (item: any, asNew: boolean = false) => {
@@ -77,9 +77,9 @@ export default function FormEditor({
         if (res.success) {
             showToast(`"${item.deskripsi}" disimpan ke Master!`);
             const updated = await getMasterItems();
-            if (updated.success && updated.data) setMasterItems(updated.data);
+            if (updated.success && 'data' in updated) setMasterItems(updated.data);
         } else {
-            showToast(`Gagal: ${res.message || 'Error'}`, 'error');
+            showToast(`Gagal: ${(res as any).message || 'Error'}`, 'error');
         }
     };
 
@@ -113,7 +113,7 @@ export default function FormEditor({
                 if (res.success) {
                     showToast("Item master berhasil dihapus.");
                     const updated = await getMasterItems();
-                    if (updated.success && updated.data) setMasterItems(updated.data);
+                    if (updated.success && 'data' in updated) setMasterItems(updated.data);
                 } else {
                     showToast("Gagal menghapus item master.", "error");
                 }

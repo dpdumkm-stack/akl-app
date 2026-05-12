@@ -23,7 +23,7 @@ export default function HistoryDrawer({ isOpen, onClose, onLoad, showToast, setC
     setIsLoading(true);
     try {
       const res = await getQuotations();
-      if (res.success && res.data) {
+      if (res.success && 'data' in res) {
         setQuotations(res.data);
       }
     } catch (error) {

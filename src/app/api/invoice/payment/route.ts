@@ -59,7 +59,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, invoice: updated });
   } catch (err: any) {
-    console.error('[invoice/payment]', err);
-    return NextResponse.json({ error: err.message || 'Gagal update pembayaran' }, { status: 500 });
+    console.error('[API ERROR][invoice/payment]:', err);
+    const isProd = process.env.NODE_ENV === 'production';
+    const msg = isProd ? "Gagal memperbarui status pembayaran." : (err?.message || "Unknown error");
+    return NextResponse.json({ success: false, error: msg }, { status: 500 });
   }
 }

@@ -117,7 +117,7 @@ export default function InvoicePage() {
       
       // Load Global Settings
       getGlobalSettings().then(res => {
-        if (res.success && res.data) {
+        if (res.success && 'data' in res) {
           const logo = res.data.find((s: any) => s.id === 'LOGO')?.value || null;
           const ttd = res.data.find((s: any) => s.id === 'TTD')?.value || null;
           setGlobalLogo(logo);

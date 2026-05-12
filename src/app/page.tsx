@@ -128,7 +128,7 @@ export default function QuotationApp() {
           showToast("Berhasil disimpan ke Database!");
           return res;
         } else {
-          showToast("Gagal menyimpan: " + res.message, "error");
+          showToast("Gagal menyimpan: " + (res as any).message, "error");
           return res;
         }
       } catch(err: any) {
@@ -154,7 +154,7 @@ export default function QuotationApp() {
       const settings = await getGlobalSettings();
       let logo = null;
       let ttd = null;
-      if (settings.success && settings.data) {
+      if (settings.success && 'data' in settings) {
         logo = settings.data.find((s: any) => s.id === 'LOGO')?.value || null;
         ttd = settings.data.find((s: any) => s.id === 'TTD')?.value || null;
       }
@@ -167,7 +167,7 @@ export default function QuotationApp() {
           phone: '0812-1940-0496',
           ttd: ttd
       };
-      if (sigRes.success && sigRes.data && sigRes.data.length > 0) {
+      if (sigRes.success && 'data' in sigRes && sigRes.data.length > 0) {
           const s = sigRes.data[0];
           defaultSig = {
               nama: s.nama,
@@ -322,7 +322,7 @@ export default function QuotationApp() {
             let logo = null;
             let ttd = null;
             
-            if (settings.success && settings.data) {
+            if (settings.success && 'data' in settings) {
                 logo = settings.data.find((s: any) => s.id === 'LOGO')?.value || null;
                 ttd = settings.data.find((s: any) => s.id === 'TTD')?.value || null;
                 setGlobalLogo(logo);
@@ -339,7 +339,7 @@ export default function QuotationApp() {
             let defaultSig = {
                 nama: 'Apip, S.Kom.', jabatan: 'Marketing Executive', phone: '0812-1940-0496', ttd: ttd
             };
-            if (sigRes.success && sigRes.data && sigRes.data.length > 0) {
+            if (sigRes.success && 'data' in sigRes && sigRes.data.length > 0) {
                 const s = sigRes.data[0];
                 defaultSig = {
                     nama: s.nama, jabatan: s.jabatan, phone: s.phone || '', ttd: s.ttdUrl || ttd

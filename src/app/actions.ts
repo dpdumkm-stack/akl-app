@@ -2,22 +2,37 @@
 
 import { prisma } from "@/lib/prisma";
 import { QuotationData } from "@/lib/types";
+import { getServerSession } from "next-auth/next";
+
+/**
+ * Memastikan objek murni (Plain Object) yang bisa diserialisasi oleh Next.js.
+ * Penting untuk menghindari error "Server Components render" di produksi.
+ */
+function toPlainObject<T>(obj: T): T {
+    if (!obj) return obj;
+    return JSON.parse(JSON.stringify(obj));
+}
 
 // Fungsi Sanitasi Sederhana
 const sanitize = (str: string | null | undefined) => {
     if (!str) return "";
+    if (typeof str !== 'string') return String(str);
     return str.trim().replace(/[\x00-\x1F\x7F]/g, ""); // Hapus karakter kontrol non-printable
 };
 
+async function checkAuth() {
+    const session = await getServerSession();
+    if (!session) {
+        throw new Error("Unauthorized: Anda harus login untuk melakukan tindakan ini.");
+    }
+    return session;
+}
+
 export async function saveQuotation(data: QuotationData, totalHarga: number) {
   try {
-    console.log("[saveQuotation] START - Data:", { 
-        id: data.id, 
-        nomorSurat: data.nomorSurat,
-        itemsCount: data.items?.length,
-        diskon: data.diskon,
-        kenakanPPN: data.kenakanPPN
-    });
+    await checkAuth();
+    
+    console.log("[saveQuotation] START", { id: data.id, nomorSurat: data.nomorSurat });
 
     if (!data.nomorSurat || !data.namaKlien) {
         return { success: false, message: "Nomor Surat dan Nama Klien wajib diisi." };
@@ -36,11 +51,9 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     const calculatedDpp = calculatedSubtotal - (Number(data.diskon) || 0);
     const calculatedTotal = calculatedDpp + (data.kenakanPPN ? calculatedDpp * 0.11 : 0);
 
-    console.log("[saveQuotation] Recalculated Total:", calculatedTotal);
-
     const payload = {
       nomorSurat:           sanitize(data.nomorSurat),
-      nomorUrut:            data.nomorUrut              || 1,
+      nomorUrut:            Number(data.nomorUrut)      || 1,
       tanggal:              sanitize(data.tanggal),
       namaKlien:            sanitize(data.namaKlien),
       up:                   sanitize(data.up),
@@ -50,36 +63,33 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
       phonePenandatangan:   sanitize(data.phonePenandatangan),
       ttdStempelUrl:        data.ttdStempelUrl         ?? null,
       logoUrl:              data.logoUrl               ?? null,
-      showLingkupKerja:     data.showLingkupKerja      ?? true,
-      showSyaratGaransi:    data.showSyaratGaransi     ?? true,
-      isHargaSatuanMode:    data.isHargaSatuanMode     ?? false,
-      isJasaBahanMode:      data.isJasaBahanMode       ?? false,
-      isMaterialOnlyMode:   data.isMaterialOnlyMode    ?? false,
-      kenakanPPN:           data.kenakanPPN            ?? false,
+      showLingkupKerja:     !!data.showLingkupKerja,
+      showSyaratGaransi:    !!data.showSyaratGaransi,
+      isHargaSatuanMode:    !!data.isHargaSatuanMode,
+      isJasaBahanMode:      !!data.isJasaBahanMode,
+      isMaterialOnlyMode:   !!data.isMaterialOnlyMode,
+      kenakanPPN:           !!data.kenakanPPN,
       diskon:               Number(data.diskon)         || 0,
-      totalHarga:           calculatedTotal, // Gunakan hasil hitung ulang server
+      totalHarga:           calculatedTotal,
       termin:               JSON.stringify(data.termin        ?? []),
       lingkupKerja:         JSON.stringify(data.lingkupKerja  ?? []),
       syaratGaransi:        JSON.stringify(data.syaratGaransi ?? []),
     };
 
-    console.log("[saveQuotation] Payload ready, items count:", data.items?.length);
-
     let quotation;
 
     if (data.id) {
-      // Update existing
       quotation = await prisma.quotation.update({
         where: { id: data.id },
         data: {
           ...payload,
           items: {
-            deleteMany: {}, // Clean up old items
-            create: data.items.map((item, index) => ({
-              deskripsi:  item.deskripsi  ?? '',
-              bahan:      item.bahan      ?? null,
+            deleteMany: {},
+            create: (data.items || []).map((item, index) => ({
+              deskripsi:  sanitize(item.deskripsi),
+              bahan:      sanitize(item.bahan),
               volume:     Number(item.volume)     || 0,
-              satuan:     item.satuan     ?? 'm²',
+              satuan:     sanitize(item.satuan)   || 'm²',
               harga:      Number(item.harga)      || 0,
               hargaBahan: Number(item.hargaBahan) || 0,
               hargaJasa:  Number(item.hargaJasa)  || 0,
@@ -89,16 +99,15 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
         }
       });
     } else {
-      // Create new
       quotation = await prisma.quotation.create({
         data: {
           ...payload,
           items: {
-            create: data.items.map((item, index) => ({
-              deskripsi:  item.deskripsi  ?? '',
-              bahan:      item.bahan      ?? null,
+            create: (data.items || []).map((item, index) => ({
+              deskripsi:  sanitize(item.deskripsi),
+              bahan:      sanitize(item.bahan),
               volume:     Number(item.volume)     || 0,
-              satuan:     item.satuan     ?? 'm²',
+              satuan:     sanitize(item.satuan)   || 'm²',
               harga:      Number(item.harga)      || 0,
               hargaBahan: Number(item.hargaBahan) || 0,
               hargaJasa:  Number(item.hargaJasa)  || 0,
@@ -111,10 +120,9 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
 
     return { success: true, id: quotation.id };
   } catch (error: any) {
-    console.error("Database Error [saveQuotation]:", error);
-    // Sanitasi error untuk pengguna (Production Friendly)
+    console.error("[saveQuotation] FATAL ERROR:", error);
     const isProd = process.env.NODE_ENV === 'production';
-    const msg = isProd ? "Terjadi kesalahan saat menyimpan data. Silakan cek koneksi atau hubungi admin." : (error?.message || "Unknown Database Error");
+    const msg = isProd ? "Gagal menyimpan data ke server. Silakan coba lagi." : (error?.message || "Unknown Database Error");
     return { success: false, message: msg };
   }
 }
@@ -125,17 +133,20 @@ export async function getQuotations() {
       orderBy: { updatedAt: 'desc' },
       include: { items: true }
     });
-    return { success: true, data: qs };
+    return toPlainObject({ success: true, data: qs });
   } catch (error: any) {
-    return { success: false, message: "Terjadi kesalahan sistem saat mengambil data." };
+    console.error("[getQuotations] Error:", error);
+    return { success: false, message: "Gagal mengambil data dari database." };
   }
 }
 
 export async function deleteQuotation(id: string) {
   try {
+    await checkAuth();
     await prisma.quotation.delete({ where: { id } });
     return { success: true };
   } catch (error: any) {
+    console.error("[deleteQuotation] Error:", error);
     return { success: false, message: "Gagal menghapus data." };
   }
 }
@@ -145,21 +156,23 @@ export async function getMasterItems() {
     const items = await prisma.masterItem.findMany({
       orderBy: { deskripsi: 'asc' }
     });
-    return { success: true, data: items };
+    return toPlainObject({ success: true, data: items });
   } catch (error: any) {
+    console.error("[getMasterItems] Error:", error);
     return { success: false, message: "Gagal mengambil database master." };
   }
 }
 
 export async function saveMasterItem(data: any) {
   try {
+    await checkAuth();
     if (!data.deskripsi || !data.deskripsi.trim()) {
       return { success: false, message: 'Deskripsi tidak boleh kosong' };
     }
     const payload = {
-        deskripsi:  data.deskripsi.trim(),
-        bahan:      data.bahan      ?? '',
-        satuan:     data.satuan     ?? 'm²',
+        deskripsi:  sanitize(data.deskripsi),
+        bahan:      sanitize(data.bahan),
+        satuan:     sanitize(data.satuan) || 'm²',
         harga:      Number(data.harga)      || 0,
         hargaBahan: Number(data.hargaBahan) || 0,
         hargaJasa:  Number(data.hargaJasa)  || 0,
@@ -178,23 +191,27 @@ export async function saveMasterItem(data: any) {
             create: payload
         });
     }
-    return { success: true, data: item };
+    return toPlainObject({ success: true, data: item });
   } catch (error: any) {
+    console.error("[saveMasterItem] Error:", error);
     return { success: false, message: "Gagal menyimpan item master." };
   }
 }
 
 export async function deleteMasterItem(id: string) {
   try {
+    await checkAuth();
     await prisma.masterItem.delete({ where: { id } });
     return { success: true };
   } catch (error: any) {
+    console.error("[deleteMasterItem] Error:", error);
     return { success: false, message: "Gagal menghapus item master." };
   }
 }
 
 export async function saveGlobalSetting(id: string, value: string) {
     try {
+        await checkAuth();
         await prisma.globalSetting.upsert({
             where: { id },
             update: { value },
@@ -202,6 +219,7 @@ export async function saveGlobalSetting(id: string, value: string) {
         });
         return { success: true };
     } catch (error: any) {
+        console.error("[saveGlobalSetting] Error:", error);
         return { success: false, message: "Gagal menyimpan pengaturan." };
     }
 }
@@ -209,8 +227,9 @@ export async function saveGlobalSetting(id: string, value: string) {
 export async function getGlobalSettings() {
     try {
         const settings = await prisma.globalSetting.findMany();
-        return { success: true, data: settings };
+        return toPlainObject({ success: true, data: settings });
     } catch (error: any) {
+        console.error("[getGlobalSettings] Error:", error);
         return { success: false, message: "Gagal memuat pengaturan." };
     }
 }
@@ -218,18 +237,20 @@ export async function getGlobalSettings() {
 export async function getSignatories() {
     try {
         const data = await prisma.signatory.findMany({ orderBy: { nama: 'asc' } });
-        return { success: true, data };
+        return toPlainObject({ success: true, data });
     } catch (error: any) {
+        console.error("[getSignatories] Error:", error);
         return { success: false, message: "Gagal mengambil daftar penandatangan." };
     }
 }
 
 export async function saveSignatory(data: any) {
     try {
+        await checkAuth();
         const payload = {
-            nama:    data.nama.trim(),
-            jabatan: data.jabatan.trim(),
-            phone:   data.phone   ?? '',
+            nama:    sanitize(data.nama),
+            jabatan: sanitize(data.jabatan),
+            phone:   sanitize(data.phone),
             ttdUrl:  data.ttdUrl  ?? null,
         };
         const res = await prisma.signatory.upsert({
@@ -237,17 +258,20 @@ export async function saveSignatory(data: any) {
             update: payload,
             create: payload
         });
-        return { success: true, data: res };
+        return toPlainObject({ success: true, data: res });
     } catch (error: any) {
+        console.error("[saveSignatory] Error:", error);
         return { success: false, message: "Gagal menyimpan data penandatangan." };
     }
 }
 
 export async function deleteSignatory(id: string) {
     try {
+        await checkAuth();
         await prisma.signatory.delete({ where: { id } });
         return { success: true };
     } catch (error: any) {
+        console.error("[deleteSignatory] Error:", error);
         return { success: false, message: "Gagal menghapus penandatangan." };
     }
 }
@@ -268,12 +292,15 @@ export async function getNextQuotationNumber() {
         const nextUrut = (latest?.nomorUrut || 0) + 1;
         return { success: true, nextUrut };
     } catch (error: any) {
+        console.error("[getNextQuotationNumber] Error:", error);
         return { success: false, message: "Gagal membuat nomor surat otomatis." };
     }
 }
 
 export async function saveInvoice(data: any) {
   try {
+    await checkAuth();
+    
     if (!data.invoiceNumber || !data.clientName) {
       return { success: false, message: "Nomor Invoice dan Nama Klien wajib diisi." };
     }
@@ -297,7 +324,7 @@ export async function saveInvoice(data: any) {
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       clientName: sanitize(data.clientName),
       clientAddress: sanitize(data.clientAddress),
-      taxApplied: data.taxApplied ?? false,
+      taxApplied: !!data.taxApplied,
       taxRate: Number(data.taxRate) || 0.11,
       discountAmount: discountAmount,
       downPayment: downPayment,
@@ -312,25 +339,35 @@ export async function saveInvoice(data: any) {
     if (data.id) {
       invoice = await prisma.invoice.update({
         where: { id: data.id },
-        data: { ...payload, items: { deleteMany: {}, create: (data.items || []).map((it: any) => ({
-          description: it.description ?? '',
-          quantity: Number(it.quantity) || 0,
-          unitPrice: Number(it.unitPrice) || 0,
-        })) } },
-        include: { items: true },
+        data: { 
+            ...payload, 
+            items: { 
+                deleteMany: {}, 
+                create: (data.items || []).map((it: any) => ({
+                    description: sanitize(it.description),
+                    quantity: Number(it.quantity) || 0,
+                    unitPrice: Number(it.unitPrice) || 0,
+                })) 
+            } 
+        },
       });
     } else {
       invoice = await prisma.invoice.create({
-        data: { ...payload, items: { create: (data.items || []).map((it: any) => ({
-          description: it.description ?? '',
-          quantity: Number(it.quantity) || 0,
-          unitPrice: Number(it.unitPrice) || 0,
-        })) } },
-        include: { items: true },
+        data: { 
+            ...payload, 
+            items: { 
+                create: (data.items || []).map((it: any) => ({
+                    description: sanitize(it.description),
+                    quantity: Number(it.quantity) || 0,
+                    unitPrice: Number(it.unitPrice) || 0,
+                })) 
+            } 
+        },
       });
     }
     return { success: true, id: invoice.id };
   } catch (error: any) {
+    console.error("[saveInvoice] Error:", error);
     return { success: false, message: "Terjadi kesalahan saat menyimpan Invoice." };
   }
 }
