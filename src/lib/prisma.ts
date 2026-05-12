@@ -5,37 +5,37 @@ import { execSync } from "child_process";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-// 1. Tentukan path absolut (Prioritaskan DB_PATH dari env, fallback ke folder lokal)
-const absoluteDbPath = process.env.DB_PATH 
-  ? path.resolve(process.env.DB_PATH) 
-  : path.join(process.cwd(), "prisma", "dev.db");
+// 1. Tentukan path absolut database secara dinamis
+// Di produksi (Docker/VPS), gunakan DB_PATH dari env jika ada, 
+// atau fallback ke direktori 'prisma' di root project secara absolut.
+const DB_FILENAME = "dev.db";
+const defaultDbPath = path.join(process.cwd(), "prisma", DB_FILENAME);
 
-// 2. Cek apakah file database sudah ada
-if (!fs.existsSync(absoluteDbPath)) {
-  console.log(`[DATABASE] File database tidak ditemukan di: ${absoluteDbPath}`);
-  console.log("[DATABASE] Menjalankan inisialisasi tabel otomatis...");
-  try {
-    // Pastikan folder induknya ada
-    const dir = path.dirname(absoluteDbPath);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    
-    // Jalankan push schema ke database baru
-    execSync(`npx prisma db push --accept-data-loss`, {
-      env: { ...process.env, DATABASE_URL: `file:${absoluteDbPath}` },
-      stdio: "inherit",
-    });
-    console.log("[DATABASE] Inisialisasi berhasil.");
-  } catch (error) {
-    console.error("[DATABASE] Gagal menginisialisasi database:", error);
+const absoluteDbPath = process.env.DB_PATH 
+  ? (path.isAbsolute(process.env.DB_PATH) ? process.env.DB_PATH : path.resolve(process.env.DB_PATH))
+  : defaultDbPath;
+
+console.log(`[DATABASE] Menggunakan database di: ${absoluteDbPath}`);
+
+// 2. Pastikan direktori database tersedia sebelum inisialisasi
+try {
+  const dbDir = path.dirname(absoluteDbPath);
+  if (!fs.existsSync(dbDir)) {
+    console.log(`[DATABASE] Membuat direktori database: ${dbDir}`);
+    fs.mkdirSync(dbDir, { recursive: true });
   }
+} catch (err) {
+  console.error("[DATABASE] Gagal menyiapkan direktori database:", err);
 }
 
+// 3. Inisialisasi Prisma Client dengan path absolut yang sudah ditentukan
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
     datasources: {
-      db: { url: `file:${absoluteDbPath}` },
+      db: { url: `file:${absoluteDbPath}?connection_limit=1` },
     },
+    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
