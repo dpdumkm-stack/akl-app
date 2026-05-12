@@ -50,8 +50,9 @@ export interface InvoiceData {
   invoiceNumber: string;
   date: string; // ISO
   dueDate?: string;
-  clientName: string;
-  clientAddress: string;
+  clientName?: string;
+  companyName?: string;
+  clientAddress?: string;
   items: InvoiceItemData[];
   subtotal: number;
   taxRate?: number; // default 0.11

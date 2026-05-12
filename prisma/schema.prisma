@@ -106,8 +106,9 @@ model Invoice {
   invoiceNumber     String        @unique
   date              DateTime      @default(now())
   dueDate           DateTime?
-  clientName        String
-  clientAddress     String
+  clientName        String?
+  companyName       String?
+  clientAddress     String?
   items             InvoiceItem[]
   subtotal          Decimal       @default(0)
   taxRate           Decimal       @default(0.11) // 11% PPN

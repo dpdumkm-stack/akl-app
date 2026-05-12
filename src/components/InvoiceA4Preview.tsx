@@ -222,7 +222,7 @@ export default function InvoiceA4Preview({ data, isGeneratingPDF, globalLogoUrl,
               </td>
               <td style={{ width: '20px', fontWeight: 'bold', paddingTop: '6px' }}>:</td>
               <td style={{ borderBottom: '1px dotted #94a3b8', padding: '6px 10px', fontWeight: '900', fontSize: '13px', backgroundColor: '#f8fafc' }}>
-                {data.clientName}
+                {data.companyName || data.clientName || '---'}
               </td>
             </tr>
           </tbody>
