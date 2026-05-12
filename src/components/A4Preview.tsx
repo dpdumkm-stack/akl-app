@@ -140,7 +140,13 @@ export default function A4Preview({
                                         <div style={{ padding: '15px 40px 0px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="break-inside-avoid">
                                             <div style={{ width: '120px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                                                 {(data.logoUrl || globalLogoUrl) ? (
-                                                    <img src={data.logoUrl || globalLogoUrl || ""} style={{ maxHeight: '80px', maxWidth: '100px', objectFit: 'contain' }} alt="Logo" />
+                                                    <img 
+                                                        src={data.logoUrl || globalLogoUrl || ""} 
+                                                        style={{ maxHeight: '80px', maxWidth: '100px', objectFit: 'contain' }} 
+                                                        alt="Logo" 
+                                                        decoding="async"
+                                                        loading="eager"
+                                                    />
                                                 ) : (
                                                     <div style={{ width: '80px', height: '80px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#94a3b8', fontWeight: 'bold' }}>LOGO</div>
                                                 )}
@@ -315,7 +321,17 @@ export default function A4Preview({
                                                                     <p style={{ margin: '0 0 4px 0', color: '#475569' }}>Hormat Kami,</p>
                                                                     <p style={{ fontWeight: 'bold', margin: '0', fontSize: '11px' }}>PT. APINDO KARYA LESTARI</p>
                                                                     <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyItems: 'center', margin: '2px 0' }}>
-                                                                        {data.ttdStempelUrl ? <img src={data.ttdStempelUrl} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', margin: '0 auto' }} alt="TTD" /> : <div style={{ border: '1px dashed #cbd5e1', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>TTD</div>}
+                                                                        {data.ttdStempelUrl ? (
+                                                                            <img 
+                                                                                src={data.ttdStempelUrl} 
+                                                                                style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', margin: '0 auto' }} 
+                                                                                alt="TTD" 
+                                                                                decoding="async"
+                                                                                loading="eager"
+                                                                            />
+                                                                        ) : (
+                                                                            <div style={{ border: '1px dashed #cbd5e1', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>TTD</div>
+                                                                        )}
                                                                     </div>
                                                                     <p style={{ fontWeight: '900', textDecoration: 'underline', textTransform: 'uppercase', margin: '0 0 2px 0', fontSize: '11px' }}>{data.namaPenandatangan}</p>
                                                                     <p style={{ fontSize: '9px', textTransform: 'uppercase', margin: '0 0 2px 0' }}>{data.jabatanPenandatangan}</p>

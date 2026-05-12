@@ -75,6 +75,21 @@ export async function GET(req: NextRequest) {
 
     try {
         await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 60000 });
+        
+        // SCSA FIX: Tunggu semua gambar (terutama Base64) selesai didecode
+        await page.evaluate(async () => {
+          const selectors = Array.from(document.querySelectorAll('img'));
+          await Promise.all(selectors.map(img => {
+            if (img.complete) return;
+            return new Promise((resolve, reject) => {
+              img.onload = resolve;
+              img.onerror = reject;
+              // Timeout 10 detik per gambar agar tidak stuck selamanya
+              setTimeout(() => resolve(true), 10000);
+            });
+          }));
+        });
+
         await page.waitForSelector('.a4-page', { timeout: 20000 });
         console.log(`[PDF-ENGINE] Rendered: ${id}`);
     } catch (err: any) {

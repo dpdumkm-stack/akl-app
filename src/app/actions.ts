@@ -34,9 +34,13 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     
     console.log("[saveQuotation] START", { id: data.id, nomorSurat: data.nomorSurat });
 
-    if (!data.nomorSurat || !data.namaKlien) {
-        return { success: false, message: "Nomor Surat dan Nama Klien wajib diisi." };
+    if (!data.namaKlien || data.namaKlien.trim() === "") {
+        return { success: false, message: "Nama Klien wajib diisi untuk menyimpan draf." };
     }
+
+    const finalNomorSurat = (data.nomorSurat && data.nomorSurat.trim() !== "") 
+        ? sanitize(data.nomorSurat) 
+        : `DRAFT-${new Date().getTime()}`;
 
     // Safe Mode: Recalculate total on server to prevent mismatches
     const calculatedSubtotal = (data.items || []).reduce((acc, i) => {
@@ -52,7 +56,7 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     const calculatedTotal = calculatedDpp + (data.kenakanPPN ? calculatedDpp * 0.11 : 0);
 
     const payload = {
-      nomorSurat:           sanitize(data.nomorSurat),
+      nomorSurat:           finalNomorSurat,
       nomorUrut:            Number(data.nomorUrut)      || 1,
       tanggal:              sanitize(data.tanggal),
       namaKlien:            sanitize(data.namaKlien),
