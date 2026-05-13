@@ -16,19 +16,12 @@ if [ $? -ne 0 ]; then
   git pull origin main
 fi
 
-# 3. Install dependencies
-echo "📦 Menginstall dependencies..."
-npm install --no-audit --no-fund
+# 3. Deployment via Docker
+echo "🏗️ Membangun dan menjalankan container (Docker Compose)..."
+docker compose up -d --build
 
-# 4. Build Application
-echo "🏗️ Membangun aplikasi (Next.js Build)..."
-# Membatasi memori Node untuk mencegah hang saat build di VPS kecil
-export NODE_OPTIONS="--max-old-space-size=2048"
-npm run build
-
-# 5. Restart PM2
-echo "♻️ Merestart server PM2..."
-# Asumsi nama app di PM2 adalah akl-app. Jika berbeda, PM2 akan mencoba mencari.
-pm2 restart all || pm2 start npm --name "akl-app" -- run start
+# 5. Cleanup
+echo "🧹 Membersihkan image lama..."
+docker image prune -f
 
 echo "✅ Pemulihan SELESAI. Cek aplikasi di https://app.apindoepoxy.co.id"
