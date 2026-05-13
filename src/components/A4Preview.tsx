@@ -190,10 +190,20 @@ export default function A4Preview({
 
                                                     <div style={{ marginBottom: '10px', fontSize: '12px', color: '#0f172a' }} className="break-inside-avoid">
                                                         <p style={{ margin: '0 0 2px 0' }}>Kepada Yth,</p>
-                                                        <h2 style={{ fontSize: '14px', fontWeight: '900', color: '#1e3a8a', textTransform: 'uppercase', margin: '0 0 2px 0' }}>
-                                                            {data.companyName || data.clientName || data.namaKlien || '---'}
-                                                        </h2>
-                                                        <p style={{ margin: '0 0 2px 0', fontWeight: 'bold' }}>UP: Bapak/Ibu {data.up || '---'}</p>
+                                                        {data.companyName ? (
+                                                            <>
+                                                                <h2 style={{ fontSize: '14px', fontWeight: '900', color: '#1e3a8a', textTransform: 'uppercase', margin: '0 0 2px 0' }}>
+                                                                    {data.companyName}
+                                                                </h2>
+                                                                {data.up && (
+                                                                    <p style={{ margin: '0 0 2px 0', fontWeight: 'bold', fontSize: '11px' }}>U.P.: {data.up}</p>
+                                                                )}
+                                                            </>
+                                                        ) : (
+                                                            <h2 style={{ fontSize: '14px', fontWeight: '900', color: '#1e3a8a', textTransform: 'uppercase', margin: '0 0 2px 0' }}>
+                                                                {data.up || data.namaKlien || '---'}
+                                                            </h2>
+                                                        )}
                                                         {data.lokasi && <p style={{ margin: '0', fontStyle: 'italic', color: '#475569', fontSize: '10px' }}>Lokasi Proyek: {data.lokasi}</p>}
                                                         <p style={{ marginTop: '5px', marginBottom: '5px' }}>Dengan hormat,</p>
                                                         <p style={{ margin: '0', lineHeight: '1.3', textAlign: 'justify' }}>

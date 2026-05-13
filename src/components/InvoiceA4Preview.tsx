@@ -198,8 +198,17 @@ export default function InvoiceA4Preview({ data, isGeneratingPDF, globalLogoUrl,
                           <span style={{ fontStyle: 'italic', fontSize: '10px', color: '#64748b' }}>Received From</span>
                         </td>
                         <td style={{ width: '20px', fontWeight: 'bold', paddingTop: '6px' }}>:</td>
-                        <td style={{ borderBottom: '1px dotted #94a3b8', padding: '6px 10px', fontWeight: '900', fontSize: '13px', backgroundColor: '#f8fafc' }}>
-                          {data.companyName || data.clientName || '---'}
+                        <td style={{ borderBottom: '1px dotted #94a3b8', padding: '6px 10px', backgroundColor: '#f8fafc' }}>
+                          {data.companyName ? (
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <span style={{ fontWeight: '900', fontSize: '13px', textTransform: 'uppercase' }}>{data.companyName}</span>
+                              {data.clientName && (
+                                <span style={{ fontWeight: '600', fontSize: '11px', marginTop: '2px' }}>U.P.: {data.clientName}</span>
+                              )}
+                            </div>
+                          ) : (
+                            <span style={{ fontWeight: '900', fontSize: '13px', textTransform: 'uppercase' }}>{data.clientName || '---'}</span>
+                          )}
                         </td>
                       </tr>
                     </tbody>

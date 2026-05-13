@@ -113,22 +113,24 @@ export default function UmumSection({
                 </div>
 
                 <div className="space-y-3">
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Data Klien</label>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                        Penerima Dokumen <span className="text-red-400 font-normal ml-1 lowercase">(Minimal isi salah satu)</span>
+                    </label>
                     <input 
                         type="text" 
-                        placeholder="Nama Perusahaan Klien..." 
+                        placeholder="Nama Perusahaan (Opsional jika U.P. diisi)..." 
                         value={data.namaKlien || ""} 
                         onChange={(e) => setData({ ...data, namaKlien: e.target.value })} 
-                        className="w-full p-4 bg-slate-50 border-none rounded-2xl font-black text-base focus:bg-white shadow-inner outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
+                        className={`w-full p-4 bg-slate-50 border-none rounded-2xl font-black text-base focus:bg-white shadow-inner outline-none focus:ring-2 transition-all ${!data.namaKlien && !data.up ? 'ring-1 ring-red-200 focus:ring-red-500' : 'focus:ring-blue-500'}`} 
                     />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
                         <input 
                             type="text" 
-                            placeholder="UP (Nama Penerima)..." 
+                            placeholder="U.P. / Nama Penerima (Opsional jika PT diisi)..." 
                             value={data.up || ""} 
                             onChange={(e) => setData({ ...data, up: e.target.value })} 
-                            className="w-full p-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:bg-white shadow-inner outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
+                            className={`w-full p-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:bg-white shadow-inner outline-none focus:ring-2 transition-all ${!data.namaKlien && !data.up ? 'ring-1 ring-red-200 focus:ring-red-500' : 'focus:ring-blue-500'}`} 
                         />
                         <input 
                             type="text" 

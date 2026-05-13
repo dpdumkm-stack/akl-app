@@ -13,6 +13,7 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
   const [date, setDate] = useState<string>('');
   const [dueDate, setDueDate] = useState<string>('');
   const [clientName, setClientName] = useState<string>('');
+  const [companyName, setCompanyName] = useState<string>('');
   const [clientAddress, setClientAddress] = useState<string>('');
   const [taxApplied, setTaxApplied] = useState<boolean>(false);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
@@ -51,11 +52,19 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
 
   const handleSave = async () => {
     if (!isAdmin) {
-      // Use toast if available, fallback to alert
       if (typeof window !== 'undefined' && (window as any).showToast) {
         (window as any).showToast('Hanya admin yang dapat menyimpan invoice', 'error');
       } else {
         alert('Hanya admin yang dapat menyimpan invoice');
+      }
+      return;
+    }
+
+    if (!clientName && !companyName) {
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('Minimal isi salah satu antara Nama Perusahaan atau Nama Penerima (U.P.)', 'error');
+      } else {
+        alert('Minimal isi salah satu antara Nama Perusahaan atau Nama Penerima (U.P.)');
       }
       return;
     }
@@ -68,6 +77,7 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
       date: date, // send as string
       dueDate: dueDate || null,
       clientName,
+      companyName,
       clientAddress,
       items,
       subtotal,
@@ -113,9 +123,15 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
           <label className="block text-sm font-medium text-slate-700">Jatuh Tempo</label>
           <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="mt-1 w-full border rounded p-2" />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-slate-700">Klien</label>
-          <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} className="mt-1 w-full border rounded p-2" placeholder="Nama Perusahaan / UP" />
+        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Nama Perusahaan</label>
+            <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full border rounded-xl p-2.5 text-sm font-bold" placeholder="Opsional jika U.P. diisi" />
+          </div>
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Nama Penerima (U.P.)</label>
+            <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} className="w-full border rounded-xl p-2.5 text-sm font-bold" placeholder="Opsional jika PT diisi" />
+          </div>
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-slate-700">Alamat Klien</label>

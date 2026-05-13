@@ -93,7 +93,7 @@ export default function QuotationApp() {
     const hasItems = (data.items || []).some(item => (item.deskripsi || '').trim() !== '');
 
     if (!hasClientInfo) {
-      showToast("Mohon lengkapi Identitas Klien (Nama Perusahaan atau UP) agar dokumen dapat diidentifikasi di sistem.", "error");
+      showToast("Minimal isi salah satu antara Nama Perusahaan atau Nama Penerima (U.P.)", "error");
       return false;
     }
 
