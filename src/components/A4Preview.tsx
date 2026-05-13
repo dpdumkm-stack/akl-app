@@ -137,28 +137,36 @@ export default function A4Preview({
                                         className={`a4-page bg-white flex flex-col relative flex-shrink-0 print:shadow-none ${isGeneratingPDF ? 'shadow-none' : 'shadow-2xl'} ${pageIndex > 0 ? 'pdf-page-break' : ''}`}
                                     >
                                         <div style={{ width: '100%', height: '15px', backgroundColor: '#1e3a8a' }} className="flex-shrink-0"></div>
+                                        {/* DYNAMIC HEADER */}
                                         <div style={{ padding: '15px 40px 0px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="break-inside-avoid">
                                             <div style={{ width: '120px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                                                 {(data.logoUrl || globalLogoUrl) ? (
                                                     <img 
                                                         src={data.logoUrl || globalLogoUrl || ""} 
-                                                        style={{ maxHeight: '80px', maxWidth: '100px', objectFit: 'contain' }} 
+                                                        style={{ maxHeight: pageIndex === 0 ? '80px' : '40px', maxWidth: '100px', objectFit: 'contain' }} 
                                                         alt="Logo" 
                                                         decoding="async"
                                                         loading="eager"
                                                     />
                                                 ) : (
-                                                    <div style={{ width: '80px', height: '80px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#94a3b8', fontWeight: 'bold' }}>LOGO</div>
+                                                    <div style={{ width: pageIndex === 0 ? '80px' : '40px', height: pageIndex === 0 ? '80px' : '40px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#94a3b8', fontWeight: 'bold' }}>LOGO</div>
                                                 )}
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
-                                                <h1 style={{ fontSize: '22px', fontWeight: '900', color: '#1e3a8a', margin: '0 0 2px 0', letterSpacing: '-0.5px', textTransform: 'uppercase' }}>PT. APINDO KARYA LESTARI</h1>
-                                                <p style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', margin: '0 0 4px 0', letterSpacing: '2px', textTransform: 'uppercase' }}>SPESIALIS EPOXY LANTAI SEJAK 1987</p>
-                                                <p style={{ fontSize: '10px', color: '#334155', margin: '0' }}>Jl. Raya Serpong KM.15 Ruko 17A, Tangerang Selatan</p>
-                                                <p style={{ fontSize: '10px', color: '#334155', margin: '0' }}>Telp: (021) 5316 2972 | Email: apindokl@gmail.com | Web: www.apindokl.co.id</p>
+                                                <h1 style={{ fontSize: pageIndex === 0 ? '22px' : '14px', fontWeight: '900', color: '#1e3a8a', margin: '0 0 2px 0', letterSpacing: '-0.5px', textTransform: 'uppercase' }}>PT. APINDO KARYA LESTARI</h1>
+                                                {pageIndex === 0 && (
+                                                    <>
+                                                        <p style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', margin: '0 0 4px 0', letterSpacing: '2px', textTransform: 'uppercase' }}>SPESIALIS EPOXY LANTAI SEJAK 1987</p>
+                                                        <p style={{ fontSize: '10px', color: '#334155', margin: '0' }}>Jl. Raya Serpong KM.15 Ruko 17A, Tangerang Selatan</p>
+                                                        <p style={{ fontSize: '10px', color: '#334155', margin: '0' }}>Telp: (021) 5316 2972 | Email: apindokl@gmail.com | Web: www.apindokl.co.id</p>
+                                                    </>
+                                                )}
+                                                {pageIndex > 0 && (
+                                                    <p style={{ fontSize: '9px', fontWeight: 'bold', color: '#64748b', margin: '0', textTransform: 'uppercase' }}>Quotation: {data.nomorSurat} — Hal {pageIndex + 1}</p>
+                                                )}
                                             </div>
                                         </div>
-                                        <div style={{ margin: '8px 40px 2px 40px', borderBottom: '3px solid #1e3a8a' }}></div>
+                                        <div style={{ margin: pageIndex === 0 ? '8px 40px 2px 40px' : '4px 40px 2px 40px', borderBottom: '3px solid #1e3a8a' }}></div>
                                         <div style={{ margin: '0 40px 10px 40px', borderBottom: '1px solid #dc2626' }}></div>
 
                                         <div style={{ padding: '0 40px 60px 40px', flexGrow: 1, display: 'flex', flexDirection: 'column' }} className="relative">
