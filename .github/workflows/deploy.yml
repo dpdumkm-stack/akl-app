@@ -76,4 +76,10 @@ jobs:
             echo "🧹 Membersihkan sisa-sisa build lama..."
             docker image prune -f
             
-            echo "✨ Deployment Berhasil dengan Optimasi Standalone & Caching!"
+            echo "🔍 Mengecek status container..."
+            docker ps
+            
+            echo "📋 20 Baris Log Terakhir Aplikasi:"
+            docker-compose logs --tail=20 akl-app
+            
+            echo "✨ Deployment Berhasil!"
