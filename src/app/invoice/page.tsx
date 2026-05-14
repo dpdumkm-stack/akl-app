@@ -27,6 +27,7 @@ interface Invoice {
   date: string;
   dueDate: string | null;
   clientName: string;
+  companyName?: string | null;
   clientAddress: string;
   subtotal: number;
   taxAmount: number;
