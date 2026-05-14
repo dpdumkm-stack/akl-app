@@ -37,21 +37,20 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     const payloadSize = JSON.stringify(data).length;
     console.log(`[saveQuotation] START - ID: ${data.id}, Nomor: ${data.nomorSurat}, Payload Size: ${(payloadSize / 1024).toFixed(2)} KB`);
 
-    // SCSA VALIDATION LOGIC: Minimal salah satu harus diisi
-    // Frontend mungkin mengirim namaKlien untuk Perusahaan dan up untuk Pribadi
-    const company = (data.companyName || data.namaKlien)?.trim() || "";
-    const client = (data.clientName || data.up)?.trim() || "";
+    // SCSA RELAXED VALIDATION: Logika "Minimal salah satu" agar lebih fleksibel
+    const company = (data.companyName || data.namaKlien || "").trim();
+    const client = (data.clientName || data.up || "").trim();
+    
+    // Debug log untuk melihat data yang masuk ke server
+    console.log(`[saveQuotation] VALIDATION DEBUG - Company: "${company}", Client: "${client}"`);
 
     if (!company && !client) {
-        logActivity(`GAGAL simpan: Nama Perusahaan & UP kosong`, 'ERROR');
-        return { 
-            success: false, 
-            message: "Validasi Gagal: Mohon isi minimal salah satu antara Nama Perusahaan atau Nama Penerima (U.P.)" 
-        };
+        // Alih-alih memblokir, kita beri nama default jika benar-benar kosong agar data tidak hilang
+        logActivity(`WARNING: Simpan dengan nama kosong, menggunakan fallback "KLIEN-TANPA-NAMA"`, 'WARN');
     }
 
     // Gabungkan untuk namaKlien (sebagai fallback tampilan lama)
-    const displayClientName = company || client;
+    const displayClientName = company || client || "KLIEN-TANPA-NAMA";
 
     const finalNomorSurat = (data.nomorSurat && data.nomorSurat.trim() !== "") 
         ? sanitize(data.nomorSurat) 

@@ -33,7 +33,7 @@ jobs:
             # Ambil kode terbaru
             git pull origin main
             
-            # Jalankan dengan Docker (Lebih stabil untuk VPS modern)
-            docker-compose up -d --build
+            # Bangun ulang container (database tetap aman karena pakai volumes)
+            docker-compose up -d --build --force-recreate
             
             echo "✨ Deployment Selesai & Berhasil!"
