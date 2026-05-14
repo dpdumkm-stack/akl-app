@@ -396,3 +396,59 @@ export async function saveInvoice(data: any) {
     return { success: false, message: "Terjadi kesalahan saat menyimpan Invoice." };
   }
 }
+
+export async function convertToInvoice(quotationId: string) {
+  try {
+    await checkAuth();
+    
+    // 1. Ambil Penawaran
+    const q = await prisma.quotation.findUnique({
+      where: { id: quotationId },
+      include: { items: true }
+    });
+    
+    if (!q) throw new Error("Penawaran tidak ditemukan.");
+    
+    // 2. Generate No Invoice
+    const { getNextInvoiceNumber } = await import("@/lib/invoice-number-service");
+    const nextInvoiceNumber = await getNextInvoiceNumber();
+    
+    // 3. Hitung Subtotal (Pastikan sinkron dengan Quotation)
+    const subtotal = q.totalHarga;
+    
+    // 4. Buat Invoice
+    const newInvoice = await prisma.invoice.create({
+      data: {
+        invoiceNumber: nextInvoiceNumber,
+        clientName: q.clientName || q.up || q.namaKlien,
+        companyName: q.companyName || q.namaKlien,
+        quotationId: q.id,
+        subtotal: subtotal,
+        total: subtotal,
+        status: 'PENDING',
+        invoiceType: 'PELUNASAN',
+        items: {
+          create: q.items.map(it => ({
+            description: `${it.deskripsi}${it.bahan ? ` (${it.bahan})` : ''}`,
+            quantity: Math.round(it.volume),
+            unitPrice: it.harga,
+            lineTotal: it.volume * it.harga
+          }))
+        }
+      }
+    });
+    
+    // 5. Update Status Penawaran
+    await prisma.quotation.update({
+      where: { id: quotationId },
+      data: { isInvoiced: true }
+    });
+    
+    logActivity(`Konversi Penawaran ke Invoice: ${q.nomorSurat} -> ${newInvoice.invoiceNumber}`, 'SUCCESS');
+    revalidatePath('/');
+    return { success: true, id: newInvoice.id };
+  } catch (error: any) {
+    console.error("[convertToInvoice] Error:", error);
+    return { success: false, message: error.message || "Gagal melakukan konversi ke Invoice." };
+  }
+}

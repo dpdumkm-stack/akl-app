@@ -19,6 +19,7 @@ export async function GET() {
         namaKlien: true,
         tanggal: true,
         totalHarga: true,
+        isInvoiced: true,
         createdAt: true,
       },
     });
@@ -31,6 +32,7 @@ export async function GET() {
         namaKlien: q.namaKlien,
         tanggal: q.tanggal,
         totalHarga: q.totalHarga,
+        isInvoiced: q.isInvoiced,
         createdAt: q.createdAt.toISOString(),
       })),
     });

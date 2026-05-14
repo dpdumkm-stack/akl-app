@@ -15,6 +15,7 @@ interface QuotationSummary {
   namaKlien: string;
   tanggal: string;
   totalHarga: number;
+  isInvoiced?: boolean;
   createdAt: string;
 }
 
@@ -102,6 +103,26 @@ export default function DashboardPage() {
     }
     setLoading(false);
   }, []);
+
+  const handleConvertToInvoice = async (id: string, name: string) => {
+    if (!confirm(`Terbitkan Invoice untuk ${name}?`)) return;
+    
+    setLoading(true);
+    try {
+      const { convertToInvoice } = await import("@/app/actions");
+      const res = await convertToInvoice(id);
+      if (res.success) {
+        alert("Invoice berhasil diterbitkan!");
+        router.push("/invoice");
+      } else {
+        alert(res.message || "Gagal menerbitkan invoice.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Terjadi kesalahan sistem.");
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (status === "authenticated") loadData();
@@ -266,6 +287,20 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-violet-400 text-xs font-bold">{fmtCompact(q.totalHarga)}</span>
+                    {q.isInvoiced ? (
+                       <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md text-[9px] font-black uppercase tracking-tighter">Invoiced</span>
+                    ) : (
+                       <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleConvertToInvoice(q.id, q.namaKlien);
+                        }}
+                        className="p-1.5 bg-violet-600/10 text-violet-400 hover:bg-violet-600 hover:text-white rounded-lg transition-all"
+                        title="Terbitkan Invoice"
+                       >
+                         <Receipt className="w-3.5 h-3.5" />
+                       </button>
+                    )}
                     <ChevronRight className="w-3 h-3 text-slate-600" />
                   </div>
                 </div>
