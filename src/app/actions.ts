@@ -37,20 +37,12 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     const payloadSize = JSON.stringify(data).length;
     console.log(`[saveQuotation] START - ID: ${data.id}, Nomor: ${data.nomorSurat}, Payload Size: ${(payloadSize / 1024).toFixed(2)} KB`);
 
-    // SCSA RELAXED VALIDATION: Logika "Minimal salah satu" agar lebih fleksibel
+    // SCSA RELAXED: Izinkan simpan apapun, beri fallback jika benar-benar kosong
     const company = (data.companyName || data.namaKlien || "").trim();
     const client = (data.clientName || data.up || "").trim();
-    
-    // Debug log untuk melihat data yang masuk ke server
-    console.log(`[saveQuotation] VALIDATION DEBUG - Company: "${company}", Client: "${client}"`);
-
-    if (!company && !client) {
-        // Alih-alih memblokir, kita beri nama default jika benar-benar kosong agar data tidak hilang
-        logActivity(`WARNING: Simpan dengan nama kosong, menggunakan fallback "KLIEN-TANPA-NAMA"`, 'WARN');
-    }
-
-    // Gabungkan untuk namaKlien (sebagai fallback tampilan lama)
     const displayClientName = company || client || "KLIEN-TANPA-NAMA";
+
+    console.log(`[saveQuotation] PROSES SIMPAN - Company: "${company}", Client: "${client}"`);
 
     const finalNomorSurat = (data.nomorSurat && data.nomorSurat.trim() !== "") 
         ? sanitize(data.nomorSurat) 
