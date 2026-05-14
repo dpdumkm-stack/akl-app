@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { QuotationData } from "@/lib/types";
 import { getServerSession } from "next-auth/next";
 import { logActivity } from "@/lib/logger";
+import { revalidatePath } from "next/cache";
 
 /**
  * Memastikan objek murni (Plain Object) yang bisa diserialisasi oleh Next.js.
@@ -277,6 +278,7 @@ export async function saveSignatory(data: any) {
             update: payload,
             create: payload
         });
+        revalidatePath('/');
         return toPlainObject({ success: true, data: res });
     } catch (error: any) {
         console.error("[saveSignatory] Error:", error);
@@ -288,6 +290,7 @@ export async function deleteSignatory(id: string) {
     try {
         await checkAuth();
         await prisma.signatory.delete({ where: { id } });
+        revalidatePath('/');
         return { success: true };
     } catch (error: any) {
         console.error("[deleteSignatory] Error:", error);

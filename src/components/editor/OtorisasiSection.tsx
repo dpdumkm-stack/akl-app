@@ -25,6 +25,7 @@ export default function OtorisasiSection({
     const loadSignatories = async () => {
         setIsLoading(true);
         const res = await getSignatories();
+        console.log("DEBUG Signatories:", res);
         if (res.success && 'data' in res) setSignatories(res.data);
         setIsLoading(false);
     };
