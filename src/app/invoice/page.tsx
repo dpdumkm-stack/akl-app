@@ -90,6 +90,41 @@ export default function InvoicePage() {
   const [newPaymentAmount, setNewPaymentAmount] = useState<string>("");
   const [updatingPayment, setUpdatingPayment] = useState(false);
 
+  const [clients, setClients] = useState<any[]>([]);
+  const [showClients, setShowClients] = useState(false);
+  const [clientLoading, setClientLoading] = useState(false);
+  const clientDropdownRef = useRef<HTMLDivElement>(null);
+
+  const loadClients = async () => {
+    setClientLoading(true);
+    try {
+      const res = await fetch("/api/clients/list");
+      const d = await res.json();
+      if (d.success) setClients(d.clients);
+    } catch (e) { console.error(e); }
+    setClientLoading(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (clientDropdownRef.current && !clientDropdownRef.current.contains(event.target as Node)) {
+            setShowClients(false);
+        }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handlePickClient = (c: any) => {
+    setForm(prev => ({
+      ...prev,
+      clientName: c.companyName || c.clientName,
+      companyName: c.companyName,
+      clientAddress: c.address
+    }));
+    setShowClients(false);
+  };
+
   // Clean up interval on unmount
   useEffect(() => {
     return () => {
@@ -621,11 +656,43 @@ export default function InvoicePage() {
                   </div>
                 </div>
 
-                <div>
+                <div className="relative" ref={clientDropdownRef}>
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1.5">Nama Klien *</label>
-                  <input value={form.clientName} onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))}
+                  <input 
+                    value={form.clientName} 
+                    onFocus={() => {
+                        setShowClients(true);
+                        if (clients.length === 0) loadClients();
+                    }}
+                    onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))}
                     placeholder="PT. Nama Perusahaan..."
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-bold text-xs outline-none focus:border-blue-500 transition-colors placeholder:text-slate-600" />
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-bold text-xs outline-none focus:border-blue-500 transition-colors placeholder:text-slate-600" 
+                  />
+
+                  {showClients && clients.length > 0 && (
+                    <div className="absolute z-[60] w-full mt-2 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-h-64 overflow-y-auto p-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-2 mb-1 border-b border-slate-800 flex justify-between items-center">
+                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Pilih Klien Terdaftar</p>
+                            {clientLoading && <RefreshCw className="w-2.5 h-2.5 animate-spin text-blue-500" />}
+                        </div>
+                        <div className="space-y-1">
+                            {clients.filter(c => 
+                                !form.clientName || 
+                                (c.companyName || "").toLowerCase().includes(form.clientName.toLowerCase()) ||
+                                (c.clientName || "").toLowerCase().includes(form.clientName.toLowerCase())
+                            ).map((c, i) => (
+                                <div 
+                                    key={i} 
+                                    onClick={() => handlePickClient(c)}
+                                    className="p-3 hover:bg-blue-600 group rounded-xl cursor-pointer transition-all border border-transparent hover:border-blue-500"
+                                >
+                                    <p className="text-xs font-black text-white group-hover:text-white">{c.companyName || c.clientName}</p>
+                                    <p className="text-[10px] text-slate-400 group-hover:text-blue-100 truncate">{c.address}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>

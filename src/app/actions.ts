@@ -30,6 +30,33 @@ async function checkAuth() {
     return session;
 }
 
+async function syncClient(data: { companyName?: string | null, clientName?: string | null, address?: string | null, phone?: string | null }) {
+    if (!data.companyName && !data.clientName) return;
+    
+    try {
+        await prisma.client.upsert({
+            where: { 
+                companyName_clientName: { 
+                    companyName: data.companyName || "", 
+                    clientName: data.clientName || "" 
+                } 
+            },
+            update: {
+                address: data.address || undefined,
+                phone: data.phone || undefined
+            },
+            create: {
+                companyName: data.companyName || "",
+                clientName: data.clientName || "",
+                address: data.address || "",
+                phone: data.phone || ""
+            }
+        });
+    } catch (e) {
+        console.error("[syncClient] Error:", e);
+    }
+}
+
 export async function saveQuotation(data: QuotationData, totalHarga: number) {
   try {
     await checkAuth();
@@ -130,6 +157,14 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
         }
       });
     }
+
+    // Sync Client Database
+    await syncClient({
+        companyName: company,
+        clientName: client,
+        address: data.lokasi,
+        phone: data.up // Fallback phone or we can add it later
+    });
 
     logActivity(`Berhasil simpan Penawaran: ${quotation.nomorSurat} (ID: ${quotation.id})`, 'SUCCESS');
     return { success: true, id: quotation.id };
@@ -388,6 +423,13 @@ export async function saveInvoice(data: any) {
         },
       });
     }
+    // Sync Client Database
+    await syncClient({
+        companyName: payload.companyName,
+        clientName: payload.clientName,
+        address: payload.clientAddress,
+    });
+
     logActivity(`Berhasil simpan Invoice: ${invoice.invoiceNumber} (ID: ${invoice.id})`, 'SUCCESS');
     return { success: true, id: invoice.id };
   } catch (error: any) {

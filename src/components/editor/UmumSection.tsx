@@ -17,6 +17,42 @@ export default function UmumSection({
     data, setData, nomorUrut, setNomorUrut
 }: UmumSectionProps) {
     const [isSyncing, setIsSyncing] = React.useState(false);
+    const [clients, setClients] = React.useState<any[]>([]);
+    const [showClients, setShowClients] = React.useState(false);
+    const [clientLoading, setClientLoading] = React.useState(false);
+    const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+    const loadClients = async () => {
+        setClientLoading(true);
+        try {
+            const res = await fetch("/api/clients/list");
+            const d = await res.json();
+            if (d.success) setClients(d.clients);
+        } catch (e) { console.error(e); }
+        setClientLoading(false);
+    };
+
+    React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowClients(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handlePickClient = (c: any) => {
+        setData(prev => ({
+            ...prev,
+            namaKlien: c.companyName || c.clientName,
+            companyName: c.companyName,
+            clientName: c.clientName,
+            up: c.clientName,
+            lokasi: c.address
+        }));
+        setShowClients(false);
+    };
 
     const handleSyncNumber = async () => {
         setIsSyncing(true);
@@ -116,13 +152,44 @@ export default function UmumSection({
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
                         Penerima Dokumen <span className="text-red-400 font-normal ml-1 lowercase">(Minimal isi salah satu)</span>
                     </label>
-                    <input 
-                        type="text" 
-                        placeholder="Nama Perusahaan (Opsional jika U.P. diisi)..." 
-                        value={data.namaKlien || ""} 
-                        onChange={(e) => setData({ ...data, namaKlien: e.target.value })} 
-                        className={`w-full p-4 bg-slate-50 border-none rounded-2xl font-black text-base focus:bg-white shadow-inner outline-none focus:ring-2 transition-all ${!data.namaKlien && !data.up ? 'ring-1 ring-red-200 focus:ring-red-500' : 'focus:ring-blue-500'}`} 
-                    />
+                    <div className="relative" ref={dropdownRef}>
+                        <input 
+                            type="text" 
+                            placeholder="Nama Perusahaan (Opsional jika U.P. diisi)..." 
+                            value={data.namaKlien || ""} 
+                            onFocus={() => {
+                                setShowClients(true);
+                                if (clients.length === 0) loadClients();
+                            }}
+                            onChange={(e) => setData({ ...data, namaKlien: e.target.value })} 
+                            className={`w-full p-4 bg-slate-50 border-none rounded-2xl font-black text-base focus:bg-white shadow-inner outline-none focus:ring-2 transition-all ${!data.namaKlien && !data.up ? 'ring-1 ring-red-200 focus:ring-red-500' : 'focus:ring-blue-500'}`} 
+                        />
+
+                        {showClients && clients.length > 0 && (
+                            <div className="absolute z-[60] w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl max-h-64 overflow-y-auto p-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="p-2 mb-1 border-b border-slate-50 flex justify-between items-center">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pilih Klien Terdaftar</p>
+                                    {clientLoading && <RefreshCw className="w-2.5 h-2.5 animate-spin text-blue-500" />}
+                                </div>
+                                <div className="space-y-1">
+                                    {clients.filter(c => 
+                                        !data.namaKlien || 
+                                        (c.companyName || "").toLowerCase().includes(data.namaKlien.toLowerCase()) ||
+                                        (c.clientName || "").toLowerCase().includes(data.namaKlien.toLowerCase())
+                                    ).map((c, i) => (
+                                        <div 
+                                            key={i} 
+                                            onClick={() => handlePickClient(c)}
+                                            className="p-3 hover:bg-blue-600 group rounded-xl cursor-pointer transition-all border border-transparent hover:border-blue-400"
+                                        >
+                                            <p className="text-xs font-black text-slate-800 group-hover:text-white">{c.companyName || c.clientName}</p>
+                                            <p className="text-[10px] text-slate-500 group-hover:text-blue-100 truncate">{c.address}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
                         <input 
