@@ -6,16 +6,39 @@ on:
       - main
 
 env:
-  # Memaksa GitHub menggunakan Node 24 (Sesuai peringatan terbaru)
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.3
         with:
@@ -27,13 +50,19 @@ jobs:
             # Masuk ke folder proyek
             cd /var/www/akl-app
             
-            # Anti-Error 128 (Git Dubious Ownership)
-            git config --global --add safe.directory /var/www/akl-app
+            # Login ke GHCR di VPS (agar bisa pull image private jika perlu)
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # Ambil kode terbaru
+            # Ambil kode terbaru (hanya untuk docker-compose.yml dan env)
             git pull origin main
             
-            # Bangun ulang container (database tetap aman karena pakai volumes)
-            docker-compose up -d --build --force-recreate
+            # Pull image terbaru dari GHCR
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            
+            # Restart container menggunakan image baru
+            docker-compose up -d --force-recreate
+            
+            # Hapus image lama yang sudah tidak terpakai (cleanup)
+            docker image prune -f
             
             echo "✨ Deployment Selesai & Berhasil!"

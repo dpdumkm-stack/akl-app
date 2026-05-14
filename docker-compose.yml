@@ -1,6 +1,6 @@
 services:
   akl-app:
-    build: .
+    image: ghcr.io/dpdumkm-stack/akl-app:latest
     container_name: akl-quotation-system
     restart: always
     ports:
