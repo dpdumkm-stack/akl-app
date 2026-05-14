@@ -70,7 +70,7 @@ jobs:
             
             # 2. Restart container (Switching)
             echo "🔄 Mengganti container ke versi terbaru..."
-            docker-compose up -d --force-recreate
+            docker compose up -d --force-recreate
             
             # 3. Cleanup: Hapus image lama & cache yang tidak terpakai
             echo "🧹 Membersihkan sisa-sisa build lama..."
@@ -80,6 +80,6 @@ jobs:
             docker ps
             
             echo "📋 20 Baris Log Terakhir Aplikasi:"
-            docker-compose logs --tail=20 akl-app
+            docker compose logs --tail=20 akl-app
             
             echo "✨ Deployment Berhasil!"
