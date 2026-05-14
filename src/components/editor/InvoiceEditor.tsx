@@ -108,39 +108,44 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
   };
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-lg max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-slate-800">Buat Invoice</h2>
+    <div className="p-8 bg-slate-800/90 rounded-[40px] shadow-2xl border border-white/5 max-w-4xl mx-auto backdrop-blur-xl font-['Outfit',sans-serif]">
+      <div className="flex items-center gap-3 border-b border-white/5 pb-6 mb-6">
+          <div className="p-2 bg-slate-900 rounded-xl text-emerald-500 border border-white/5"><Save className="w-6 h-6"/></div>
+          <h2 className="text-xl font-black uppercase tracking-widest text-white">Buat Invoice Baru</h2>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700">Nomor Invoice</label>
-          <input type="text" readOnly value={invoiceNumber} className="mt-1 w-full border rounded p-2 bg-gray-100" />
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nomor Invoice</label>
+          <input type="text" readOnly value={invoiceNumber} className="w-full p-3 bg-slate-900/50 border-2 border-white/5 rounded-2xl text-sm font-black text-slate-400 outline-none" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700">Tanggal</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} className="mt-1 w-full border rounded p-2" />
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Tanggal</label>
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full p-3 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-white focus:border-blue-500 outline-none transition-all" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700">Jatuh Tempo</label>
-          <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="mt-1 w-full border rounded p-2" />
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Jatuh Tempo</label>
+          <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="w-full p-3 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-white focus:border-blue-500 outline-none transition-all" />
         </div>
         <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Nama Perusahaan</label>
-            <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full border rounded-xl p-2.5 text-sm font-bold" placeholder="Opsional jika U.P. diisi" />
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nama Perusahaan</label>
+            <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full p-4 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-white focus:border-blue-500 outline-none transition-all shadow-lg" placeholder="Opsional jika U.P. diisi" />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Nama Penerima (U.P.)</label>
-            <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} className="w-full border rounded-xl p-2.5 text-sm font-bold" placeholder="Opsional jika PT diisi" />
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nama Penerima (U.P.)</label>
+            <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} className="w-full p-4 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-white focus:border-blue-500 outline-none transition-all shadow-lg" placeholder="Opsional jika PT diisi" />
           </div>
         </div>
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-slate-700">Alamat Klien</label>
-          <textarea value={clientAddress} onChange={e => setClientAddress(e.target.value)} className="mt-1 w-full border rounded p-2" rows={2} placeholder="Alamat lengkap" />
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Alamat Klien</label>
+          <textarea value={clientAddress} onChange={e => setClientAddress(e.target.value)} className="w-full p-4 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-white focus:border-blue-500 outline-none transition-all shadow-lg" rows={2} placeholder="Alamat lengkap..." />
         </div>
       </div>
 
-      <section className="mt-6">
-        <h3 className="text-lg font-semibold mb-2 text-slate-800">Item</h3>
+      <section className="mt-10">
+        <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-3">
+            <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Item Detail Pekerjaan</h3>
+        </div>
         {items.map((it, idx) => (
           <InvoiceItemRow
             key={it.id}
@@ -150,36 +155,40 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
             onRemove={() => handleRemoveItem(idx)}
           />
         ))}
-        <button type="button" onClick={handleAddItem} className="mt-2 px-4 py-2 bg-emerald-100 text-emerald-800 rounded hover:bg-emerald-200 transition">
-          + Tambah Item
+        <button type="button" onClick={handleAddItem} className="mt-4 px-6 py-3 bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all active:scale-95">
+          + Tambah Item Baru
         </button>
       </section>
 
-      <section className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-slate-700">PPN 11%</label>
-          <input type="checkbox" checked={taxApplied} onChange={e => setTaxApplied(e.target.checked)} className="mt-1" />
+      <section className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-900/40 p-6 rounded-[32px] border border-white/5">
+        <div className="flex items-center justify-between p-4 bg-slate-900 border-2 border-white/10 rounded-2xl shadow-lg">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">PPN</span>
+            <span className="text-xs font-bold text-white">Kenakan 11%</span>
+          </div>
+          <input type="checkbox" checked={taxApplied} onChange={e => setTaxApplied(e.target.checked)} className="w-5 h-5 rounded border-white/10 bg-slate-800 text-blue-600 focus:ring-blue-500" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700">Diskon (Rp)</label>
-          <input type="number" value={discountAmount} onChange={e => setDiscountAmount(Number(e.target.value))} className="mt-1 w-full border rounded p-2" />
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Diskon (Rp)</label>
+          <input type="number" value={discountAmount} onChange={e => setDiscountAmount(Number(e.target.value))} className="w-full p-4 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-red-400 focus:border-red-500 outline-none shadow-lg transition-all" placeholder="0" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700">Uang Muka (DP)</label>
-          <input type="number" value={downPayment} onChange={e => setDownPayment(Number(e.target.value))} className="mt-1 w-full border rounded p-2" />
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Uang Muka (DP)</label>
+          <input type="number" value={downPayment} onChange={e => setDownPayment(Number(e.target.value))} className="w-full p-4 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-emerald-400 focus:border-emerald-500 outline-none shadow-lg transition-all" placeholder="0" />
         </div>
         <div className="md:col-span-3">
-          <label className="block text-sm font-medium text-slate-700">Catatan</label>
-          <textarea value={notes} onChange={e => setNotes(e.target.value)} className="mt-1 w-full border rounded p-2" rows={2} placeholder="Opsional" />
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Catatan Tambahan</label>
+          <textarea value={notes} onChange={e => setNotes(e.target.value)} className="w-full p-4 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-white focus:border-blue-500 outline-none shadow-lg transition-all" rows={2} placeholder="Tulis catatan di sini..." />
         </div>
       </section>
 
-      <div className="mt-6 flex justify-end space-x-3">
-        <button type="button" onClick={onClose} className="px-4 py-2 bg-slate-200 text-slate-700 rounded hover:bg-slate-300 transition">
-          Batal
+      <div className="mt-10 flex justify-end gap-4">
+        <button type="button" onClick={onClose} className="px-8 py-3.5 bg-slate-900 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:text-white border border-white/5 transition-all active:scale-95">
+          Batalkan
         </button>
-        <button type="button" onClick={handleSave} className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition">
-          Simpan Invoice
+        <button type="button" onClick={handleSave} className="px-10 py-3.5 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-blue-900/40 hover:bg-blue-500 transition-all active:scale-95 flex items-center gap-2">
+          <Save className="w-4 h-4" />
+          Simpan Dokumen
         </button>
       </div>
     </div>

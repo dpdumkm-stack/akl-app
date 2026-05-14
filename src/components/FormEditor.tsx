@@ -201,17 +201,17 @@ export default function FormEditor({
     return (
         <div className={`lg:col-span-5 xl:col-span-4 flex flex-col h-full relative ${viewMode === 'preview' ? 'hidden lg:flex' : 'flex'} print:hidden`}>
             {/* TAB NAVIGATION - STICKY TOP */}
-            <div className="sticky top-0 z-40 bg-slate-100/80 backdrop-blur-md border-b border-slate-200 pb-2 mb-4">
+            <div className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-white/5 pb-2 mb-4">
                 <div className="flex gap-1 overflow-x-auto no-scrollbar py-2">
                     {tabs.map(tab => (
-                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 translate-y-[-2px]' : 'bg-white text-slate-400 hover:bg-slate-50 border border-transparent hover:border-slate-200'}`}>
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 translate-y-[-2px]' : 'bg-slate-900 text-slate-500 hover:bg-slate-800 border border-white/5'}`}>
                             {tab.icon} {tab.label}
                         </button>
                     ))}
                 </div>
             </div>
-
-            <div className="flex-1 space-y-6 pb-24">
+            {/* CONTENT AREA - INDEPENDENT SCROLL */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar px-1 space-y-6">
                 {activeTab === 'umum' && (
                     <UmumSection 
                         data={data} 
@@ -224,16 +224,16 @@ export default function FormEditor({
 
                 {activeTab === 'item' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
-                        <div className="bg-white p-6 rounded-3xl border border-slate-200">
+                        <div className="bg-slate-900 p-6 rounded-3xl border border-white/5 shadow-2xl">
                             <div className="flex justify-between items-center mb-6">
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                     <Plus className="w-3 h-3 text-blue-500" />
                                     {data.isMaterialOnlyMode ? 'Daftar Material' : 'Daftar Pekerjaan'}
                                 </h4>
                                 <button 
                                     type="button" 
                                     onClick={() => { setActiveRowId(data.items[0]?.id || null); setIsMasterModalOpen(true); }}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                    className="flex items-center gap-2 px-4 py-2 bg-slate-950 border border-white/5 text-slate-400 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                 >
                                     <Search className="w-3.5 h-3.5" />
                                     Cari dari Database
@@ -253,7 +253,7 @@ export default function FormEditor({
                                         onDetachMaster={detachFromMaster}
                                     />
                                 ))}
-                                <button type="button" onClick={() => setData(prev => ({ ...prev, items: [...(prev.items || []), { id: getUniqueId(), deskripsi: '', bahan: '', volume: 0, satuan: 'm²', harga: 0, hargaBahan: 0, hargaJasa: 0 }] }))} className="w-full py-4 bg-white border-2 border-dashed border-slate-200 rounded-3xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-blue-400 hover:text-blue-500 transition-all shadow-sm">+ TAMBAH BARIS</button>
+                                <button type="button" onClick={() => setData(prev => ({ ...prev, items: [...(prev.items || []), { id: getUniqueId(), deskripsi: '', bahan: '', volume: 0, satuan: 'm²', harga: 0, hargaBahan: 0, hargaJasa: 0 }] }))} className="w-full py-4 bg-slate-950/50 border-2 border-dashed border-white/5 rounded-3xl text-[10px] font-black text-slate-600 uppercase tracking-widest hover:border-blue-500/50 hover:text-blue-400 transition-all shadow-inner">+ TAMBAH BARIS</button>
                             </div>
                         </div>
                     </div>
@@ -277,16 +277,31 @@ export default function FormEditor({
                         globalLogoUrl={globalLogoUrl}
                         globalTTDUrl={globalTTDUrl}
                     />
-
-
                 )}
             </div>
 
-            {/* STICKY ACTION FOOTER */}
-            <div className="absolute bottom-0 left-[-1.5rem] right-[-1.5rem] p-6 bg-gradient-to-t from-slate-100 via-slate-100/95 to-transparent z-40 pointer-events-none">
-                <div className="flex gap-4 pointer-events-auto">
-                    <button type="button" onClick={onSave} disabled={isSaving} className={`flex-1 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-black py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isSaving ? 'opacity-50 cursor-wait' : 'hover:shadow-green-200 hover:translate-y-[-2px]'}`}>{isSaving ? <Loader2 className="animate-spin w-5 h-5" /> : <Save className="w-5 h-5" />} <span className="uppercase tracking-widest text-[11px]">SIMPAN DRAF</span></button>
-                    <button type="button" onClick={onDownloadPDF} disabled={isGeneratingPDF} className={`flex-1 bg-gradient-to-r from-blue-800 to-slate-900 text-white font-black py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isGeneratingPDF ? 'opacity-50 cursor-wait' : 'hover:shadow-blue-200 hover:translate-y-[-2px]'}`}>{isGeneratingPDF ? <Loader2 className="animate-spin w-5 h-5" /> : <Download className="w-5 h-5" />} <span className="uppercase tracking-widest text-[11px]">SIMPAN & UNDUH PDF</span></button>
+            {/* ACTION FOOTER - FIXED POSITION AT BOTTOM (NOT OVERLAYING) */}
+            <div className="pt-6 pb-2 border-t border-white/5 bg-slate-950">
+                <div className="flex gap-3">
+                    <button 
+                        type="button" 
+                        onClick={onSave} 
+                        disabled={isSaving} 
+                        className={`flex-1 bg-emerald-600/10 hover:bg-emerald-600 border border-emerald-500/20 hover:border-emerald-500 text-emerald-500 hover:text-white font-black py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
+                    >
+                        {isSaving ? <Loader2 className="animate-spin w-5 h-5" /> : <Save className="w-5 h-5" />} 
+                        <span className="uppercase tracking-[0.2em] text-[10px]">SIMPAN DRAF</span>
+                    </button>
+                    
+                    <button 
+                        type="button" 
+                        onClick={onDownloadPDF} 
+                        disabled={isGeneratingPDF} 
+                        className={`flex-[1.5] bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isGeneratingPDF ? 'opacity-50 cursor-wait' : 'hover:shadow-blue-900/40 hover:translate-y-[-2px]'}`}
+                    >
+                        {isGeneratingPDF ? <Loader2 className="animate-spin w-5 h-5" /> : <Download className="w-5 h-5" />} 
+                        <span className="uppercase tracking-[0.2em] text-[10px]">SIMPAN & UNDUH PDF</span>
+                    </button>
                 </div>
             </div>
 

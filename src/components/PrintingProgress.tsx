@@ -58,7 +58,7 @@ export default function PrintingProgress({ isOpen, progress }: PrintingProgressP
                                             fill="none"
                                             stroke="currentColor"
                                             strokeWidth="6"
-                                            className="text-blue-600 transition-all duration-500 ease-out"
+                                            className="text-blue-600 transition-all duration-150 ease-out"
                                             strokeDasharray={2 * Math.PI * 44}
                                             strokeDashoffset={2 * Math.PI * 44 * (1 - progress / 100)}
                                             strokeLinecap="round"

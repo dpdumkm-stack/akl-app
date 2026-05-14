@@ -15,6 +15,8 @@ export async function getQuotationForPDF(id: string): Promise<QuotationData | nu
     nomorUrut: q.nomorUrut,
     tanggal: q.tanggal,
     namaKlien: q.namaKlien,
+    companyName: q.companyName,
+    clientName: q.clientName,
     up: q.up,
     lokasi: q.lokasi,
     namaPenandatangan: q.namaPenandatangan,

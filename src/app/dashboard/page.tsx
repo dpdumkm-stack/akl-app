@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import {
   FileText, Receipt, Plus, ArrowRight, Clock, CheckCircle,
   AlertCircle, TrendingUp, Users, LogOut, Settings,
-  ChevronRight, Layers, Bell
+  ChevronRight, Layers, Bell, Database, Printer, Eye,
+  Package, Truck
 } from "lucide-react";
 import { convertToInvoice } from "@/app/actions";
 
@@ -53,12 +54,6 @@ const fmtCompact = (n: number) => {
   return fmt(n);
 };
 
-const statusConfig = {
-  PENDING: { label: "Pending", cls: "bg-amber-500/20 text-amber-400 border-amber-500/30", dot: "bg-amber-400" },
-  PAID: { label: "Lunas", cls: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30", dot: "bg-emerald-400" },
-  CANCELLED: { label: "Batal", cls: "bg-red-500/20 text-red-400 border-red-500/30", dot: "bg-red-400" },
-};
-
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -81,9 +76,23 @@ export default function DashboardPage() {
     if (hasLoaded.current) return;
     setLoading(true);
     try {
+      const safeFetch = async (url: string) => {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) return { success: false };
+          const ct = res.headers.get("content-type");
+          if (ct && ct.includes("application/json")) {
+            return await res.json();
+          }
+          return { success: false };
+        } catch (e) {
+          return { success: false };
+        }
+      };
+
       const [qRes, iRes] = await Promise.all([
-        fetch("/api/quotations/list").then(r => r.json()).catch(() => ({ success: false })),
-        fetch("/api/invoice/list").then(r => r.json()).catch(() => ({ success: false })),
+        safeFetch("/api/quotations/list"),
+        safeFetch("/api/invoice/list"),
       ]);
 
       const quotations: QuotationSummary[] = qRes.success ? qRes.quotations ?? [] : [];
@@ -108,8 +117,8 @@ export default function DashboardPage() {
         outstandingBalance,
       });
 
-      setRecentQuotations(quotations.slice(0, 4));
-      setRecentInvoices(invoices.slice(0, 4));
+      setRecentQuotations(quotations.slice(0, 5));
+      setRecentInvoices(invoices.slice(0, 5));
       hasLoaded.current = true;
     } catch (e) {
       console.error(e);
@@ -151,315 +160,317 @@ export default function DashboardPage() {
   }, [loadData]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-900 font-sans">
-      {/* Ambient background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-violet-600/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600/8 blur-[120px] rounded-full" />
-        <div className="absolute top-[40%] right-[20%] w-[25%] h-[25%] bg-emerald-600/6 blur-[100px] rounded-full" />
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-blue-500/30">
+      {/* Dynamic Background Elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-indigo-600/10 blur-[100px] rounded-full" />
       </div>
 
-      {/* Top Nav */}
-      <nav className="relative z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/40">
-                <Layers className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <span className="text-gray-900 font-black text-lg tracking-tight">STUDIO AKL</span>
-                <p className="text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-none">Management System</p>
-              </div>
+      {/* Top Navigation */}
+      <nav className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20">
+              <FileText className="w-5 h-5 text-white" />
             </div>
-
-            <div className="flex items-center gap-3">
-              <button className="relative p-2.5 rounded-xl bg-gray-200 text-gray-600 hover:text-gray-900 transition-colors">
-                <Bell className="w-4 h-4" />
-                {stats.pendingInvoices > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[9px] font-black flex items-center justify-center">
-                    {stats.pendingInvoices}
-                  </span>
-                )}
-              </button>
-              <div className="flex items-center gap-2.5 bg-gray-200 rounded-xl px-3 py-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-red-500 rounded-lg flex items-center justify-center text-[10px] font-black">
-                  {session?.user?.name?.[0]?.toUpperCase() ?? "A"}
-                </div>
-                <span className="text-gray-800 text-xs font-bold hidden md:block">{session?.user?.name ?? "Admin"}</span>
-              </div>
-              <button
-                onClick={() => signOut({ callbackUrl: "/login" })}
-                className="p-2.5 rounded-xl bg-gray-200 text-gray-600 hover:text-red-400 hover:bg-red-100 transition-all"
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+            <div>
+              <h1 className="text-sm font-black tracking-tight text-white uppercase">Studio AKL <span className="text-blue-500">v2.5</span></h1>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">PT. Apindo Karya Lestari</p>
             </div>
           </div>
-        </nav>
 
-      <div className="relative z-[60] max-w-7xl mx-auto px-6 py-8 space-y-8">
-        {/* Welcome */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-slate-900">
-              Selamat datang, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-red-600">{session?.user?.name ?? "Admin"}</span> 👋
-            </h1>
-            <p className="text-slate-500 mt-1 text-sm">PT. Apindo Karya Lestari — Sistem Manajemen Penawaran &amp; Invoice</p>
+          <div className="flex items-center gap-3">
+             <button 
+              onClick={() => router.push("/clients")}
+              className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-white/5 rounded-xl text-xs font-bold transition-all"
+            >
+              <Users className="w-3.5 h-3.5 text-blue-400" /> Database Klien
+            </button>
+            <div className="h-8 w-px bg-white/10 mx-1 hidden md:block" />
+             <button 
+              onClick={() => router.push("/settings")}
+              className="p-2.5 bg-slate-900 hover:bg-blue-600 text-slate-400 hover:text-white rounded-xl border border-white/5 transition-all"
+              title="Pengaturan"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+            <div className="h-8 w-px bg-white/10 mx-1 hidden md:block" />
+            <button 
+              onClick={() => signOut()}
+              className="p-2.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all"
+              title="Keluar"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
+        </div>
+      </nav>
+
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-8 md:py-12 space-y-12">
+        {/* Welcome Header */}
+        <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="space-y-1">
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white">
+              Selamat datang, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">{session?.user?.name ?? "Administrator"}</span>
+            </h2>
+            <p className="text-slate-400 font-medium">Ikhtisar operasional harian Anda dalam satu tampilan.</p>
+          </div>
+        </section>
+
+        {/* Stats Grid */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+          <StatCard title="Total Penawaran" value={stats.totalQuotations} icon={<FileText className="w-5 h-5" />} color="blue" />
+          <StatCard title="Tingkat Konversi" value={`${stats.conversionRate}%`} icon={<TrendingUp className="w-5 h-5" />} color="emerald" />
+          <StatCard title="Invoice Terbit" value={stats.totalInvoices} icon={<Database className="w-5 h-5" />} color="indigo" />
+          <StatCard title="Piutang (Pending)" value={fmtCompact(stats.outstandingBalance)} icon={<Clock className="w-5 h-5" />} color="amber" />
+        </section>
+
+        {/* 4 Pilar Utama Cards */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+          <ServiceCard 
+            title="Penawaran" 
+            subtitle="Buat Penawaran Baru" 
+            icon={<FileText className="w-8 h-8" />} 
+            color="blue" 
+            onClick={() => router.push("/quotations")}
+            stats={`${stats.totalQuotations} Dokumen`}
+          />
+          <ServiceCard 
+            title="Invoice" 
+            subtitle="Kelola Penagihan" 
+            icon={<Receipt className="w-8 h-8" />} 
+            color="emerald" 
+            onClick={() => router.push("/invoice")}
+            stats={`${stats.totalInvoices} Terbit`}
+          />
+          <ServiceCard 
+            title="Purchase Order" 
+            subtitle="Manajemen PO" 
+            icon={<Package className="w-8 h-8" />} 
+            color="amber" 
+            isPlaceholder
+            stats="Coming Soon"
+          />
+          <ServiceCard 
+            title="Surat Jalan" 
+            subtitle="Cetak Surat Jalan" 
+            icon={<Truck className="w-8 h-8" />} 
+            color="indigo" 
+            isPlaceholder
+            stats="Coming Soon"
+          />
+        </section>
+
+        {/* Main Dashboard Layout (Refined Clean List System) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
           
-          <button 
-            onClick={() => window.alert("SISTEM KLIK AKTIF!")}
-            className="px-4 py-2 bg-red-600 text-white font-black rounded-xl shadow-lg z-[100]"
-          >
-            TEST KLIK SISTEM
-          </button>
-          <div className="flex items-center gap-2 px-4 py-2 bg-slate-900/50 border border-slate-800 rounded-2xl">
-             <div className="flex flex-col items-end">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Conversion Rate</span>
-                <span className="text-sm font-black text-fuchsia-400">{stats.conversionRate}%</span>
-             </div>
-             <div className="w-10 h-10 bg-fuchsia-500/10 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-fuchsia-400" />
-             </div>
-          </div>
-        </div>
-
-        {/* Lifecycle Visualization */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 p-8 opacity-5">
-                <Layers className="w-48 h-48 text-white" />
-            </div>
-            
-            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-10 text-center md:text-left">Alur Kerja Dokumen (Lifecycle)</h3>
-            
-            <div className="relative flex flex-col md:flex-row items-center justify-between gap-12 md:gap-4 max-w-4xl mx-auto">
-                {/* Connector Line */}
-                <div className="hidden md:block absolute top-[32px] left-0 w-full h-[2px] bg-gradient-to-r from-violet-500/20 via-blue-500/20 to-emerald-500/20 z-0"></div>
-                
-                {[
-                    { label: "Penawaran", value: stats.totalQuotations, sub: "Diterbitkan", icon: FileText, color: "from-violet-500 to-violet-600", shadow: "shadow-violet-900/40" },
-                    { label: "Invoice", value: stats.invoicedQuotations, sub: "Terintegrasi", icon: Receipt, color: "from-blue-500 to-blue-600", shadow: "shadow-blue-900/40" },
-                    { label: "Pembayaran", value: stats.paidInvoices, sub: "Dana Masuk", icon: CheckCircle, color: "from-emerald-500 to-emerald-600", shadow: "shadow-emerald-900/40" },
-                ].map((step, idx) => (
-                    <div key={idx} className="relative z-10 flex flex-col items-center text-center group">
-                        <div className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center shadow-xl ${step.shadow} mb-4 group-hover:scale-110 transition-transform duration-500`}>
-                            <step.icon className="w-8 h-8 text-white" />
-                        </div>
-                        <p className="text-white font-black text-2xl tracking-tighter">{step.value}</p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{step.label}</p>
-                        <p className="text-[9px] font-bold text-slate-600 uppercase mt-0.5">{step.sub}</p>
-                    </div>
-                ))}
-            </div>
-        </div>
-
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: "Total Penawaran", value: stats.totalQuotations, icon: FileText, color: "from-violet-600 to-violet-700", glow: "shadow-violet-900/40" },
-            { label: "Total Invoice", value: stats.totalInvoices, icon: Receipt, color: "from-blue-600 to-blue-700", glow: "shadow-blue-900/40" },
-            { label: "Invoice Pending", value: stats.pendingInvoices, icon: Clock, color: "from-amber-500 to-orange-600", glow: "shadow-amber-900/40" },
-            { label: "Invoice Lunas", value: stats.paidInvoices, icon: CheckCircle, color: "from-emerald-500 to-emerald-600", glow: "shadow-emerald-900/40" },
-          ].map(stat => {
-            const Icon = stat.icon;
-            return (
-              <div key={stat.label} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center gap-4 hover:border-slate-700 transition-all">
-                <div className={`w-11 h-11 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center shadow-lg ${stat.glow} flex-shrink-0`}>
-                  <Icon className="w-5 h-5 text-white" />
+          {/* Recent Quotations Container */}
+          <div className="bg-slate-900/40 border border-white/5 rounded-[40px] p-8 shadow-2xl backdrop-blur-sm flex flex-col">
+            <div className="flex items-center justify-between mb-8 px-2">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-blue-600/10 rounded-2xl flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-white">{stat.value}</p>
-                  <p className="text-xs text-slate-500 font-medium">{stat.label}</p>
+                  <h3 className="text-lg font-black tracking-tight text-white uppercase italic">Penawaran</h3>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Update Terbaru</p>
                 </div>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Revenue Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 border border-emerald-700/30 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-black text-emerald-400 uppercase tracking-widest">Total Pendapatan Terbayar</p>
-              <TrendingUp className="w-4 h-4 text-emerald-400" />
-            </div>
-            <p className="text-3xl font-black text-emerald-300">{fmtCompact(stats.totalRevenue)}</p>
-            <p className="text-xs text-emerald-600 mt-1">{stats.paidInvoices} invoice lunas</p>
-          </div>
-          <div className="bg-gradient-to-br from-amber-900/40 to-amber-800/20 border border-amber-700/30 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-black text-amber-400 uppercase tracking-widest">Outstanding / Belum Dibayar</p>
-              <AlertCircle className="w-4 h-4 text-amber-400" />
-            </div>
-            <p className="text-3xl font-black text-amber-300">{fmtCompact(stats.outstandingBalance)}</p>
-            <p className="text-xs text-amber-600 mt-1">{stats.pendingInvoices} invoice pending</p>
-          </div>
-        </div>
-
-        {/* Main Module Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Penawaran Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col hover:border-violet-700/50 transition-all group">
-            <div className="flex items-center gap-4 mb-5">
-              <div className="w-14 h-14 bg-gradient-to-br from-violet-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-violet-900/50">
-                <FileText className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl font-black text-white">PENAWARAN</h2>
-                <p className="text-xs text-slate-500 font-medium">Quotation Generator</p>
-              </div>
+              <button onClick={() => router.push("/")} className="p-2 hover:bg-white/5 rounded-full transition-colors group">
+                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-blue-400" />
+              </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 mb-5">
-              {[
-                { label: "Total Aktif", value: stats.totalQuotations },
-                { label: "Bulan Ini", value: recentQuotations.filter(q => new Date(q.createdAt).getMonth() === new Date().getMonth()).length },
-                { label: "Template", value: 3 },
-              ].map(s => (
-                <div key={s.label} className="bg-slate-800/60 rounded-xl p-3 text-center">
-                  <p className="text-xl font-black text-violet-400">{s.value}</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5 font-medium">{s.label}</p>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => router.push("/")}
-              className="w-full py-3 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white font-black text-sm rounded-xl transition-all shadow-lg shadow-violet-900/30 flex items-center justify-center gap-2 mb-5"
-            >
-              <Plus className="w-4 h-4" /> Buat Penawaran Baru
-            </button>
-
-            {/* Recent quotations */}
-            <div className="flex-1 space-y-2">
-              <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-2">Penawaran Terbaru</p>
+            <div className="flex-1 space-y-1">
               {recentQuotations.length === 0 ? (
-                <p className="text-slate-600 text-xs text-center py-4">Belum ada penawaran</p>
-              ) : recentQuotations.map(q => (
-                <div key={q.id} className="flex items-center justify-between py-2.5 px-3 bg-slate-200 border border-slate-300 rounded-xl group relative">
-                  <div className="min-w-0">
-                    <p className="text-slate-900 font-bold text-xs truncate">{q.namaKlien}</p>
-                    <p className="text-slate-500 text-[10px]">{q.nomorSurat}</p>
-                  </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <span className="text-blue-600 text-xs font-black">{fmtCompact(q.totalHarga)}</span>
-                      {q.isInvoiced ? (
-                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-md text-[9px] font-black uppercase tracking-tighter">Terbit</span>
-                      ) : (
-                        <button 
-                          type="button"
-                          onClick={() => handleConvertToInvoice(q.id, q.namaKlien)}
-                          className="relative z-[200] p-2.5 bg-red-600 text-white hover:bg-red-700 rounded-xl transition-all shadow-md active:scale-90"
-                          title="Terbitkan Invoice"
-                        >
-                          <Receipt className="w-4 h-4" />
-                        </button>
-                      )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button onClick={() => router.push("/")} className="mt-4 flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-violet-400 transition-colors font-semibold">
-              Lihat semua penawaran <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-
-          {/* Invoice Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col hover:border-emerald-700/50 transition-all group">
-            <div className="flex items-center gap-4 mb-5">
-              <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-900/50">
-                <Receipt className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl font-black text-white">INVOICE</h2>
-                <p className="text-xs text-slate-500 font-medium">Invoice Generator</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 mb-5">
-              {[
-                { label: "Total Invoice", value: stats.totalInvoices },
-                { label: "Pending", value: stats.pendingInvoices },
-                { label: "Lunas", value: stats.paidInvoices },
-              ].map(s => (
-                <div key={s.label} className="bg-slate-800/60 rounded-xl p-3 text-center">
-                  <p className="text-xl font-black text-emerald-400">{s.value}</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5 font-medium">{s.label}</p>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => router.push("/invoice")}
-              className="w-full py-3 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black text-sm rounded-xl transition-all shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 mb-5"
-            >
-              <Plus className="w-4 h-4" /> Buat Invoice Baru
-            </button>
-
-            {/* Recent invoices */}
-            <div className="flex-1 space-y-2">
-              <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-2">Invoice Terbaru</p>
-              {recentInvoices.length === 0 ? (
-                <p className="text-slate-600 text-xs text-center py-4">Belum ada invoice</p>
-              ) : recentInvoices.map(inv => {
-                const sc = statusConfig[inv.status];
-                return (
-                  <div key={inv.id} className="flex items-center justify-between py-2.5 px-3 bg-slate-800/40 rounded-xl hover:bg-slate-800 transition-colors cursor-pointer" onClick={() => router.push("/invoice")}>
+                <div className="py-20 text-center text-slate-600 font-medium italic">Belum ada penawaran terbaru.</div>
+              ) : recentQuotations.map((q, idx) => (
+                <div 
+                  key={q.id} 
+                  onClick={() => router.push(`/quotations/edit/${q.id}`)}
+                  className={`flex items-center justify-between p-4 hover:bg-white/[0.03] rounded-2xl transition-all group cursor-pointer ${idx !== recentQuotations.length - 1 ? 'border-b border-white/[0.02]' : ''}`}
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-10 h-10 rounded-full bg-slate-950 border border-white/5 flex items-center justify-center text-[10px] font-black text-slate-400 group-hover:border-blue-500/50 group-hover:text-blue-400 transition-all">
+                      {q.namaKlien?.substring(0, 2).toUpperCase()}
+                    </div>
                     <div className="min-w-0">
-                      <p className="text-white font-semibold text-xs truncate">{inv.clientName}</p>
-                      <p className="text-slate-500 text-[10px]">{inv.invoiceNumber}</p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${sc.cls}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
-                        {sc.label}
-                      </span>
-                      <ChevronRight className="w-3 h-3 text-slate-600" />
+                      <h4 className="text-sm font-bold text-slate-200 truncate group-hover:text-white transition-colors">{q.namaKlien}</h4>
+                      <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">{q.nomorSurat}</p>
                     </div>
                   </div>
-                );
-              })}
+                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    <span className="text-xs font-black text-blue-500">{fmtCompact(q.totalHarga)}</span>
+                    {q.isInvoiced ? (
+                      <span className="flex items-center gap-1 text-[8px] font-black text-emerald-500 uppercase tracking-widest">
+                        <CheckCircle className="w-2.5 h-2.5" /> Terbit
+                      </span>
+                    ) : (
+                      <button 
+                        onClick={() => handleConvertToInvoice(q.id, q.namaKlien)}
+                        className="text-[8px] font-black text-slate-500 hover:text-blue-400 uppercase tracking-widest transition-colors"
+                      >
+                        Terbitkan →
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <button 
+              onClick={() => router.push("/quotations")}
+              className="mt-6 w-full py-4 bg-slate-950/50 hover:bg-blue-600 hover:text-white text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all border border-white/5"
+            >
+              Lihat Semua Penawaran
+            </button>
+          </div>
+
+          {/* Recent Invoices Container */}
+          <div className="bg-slate-900/40 border border-white/5 rounded-[40px] p-8 shadow-2xl backdrop-blur-sm flex flex-col">
+            <div className="flex items-center justify-between mb-8 px-2">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-emerald-600/10 rounded-2xl flex items-center justify-center">
+                  <Receipt className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black tracking-tight text-white uppercase italic">Invoice</h3>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Penagihan Terkini</p>
+                </div>
+              </div>
+              <button onClick={() => router.push("/invoice")} className="p-2 hover:bg-white/5 rounded-full transition-colors group">
+                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-emerald-400" />
+              </button>
             </div>
 
-            <button onClick={() => router.push("/invoice")} className="mt-4 flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-emerald-400 transition-colors font-semibold">
-              Lihat semua invoice <ArrowRight className="w-3 h-3" />
+            <div className="flex-1 space-y-1">
+              {recentInvoices.length === 0 ? (
+                <div className="py-20 text-center text-slate-600 font-medium italic">Belum ada invoice terkini.</div>
+              ) : recentInvoices.map((inv, idx) => (
+                <div 
+                  key={inv.id} 
+                  onClick={() => router.push(`/invoice/edit/${inv.id}`)}
+                  className={`flex items-center justify-between p-4 hover:bg-white/[0.03] rounded-2xl transition-all group cursor-pointer ${idx !== recentInvoices.length - 1 ? 'border-b border-white/[0.02]' : ''}`}
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className={`w-10 h-10 rounded-full bg-slate-950 border border-white/5 flex items-center justify-center text-[10px] font-black ${inv.status === 'PAID' ? 'text-emerald-500' : 'text-amber-500'} group-hover:border-emerald-500/50 transition-all`}>
+                      {inv.status === 'PAID' ? 'L' : 'P'}
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="text-sm font-bold text-slate-200 truncate group-hover:text-white transition-colors">{inv.clientName}</h4>
+                      <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">{inv.invoiceNumber}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    <span className="text-xs font-black text-white">{fmtCompact(inv.total)}</span>
+                    <div className="flex items-center gap-1.5">
+                      <div className={`w-1 h-1 rounded-full ${inv.status === 'PAID' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                      <span className={`text-[8px] font-black uppercase tracking-widest ${inv.status === 'PAID' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                        {inv.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button 
+              onClick={() => router.push("/invoice")}
+              className="mt-6 w-full py-4 bg-slate-950/50 hover:bg-emerald-600 hover:text-white text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all border border-white/5"
+            >
+              Lihat Semua Invoice
             </button>
           </div>
         </div>
+      </main>
 
-        {/* Log Diagnostik Persistent */}
-        <div className="mt-12 bg-black border border-slate-800 rounded-2xl p-6 shadow-2xl">
-            <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
-                <div className="w-3 h-3 bg-red-500 rounded-full" />
-                <div className="w-3 h-3 bg-amber-500 rounded-full" />
-                <div className="w-3 h-3 bg-emerald-500 rounded-full" />
-                <span className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">System Diagnostic Log</span>
-            </div>
-            <div className="font-mono text-xs space-y-2">
-                <p className="text-emerald-500">[SYSTEM] Dashboard initialized.</p>
-                {systemError ? (
-                    <p className="text-red-400 animate-pulse font-bold">{systemError}</p>
-                ) : (
-                    <p className="text-slate-600">Menunggu aksi pengguna...</p>
-                )}
-            </div>
+      <footer className="max-w-7xl mx-auto px-6 py-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-slate-600">
+        <p className="text-[10px] font-black uppercase tracking-widest">© 2026 PT. Apindo Karya Lestari — Studio Suite v2.5</p>
+        <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest">
+          <button className="hover:text-blue-500 transition-colors">Dokumentasi</button>
+          <button className="hover:text-blue-500 transition-colors">Bantuan</button>
         </div>
+      </footer>
 
-        {/* Footer */}
-        <div className="text-center py-4">
-          <p className="text-xs text-slate-700 font-medium">© 2026 PT. Apindo Karya Lestari — Studio AKL v2.0</p>
+      {loading && (
+        <div className="fixed inset-0 z-[100] bg-slate-950/50 backdrop-blur-sm flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
         </div>
+      )}
+    </div>
+  );
+}
 
-        {/* Toast Notification */}
-        {toast && (
-          <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3 border ${toast.type === 'error' ? 'bg-red-900 border-red-800 text-red-200' : 'bg-emerald-900 border-emerald-800 text-emerald-200'}`}>
-            {toast.type === 'error' ? <AlertCircle className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
-            <p className="text-sm font-bold">{toast.msg}</p>
+// Sub-components for better organization
+function StatCard({ title, value, icon, color }: { title: string, value: any, icon: any, color: 'blue' | 'emerald' | 'indigo' | 'amber' }) {
+  const colors = {
+    blue: 'bg-blue-600/10 text-blue-400 border-blue-500/20',
+    emerald: 'bg-emerald-600/10 text-emerald-400 border-emerald-500/20',
+    indigo: 'bg-indigo-600/10 text-indigo-400 border-indigo-500/20',
+    amber: 'bg-amber-600/10 text-amber-400 border-amber-500/20',
+  };
+
+  return (
+    <div className={`p-6 rounded-[32px] border ${colors[color]} backdrop-blur-sm shadow-xl transition-all hover:scale-[1.02] duration-300`}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-[10px] font-black uppercase tracking-widest opacity-70">{title}</div>
+        <div className="opacity-40">{icon}</div>
+      </div>
+      <div className="text-3xl font-black tracking-tighter text-white">{value}</div>
+    </div>
+  );
+}
+
+function ServiceCard({ title, subtitle, icon, color, onClick, isPlaceholder, stats }: { 
+  title: string, subtitle: string, icon: any, color: 'blue' | 'emerald' | 'indigo' | 'amber', 
+  onClick?: () => void, isPlaceholder?: boolean, stats?: string 
+}) {
+  const colors = {
+    blue: 'from-blue-600 to-blue-800 shadow-blue-900/40 hover:shadow-blue-500/20',
+    emerald: 'from-emerald-600 to-emerald-800 shadow-emerald-900/40 hover:shadow-emerald-500/20',
+    indigo: 'from-indigo-600 to-indigo-800 shadow-indigo-900/40 hover:shadow-indigo-500/20',
+    amber: 'from-amber-600 to-amber-800 shadow-amber-900/40 hover:shadow-amber-500/20',
+  };
+
+  return (
+    <button 
+      onClick={onClick}
+      disabled={isPlaceholder}
+      className={`relative group flex flex-col p-8 rounded-[32px] bg-gradient-to-br ${colors[color]} shadow-2xl transition-all duration-500 hover:translate-y-[-4px] ${isPlaceholder ? 'opacity-50 cursor-not-allowed filter grayscale-[0.3]' : 'active:scale-95'}`}
+    >
+      <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+        {React.cloneElement(icon as React.ReactElement, { className: 'w-24 h-24' })}
+      </div>
+      
+      <div className="relative z-10">
+        <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+          {React.cloneElement(icon as React.ReactElement, { className: 'w-7 h-7 text-white' })}
+        </div>
+        <h3 className="text-xl font-black text-white mb-1 tracking-tight uppercase">{title}</h3>
+        <p className="text-xs text-white/60 font-medium mb-6 uppercase tracking-wider">{subtitle}</p>
+        
+        {stats && (
+          <div className="mt-auto flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse" />
+            <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">{stats}</span>
           </div>
         )}
       </div>
-    </div>
+    </button>
+  );
+}
+
+function NavButton({ icon, label, onClick }: { icon: any, label: string, onClick: () => void }) {
+  return (
+    <button 
+      onClick={onClick}
+      className="flex flex-col items-center justify-center gap-2 p-4 bg-slate-950 border border-white/5 rounded-2xl hover:bg-slate-800 hover:border-blue-500/30 transition-all group"
+    >
+      <div className="text-slate-500 group-hover:text-blue-400 transition-colors scale-75 md:scale-100">
+        {React.cloneElement(icon, { className: 'w-4 h-4' })}
+      </div>
+      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-white transition-colors">{label}</span>
+    </button>
   );
 }

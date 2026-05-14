@@ -84,3 +84,143 @@ The table `main.Quotation` does not exist in the current database.
 [14/5/2026, 19.52.29] [SUCCESS] Berhasil membuat PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505
 [14/5/2026, 19.57.41] [INFO] Memulai pembuatan PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505 (Mode: inline)
 [14/5/2026, 19.57.52] [SUCCESS] Berhasil membuat PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505
+[15/5/2026, 01.03.43] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.03.44] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0swn~mr._.js:307:168
+
+  304 };
+  305 let quotation;
+  306 if (data.id) {
+→ 307     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update(
+An operation failed because it depends on one or more records that were required but not found. No 'Quotation' record (needed to inline the relation on 'Quotation' record(s)) was found for a nested create on one-to-many relation 'QuotationToQuotationItem'.
+[15/5/2026, 01.03.55] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.03.55] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0swn~mr._.js:307:168
+
+  304 };
+  305 let quotation;
+  306 if (data.id) {
+→ 307     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update(
+An operation failed because it depends on one or more records that were required but not found. No 'Quotation' record (needed to inline the relation on 'Quotation' record(s)) was found for a nested create on one-to-many relation 'QuotationToQuotationItem'.
+[15/5/2026, 01.04.31] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.04.32] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0swn~mr._.js:307:168
+
+  304 };
+  305 let quotation;
+  306 if (data.id) {
+→ 307     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update(
+An operation failed because it depends on one or more records that were required but not found. No 'Quotation' record (needed to inline the relation on 'Quotation' record(s)) was found for a nested create on one-to-many relation 'QuotationToQuotationItem'.
+[15/5/2026, 01.04.42] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.04.42] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0swn~mr._.js:307:168
+
+  304 };
+  305 let quotation;
+  306 if (data.id) {
+→ 307     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update(
+An operation failed because it depends on one or more records that were required but not found. No 'Quotation' record (needed to inline the relation on 'Quotation' record(s)) was found for a nested create on one-to-many relation 'QuotationToQuotationItem'.
+[15/5/2026, 01.04.51] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.04.51] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0swn~mr._.js:307:168
+
+  304 };
+  305 let quotation;
+  306 if (data.id) {
+→ 307     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update(
+An operation failed because it depends on one or more records that were required but not found. No 'Quotation' record (needed to inline the relation on 'Quotation' record(s)) was found for a nested create on one-to-many relation 'QuotationToQuotationItem'.
+[15/5/2026, 01.05.00] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.05.00] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0swn~mr._.js:307:168
+
+  304 };
+  305 let quotation;
+  306 if (data.id) {
+→ 307     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update(
+An operation failed because it depends on one or more records that were required but not found. No 'Quotation' record (needed to inline the relation on 'Quotation' record(s)) was found for a nested create on one-to-many relation 'QuotationToQuotationItem'.
+[15/5/2026, 01.05.09] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.05.09] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0swn~mr._.js:307:168
+
+  304 };
+  305 let quotation;
+  306 if (data.id) {
+→ 307     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.update(
+An operation failed because it depends on one or more records that were required but not found. No 'Quotation' record (needed to inline the relation on 'Quotation' record(s)) was found for a nested create on one-to-many relation 'QuotationToQuotationItem'.
+[15/5/2026, 01.17.55] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.17.55] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 01.19.21] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: inline)
+[15/5/2026, 01.20.00] [ERROR] GAGAL membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99. Error: Waiting for selector `.a4-page` failed
+[15/5/2026, 01.34.41] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.34.41] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 01.34.52] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.34.52] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 01.37.56] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.37.57] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 01.37.57] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 01.38.29] [ERROR] GAGAL membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99. Error: Waiting for selector `.a4-page` failed
+[15/5/2026, 01.40.26] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.40.27] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 01.40.28] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 01.40.41] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 01.46.26] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.46.26] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 01.46.28] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 01.46.40] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 01.50.12] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.50.13] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 01.50.15] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 01.50.27] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 01.53.36] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.53.37] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 01.53.40] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 01.54.25] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 01.58.29] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 01.58.30] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 01.58.33] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 01.59.14] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 02.02.38] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 02.02.39] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 02.02.43] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 02.03.34] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 02.06.52] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 02.06.52] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 02.06.54] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 02.07.31] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 02.07.51] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 02.07.56] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 02.07.57] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 02.08.41] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 02.12.39] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 02.12.39] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 02.12.42] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 02.13.33] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 02.22.32] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 02.22.33] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 02.22.34] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 02.23.12] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 02.25.13] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 02.25.14] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 02.25.22] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 02.25.23] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 02.25.24] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 02.25.34] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 02.26.47] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 02.26.47] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 02.26.48] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 02.27.13] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 02.32.33] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 02.32.33] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 02.32.35] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 02.33.16] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 03.12.21] [INFO] Memulai simpan Penawaran: 000/PH-AKL/V/2026
+[15/5/2026, 03.12.22] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
+[15/5/2026, 03.12.25] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
+[15/5/2026, 03.12.59] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99

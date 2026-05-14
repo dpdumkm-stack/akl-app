@@ -1,13 +1,12 @@
-"use client";
-
 import React, { useMemo } from "react";
+import { InvoiceData } from "@/lib/types";
 import { calculatePages } from "@/lib/paginator";
 
-interface InvoiceA4PreviewProps {
-    data: any;
-    isGeneratingPDF: boolean;
-    globalLogoUrl?: string | null;
-    globalTTDUrl?: string | null;
+interface Props {
+  data: InvoiceData;
+  isGeneratingPDF: boolean;
+  globalLogoUrl?: string | null;
+  globalTTDUrl?: string | null;
 }
 
 // ─── Terbilang (Indonesian Number-to-Words) ──────────────────────────────────
@@ -64,11 +63,11 @@ const fmtDate = (d: string) =>
 const fmtDateLong = (d: string) =>
   new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }: InvoiceA4PreviewProps) => {
+export default function InvoiceA4Preview({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }: Props) {
   const pages = useMemo(() => calculatePages(data), [data]);
 
   // Financial calculations
-  const subtotal = (data.items || []).reduce((a: number, i: any) => a + (i.quantity * i.unitPrice), 0);
+  const subtotal = data.items.reduce((a, i) => a + i.quantity * i.unitPrice, 0);
   const discountAmount = Number(data.discountAmount || 0);
   const dpp = subtotal - discountAmount;
   const taxAmount = data.taxApplied ? dpp * 0.11 : 0;
@@ -76,13 +75,15 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
   const dp = Number(data.downPayment || 0);
   const isDPMode = data.invoiceType === 'DP';
   const total = isDPMode ? dp : (grandTotal - dp);
+  const totalLabel = total;
 
+  // Build "Untuk Pembayaran" description from items
   const paymentDesc = data.notes
     ? data.notes
-    : (data.items || []).map((i: any) => i.description).filter(Boolean).join('; ');
+    : data.items.map(i => i.description).filter(Boolean).join('; ');
 
   return (
-    <div id="print-area" style={{ width: '794px' }} className="flex flex-col items-center bg-transparent select-none">
+    <div className="print-area" style={{ width: '794px' }}>
       {pages.map((page, pageIndex) => {
         const startIdx = pages.slice(0, pageIndex).reduce((acc, p) => acc + p.items.length, 0);
 
@@ -101,17 +102,20 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
               boxSizing: 'border-box',
               overflow: 'hidden',
               marginBottom: isGeneratingPDF ? '0' : '20px',
-              boxShadow: isGeneratingPDF ? 'none' : '0 25px 50px -12px rgb(0 0 0 / 0.25)'
+              boxShadow: isGeneratingPDF ? 'none' : '0 0 10px rgba(0,0,0,0.1)'
             }}
-            className={`a4-page flex flex-col ${pageIndex > 0 ? 'pdf-page-break' : ''}`}
+            className={`a4-page ${pageIndex > 0 ? 'pdf-page-break' : ''}`}
           >
+            {/* ── TOP HEADER ───────────────────────────────────────────────────── */}
             <div style={{ height: '8px', backgroundColor: '#1e3a8a', width: '100%' }} />
 
+            {/* Main header row: dynamic based on pageIndex */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: pageIndex === 0 ? '14px 30px 10px 30px' : '10px 30px' }}>
+              {/* Left: Logo */}
               <div style={{ flexShrink: 0 }}>
-                {(data.logoUrl || globalLogoUrl) ? (
+                {globalLogoUrl ? (
                   <img 
-                    src={data.logoUrl || globalLogoUrl || ""} 
+                    src={globalLogoUrl} 
                     style={{ maxHeight: pageIndex === 0 ? '80px' : '40px', maxWidth: '130px', objectFit: 'contain' }} 
                     alt="Logo" 
                   />
@@ -120,6 +124,7 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
                 )}
               </div>
 
+              {/* Right: Company Info */}
               <div style={{ textAlign: 'right' }}>
                 <p style={{ margin: '0 0 2px 0', fontSize: pageIndex === 0 ? '22px' : '14px', fontWeight: '900', color: '#1e3a8a', letterSpacing: '1px', textTransform: 'uppercase' }}>
                   PT. Apindo Karya Lestari
@@ -144,11 +149,14 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
               </div>
             </div>
 
+            {/* Double rule */}
             <div style={{ height: '4px', backgroundColor: '#1e3a8a', width: '100%' }} />
             <div style={{ height: '2px', backgroundColor: '#dc2626', width: '100%', marginBottom: '0' }} />
 
+            {/* ── CONTENT ────────────────────────────────────────────────────── */}
             {page.isFirstPage && (
               <>
+                {/* KWITANSI TITLE */}
                 <div style={{ display: 'flex', padding: '20px 30px 15px 30px', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                     <p style={{ margin: 0, fontSize: '18px', fontWeight: '900', letterSpacing: '4px', textDecoration: 'underline', color: '#1e3a8a' }}>
@@ -180,6 +188,7 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
 
                 <div style={{ margin: '0 20px', borderTop: '1px solid #333' }} />
 
+                {/* BODY FIELDS */}
                 <div style={{ padding: '15px 30px', fontSize: '13px' }}>
                   <table style={{ width: '100%', marginBottom: '12px', borderCollapse: 'collapse' }}>
                     <tbody>
@@ -190,7 +199,16 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
                         </td>
                         <td style={{ width: '20px', fontWeight: 'bold', paddingTop: '6px' }}>:</td>
                         <td style={{ borderBottom: '1px dotted #94a3b8', padding: '6px 10px', backgroundColor: '#f8fafc' }}>
-                          <span style={{ fontWeight: '900', fontSize: '13px', textTransform: 'uppercase' }}>{data.clientName || '---'}</span>
+                          {data.companyName ? (
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <span style={{ fontWeight: '900', fontSize: '13px', textTransform: 'uppercase' }}>{data.companyName}</span>
+                              {data.clientName && (
+                                <span style={{ fontWeight: '600', fontSize: '11px', marginTop: '2px' }}>U.P.: {data.clientName}</span>
+                              )}
+                            </div>
+                          ) : (
+                            <span style={{ fontWeight: '900', fontSize: '13px', textTransform: 'uppercase' }}>{data.clientName || '---'}</span>
+                          )}
                         </td>
                       </tr>
                     </tbody>
@@ -204,7 +222,7 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
                         </td>
                         <td style={{ width: '20px', fontWeight: 'bold', paddingTop: '6px' }}>:</td>
                         <td style={{ borderBottom: '1px dotted #94a3b8', padding: '6px 10px', fontWeight: 'bold', fontStyle: 'italic', fontSize: '12px', backgroundColor: '#f8fafc', lineHeight: '1.6' }}>
-                          ## {terbilang(total)} ##
+                          ## {terbilang(totalLabel)} ##
                         </td>
                       </tr>
                     </tbody>
@@ -228,7 +246,8 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
               </>
             )}
 
-            <div style={{ padding: page.isFirstPage ? '5px 30px 15px 30px' : '20px 30px 15px 30px', flexGrow: 1 }}>
+            {/* TABLE */}
+            <div style={{ padding: page.isFirstPage ? '5px 30px 15px 30px' : '20px 30px 15px 30px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', border: '1px solid #e2e8f0' }}>
                 <thead style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1' }}>
                   <tr>
@@ -237,7 +256,7 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
                   </tr>
                 </thead>
                 <tbody>
-                  {(page.items || []).map((item: any, idx: number) => (
+                  {page.items.map((item: any, idx: number) => (
                     <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
                       <td style={{ padding: '5px 12px', textAlign: 'left', width: '60%' }}>
                         {item.description}
@@ -277,6 +296,20 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
                           </tr>
                         </>
                       )}
+                      {(data.taxApplied || discountAmount > 0) && dp > 0 && (
+                        <tr style={{ borderTop: '1px solid #e2e8f0' }}>
+                          <td style={{ padding: '5px 12px', textAlign: 'right', fontWeight: 'bold' }}>Total Nilai Proyek =</td>
+                          <td style={{ padding: '5px 12px', textAlign: 'right', fontWeight: 'bold' }}>Rp</td>
+                          <td style={{ padding: '5px 12px', textAlign: 'right', fontWeight: 'bold' }}>{rp(grandTotal).replace('Rp ', '')}</td>
+                        </tr>
+                      )}
+                      {!isDPMode && dp > 0 && (
+                        <tr>
+                          <td style={{ padding: '5px 12px', textAlign: 'right', color: '#16a34a' }}>Uang Muka yang Sudah Dibayar =</td>
+                          <td style={{ padding: '5px 12px', textAlign: 'right', color: '#16a34a' }}>- Rp</td>
+                          <td style={{ padding: '5px 12px', textAlign: 'right', color: '#16a34a' }}>{rp(dp).replace('Rp ', '')}</td>
+                        </tr>
+                      )}
                       <tr>
                         <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: '900', fontSize: '12px', backgroundColor: '#f8fafc', borderTop: '1px solid #cbd5e1' }}>
                           {isDPMode ? 'Tagihan Uang Muka (DP) =' : (dp > 0 ? 'Sisa Tagihan =' : 'Total Tagihan =')}
@@ -301,13 +334,39 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
                       <p style={{ margin: '0 0 2px 0', fontSize: '9px', fontWeight: '700', color: '#64748b', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Jumlah Tagihan</p>
                       <p style={{ margin: 0, fontSize: '26px', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.5px', lineHeight: 1 }}>{rp(total)}</p>
                     </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
+                      <p style={{ margin: 0, fontSize: '9px', fontWeight: '700', color: '#64748b', letterSpacing: '1px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Via:</p>
+                      {(['CASH', 'CHEQUE', 'BILYET GIRO', 'TRANSFER'] as const).map(method => (
+                        <div key={method} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <div style={{
+                            width: '14px', height: '14px',
+                            border: data.paymentMethod === method ? '2px solid #1e3a8a' : '1.5px solid #94a3b8',
+                            borderRadius: '2px',
+                            backgroundColor: data.paymentMethod === method ? '#1e3a8a' : '#fff',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'white', fontSize: '9px', fontWeight: 'bold', flexShrink: 0
+                          }}>{data.paymentMethod === method && "✓"}</div>
+                          <span style={{ fontSize: '9px', fontWeight: 'bold', color: data.paymentMethod === method ? '#1e3a8a' : '#64748b', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{method}</span>
+                        </div>
+                      ))}
+                    </div>
                     <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
                       <p style={{ margin: '0 0 8px 0', fontSize: '9px', fontWeight: '800', color: '#94a3b8', letterSpacing: '2px', textTransform: 'uppercase' }}>Rekening Pembayaran</p>
                       <div style={{ display: 'flex', alignItems: 'stretch', gap: '0' }}>
                         <div style={{ width: '4px', backgroundColor: '#1e3a8a', borderRadius: '4px 0 0 4px', flexShrink: 0 }} />
                         <div style={{ padding: '10px 14px', backgroundColor: '#f8fafc', borderRadius: '0 6px 6px 0', border: '1px solid #e2e8f0', borderLeft: 'none' }}>
-                          <p style={{ fontSize: '11px', fontWeight: '800', color: '#0f172a', margin: 0 }}>Bank Danamon — BSD | <span style={{ color: '#1e3a8a', fontWeight: '900' }}>35-75-125-798</span></p>
-                          <p style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', margin: 0 }}>A.N PT. Apindo Karya Lestari</p>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', width: '110px', flexShrink: 0 }}>Bank</span>
+                            <span style={{ fontSize: '11px', fontWeight: '800', color: '#0f172a' }}>Bank Danamon — Cabang BSD I</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', width: '110px', flexShrink: 0 }}>No. Rekening</span>
+                            <span style={{ fontSize: '15px', fontWeight: '900', color: '#1e3a8a', letterSpacing: '1.5px', fontVariantNumeric: 'tabular-nums' }}>35-75-125-798</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                            <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', width: '110px', flexShrink: 0 }}>Atas Nama</span>
+                            <span style={{ fontSize: '11px', fontWeight: '800', color: '#0f172a' }}>PT. Apindo Karya Lestari</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -316,10 +375,10 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
                     <p style={{ margin: '0 0 4px 0', fontSize: '10px', color: '#475569', textAlign: 'center', fontStyle: 'italic' }}>Tangerang, {fmtDateLong(data.date)}</p>
                     <p style={{ margin: '0 0 4px 0', fontSize: '9px', fontWeight: '700', color: '#94a3b8', letterSpacing: '1.5px', textTransform: 'uppercase', textAlign: 'center' }}>Hormat Kami,</p>
                     <div style={{ width: '170px', height: '75px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      {(data.ttdStempelUrl || globalTTDUrl) && <img src={data.ttdStempelUrl || globalTTDUrl || ""} style={{ maxWidth: '160px', maxHeight: '75px', objectFit: 'contain' }} alt="Tanda Tangan" />}
+                      {globalTTDUrl && <img src={globalTTDUrl} style={{ maxWidth: '160px', maxHeight: '75px', objectFit: 'contain', position: 'absolute' }} alt="Tanda Tangan" />}
                     </div>
                     <div style={{ borderTop: '1.5px solid #334155', width: '160px', textAlign: 'center', paddingTop: '6px' }}>
-                      <p style={{ margin: 0, fontSize: '11px', fontWeight: '900', color: '#0f172a', letterSpacing: '0.3px' }}>{data.namaPenandatangan || "MUDINI NURAFIN"}</p>
+                      <p style={{ margin: 0, fontSize: '11px', fontWeight: '900', color: '#0f172a', letterSpacing: '0.3px' }}>Mudini Nurafin</p>
                     </div>
                   </div>
                 </div>
@@ -327,11 +386,14 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
             )}
 
             <div style={{ position: 'absolute', bottom: '0', left: '0', width: '100%', height: '8px', backgroundColor: '#1e3a8a' }} />
+            {pageIndex > 0 && (
+                <div style={{ position: 'absolute', bottom: '12px', right: '30px', fontSize: '8px', color: '#94a3b8' }}>
+                    Halaman {pageIndex + 1} dari {pages.length}
+                </div>
+            )}
           </div>
         );
       })}
     </div>
   );
-};
-
-export default React.memo(InvoiceA4Preview);
+}

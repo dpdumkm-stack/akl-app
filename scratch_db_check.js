@@ -1,20 +1,23 @@
-const Database = require('better-sqlite3');
-const path = require('path');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-try {
-    const dbPath = path.resolve(__dirname, 'prisma', 'dev.db');
-    console.log("Checking DB at:", dbPath);
-    const db = new Database(dbPath);
-    const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
-    console.log("Tables found:", tables);
+async function main() {
+  console.log("🔍 Mengecek Database AKL...");
+  try {
+    const settings = await prisma.globalSetting.findMany();
+    console.log("✅ Global Settings:", settings);
+
+    const signatories = await prisma.penandatangan.findMany();
+    console.log("✅ Database Penandatangan:", signatories.length, "entri");
     
-    if (tables.some(t => t.name === 'MasterItem')) {
-        const count = db.prepare("SELECT COUNT(*) as count FROM MasterItem").get();
-        console.log("MasterItem count:", count);
-    } else {
-        console.log("CRITICAL: MasterItem table NOT FOUND!");
+    if (signatories.length > 0) {
+      console.log("Contoh Penandatangan:", signatories[0].nama);
     }
-    db.close();
-} catch (err) {
-    console.error("Raw SQLite Error:", err.message);
+  } catch (error) {
+    console.error("❌ Error saat cek database:", error);
+  } finally {
+    await prisma.$disconnect();
+  }
 }
+
+main();

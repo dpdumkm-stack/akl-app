@@ -13,6 +13,7 @@ export async function getInvoiceForPDF(id: string): Promise<InvoiceData | null> 
     date: inv.date.toISOString(),
     dueDate: inv.dueDate?.toISOString(),
     clientName: inv.clientName,
+    companyName: inv.companyName,
     clientAddress: inv.clientAddress,
     items: inv.items.map(it => ({
       id: it.id,
@@ -31,5 +32,9 @@ export async function getInvoiceForPDF(id: string): Promise<InvoiceData | null> 
     invoiceType: inv.invoiceType as any,
     total: Number(inv.total),
     status: inv.status as any,
+    namaPenandatangan: inv.namaPenandatangan ?? undefined,
+    jabatanPenandatangan: inv.jabatanPenandatangan ?? undefined,
+    phonePenandatangan: inv.phonePenandatangan ?? undefined,
+    ttdStempelUrl: inv.ttdStempelUrl ?? undefined,
   };
 }

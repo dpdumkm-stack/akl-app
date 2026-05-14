@@ -123,6 +123,13 @@ model Invoice {
   total             Decimal       @default(0)
   invoiceType       String        @default("PELUNASAN") // "DP" or "PELUNASAN"
   status            InvoiceStatus @default(PENDING)
+  
+  // Penandatangan
+  namaPenandatangan     String?
+  jabatanPenandatangan  String?
+  phonePenandatangan    String?
+  ttdStempelUrl         String? // Base64
+  
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 }

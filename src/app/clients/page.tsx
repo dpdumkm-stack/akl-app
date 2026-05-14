@@ -26,8 +26,13 @@ export default function ClientsPage() {
     setLoading(true);
     try {
       const res = await fetch("/api/clients/stats");
-      const d = await res.json();
-      if (d.success) setClients(d.clients);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      
+      const ct = res.headers.get("content-type");
+      if (ct && ct.includes("application/json")) {
+        const d = await res.json();
+        if (d.success) setClients(d.clients);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -38,10 +43,15 @@ export default function ClientsPage() {
     if (!deleteId) return;
     try {
       const res = await fetch(`/api/clients/delete?id=${deleteId}`, { method: "DELETE" });
-      const d = await res.json();
-      if (d.success) {
-        setClients(clients.filter(c => c.id !== deleteId));
-        setDeleteId(null);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      
+      const ct = res.headers.get("content-type");
+      if (ct && ct.includes("application/json")) {
+        const d = await res.json();
+        if (d.success) {
+          setClients(clients.filter(c => c.id !== deleteId));
+          setDeleteId(null);
+        }
       }
     } catch (e) {
       console.error(e);

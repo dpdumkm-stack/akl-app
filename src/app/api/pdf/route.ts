@@ -48,8 +48,23 @@ export async function GET(req: NextRequest) {
   console.time(`[PDF] Total Generation Time for ${id}`);
   
   const browser = await getBrowser();
+  let filename = `Dokumen_${id}.pdf`;
 
   try {
+    // SCSA: Ambil nomor dokumen & identitas untuk filename yang lebih baik
+    const [q, inv] = await Promise.all([
+      prisma.quotation.findUnique({ where: { id }, select: { nomorSurat: true, companyName: true, up: true } }),
+      prisma.invoice.findUnique({ where: { id }, select: { invoiceNumber: true, companyName: true, clientName: true } })
+    ]);
+    
+    if (q) {
+      const identitas = q.companyName || q.up || "";
+      filename = `${q.nomorSurat} ${identitas}`.trim().replace(/[/\\?%*:|"<>]/g, '_') + ".pdf";
+    } else if (inv) {
+      const identitas = inv.companyName || inv.clientName || "";
+      filename = `${inv.invoiceNumber} ${identitas}`.trim().replace(/[/\\?%*:|"<>]/g, '_') + ".pdf";
+    }
+
     const page = await browser.newPage();
     
     // SCSA FIX: Set global timeouts to 60s
@@ -97,7 +112,8 @@ export async function GET(req: NextRequest) {
         await page.waitForSelector('.a4-page', { timeout: 20000 });
         console.log(`[PDF-ENGINE] Rendered: ${id}`);
     } catch (err: any) {
-        console.error(`[PDF-ENGINE] Failed: ${err.message}`);
+        const content = await page.content();
+        console.error(`[PDF-ENGINE] Failed: ${err.message}. Page Content: ${content.substring(0, 500)}`);
         throw err;
     }
 
@@ -119,7 +135,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(pdfBuffer as any, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `${mode}; filename="Dokumen_${id}.pdf"`,
+        'Content-Disposition': `${mode}; filename="${filename}"`,
         'Cache-Control': 'no-cache'
       },
     });

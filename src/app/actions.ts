@@ -93,8 +93,11 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     };
 
     let quotation;
+    
+    // Validasi apakah ini Update atau Create
+    const isExisting = data.id ? await prisma.quotation.findUnique({ where: { id: data.id } }) : null;
 
-    if (data.id) {
+    if (isExisting) {
       quotation = await prisma.quotation.update({
         where: { id: data.id },
         data: {
@@ -368,6 +371,10 @@ export async function saveInvoice(data: any) {
       taxAmount,
       total,
       invoiceType,
+      namaPenandatangan: sanitize(data.namaPenandatangan),
+      jabatanPenandatangan: sanitize(data.jabatanPenandatangan),
+      phonePenandatangan: sanitize(data.phonePenandatangan),
+      ttdStempelUrl: data.ttdStempelUrl,
     };
 
     let invoice;
@@ -470,6 +477,10 @@ export async function convertToInvoice(quotationId: string) {
         total: total,
         status: 'PENDING',
         invoiceType: 'PELUNASAN',
+        namaPenandatangan: q.namaPenandatangan,
+        jabatanPenandatangan: q.jabatanPenandatangan,
+        phonePenandatangan: q.phonePenandatangan,
+        ttdStempelUrl: q.ttdStempelUrl,
         items: {
           create: invoiceItems
         }

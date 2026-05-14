@@ -67,4 +67,10 @@ export interface InvoiceData {
   invoiceType: 'DP' | 'PELUNASAN';
   quotationId?: string;
   status: 'PENDING' | 'PAID' | 'CANCELLED';
+  namaPenandatangan?: string;
+  jabatanPenandatangan?: string;
+  phonePenandatangan?: string;
+  ttdStempelUrl?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
