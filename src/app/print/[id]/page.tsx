@@ -40,29 +40,55 @@ export default async function PrintPage({ params }: { params: Promise<{ id: stri
   }
 
   return (
-    <div style={{
-      background: 'white',
-      width: '794px',
-      height: `${totalHeight}px`,
-      overflow: 'hidden',
-      margin: '0',
-      padding: '0',
+    <div className="print-view-container" style={{
+      backgroundColor: '#0f172a', // slate-900
+      minHeight: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      padding: '40px 0',
+      fontFamily: 'sans-serif'
     }}>
-      {isInvoice ? (
-        <InvoiceA4Preview
-          data={invoice as InvoiceData}
-          isGeneratingPDF={true}
-          globalLogoUrl={globalLogo}
-          globalTTDUrl={globalTTD}
-        />
-      ) : (
-        <A4Preview
-          data={quotation as QuotationData}
-          isGeneratingPDF={true}
-          globalLogoUrl={globalLogo}
-          globalTTDUrl={globalTTD}
-        />
-      )}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          @page { margin: 0; size: auto; }
+          body { margin: 0; padding: 0; background: white !important; }
+          .print-view-container { 
+            background: white !important; 
+            padding: 0 !important; 
+            display: block !important;
+            min-height: auto !important;
+          }
+          .a4-paper-sheet { 
+            box-shadow: none !important; 
+            margin: 0 !important;
+          }
+        }
+      `}} />
+      
+      <div className="a4-paper-sheet" style={{
+        background: 'white',
+        width: '794px',
+        height: `${totalHeight}px`,
+        overflow: 'hidden',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+        position: 'relative'
+      }}>
+        {isInvoice ? (
+          <InvoiceA4Preview
+            data={invoice as InvoiceData}
+            isGeneratingPDF={true}
+            globalLogoUrl={globalLogo}
+            globalTTDUrl={globalTTD}
+          />
+        ) : (
+          <A4Preview
+            data={quotation as QuotationData}
+            isGeneratingPDF={true}
+            globalLogoUrl={globalLogo}
+            globalTTDUrl={globalTTD}
+          />
+        )}
+      </div>
     </div>
   );
 }

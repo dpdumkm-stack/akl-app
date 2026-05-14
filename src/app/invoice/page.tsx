@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { 
   Receipt, Plus, Trash2, Edit2, CheckCircle, 
   ArrowLeft, Banknote, Check, Wallet, RotateCcw, 
-  AlertCircle, Printer, Search, TrendingUp
+  AlertCircle, Printer, Search, TrendingUp, Download
 } from "lucide-react";
 import PrintingProgress from "@/components/PrintingProgress";
 
@@ -58,6 +58,7 @@ export default function InvoiceArchivePage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (status === "authenticated") loadInvoices();
   }, [status, loadInvoices]);
 
@@ -297,58 +298,68 @@ export default function InvoiceArchivePage() {
                       </button>
                     </>
                   )}
-                  <button 
-                    onClick={() => {
-                      setIsGeneratingPDF(true);
-                      setPrintProgress(0);
-                      const progressInterval = setInterval(() => {
-                        setPrintProgress(prev => {
-                          if (prev >= 99.5) return 99.5;
-                          const diff = prev < 70 ? 3.0 : prev < 90 ? 1.5 : prev < 95 ? 0.8 : 0.2;
-                          return prev + diff;
-                        });
-                      }, 150);
+                   {/* PRINT VIEW (INLINE PDF - ADOBE/CHROME STYLE) */}
+                   <button 
+                     onClick={() => window.open(`/api/pdf?id=${inv.id}&mode=inline`, '_blank')}
+                     className="p-2.5 bg-slate-950 hover:bg-blue-600/10 text-slate-600 hover:text-blue-400 rounded-xl border border-white/5 transition-all" 
+                     title="Cetak"
+                   >
+                     <Printer className="w-4 h-4" />
+                   </button>
 
-                      fetch(`/api/pdf?id=${inv.id}&mode=attachment`)
-                        .then(res => {
-                          if (!res.ok) throw new Error("Gagal");
-                          const contentDisposition = res.headers.get('Content-Disposition');
-                          let filename = `Invoice_${inv.invoiceNumber}.pdf`;
-                          if (contentDisposition) {
-                            const match = contentDisposition.match(/filename="(.+)"/);
-                            if (match) filename = match[1];
-                          }
-                          return res.blob().then(blob => ({ blob, filename }));
-                        })
-                        .then(({ blob, filename }) => {
-                          clearInterval(progressInterval);
-                          setPrintProgress(100);
-                          
-                          const url = window.URL.createObjectURL(blob);
-                          const link = document.createElement('a');
-                          link.href = url;
-                          link.download = filename;
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-                          window.URL.revokeObjectURL(url);
-                          
-                          setTimeout(() => {
-                            setIsGeneratingPDF(false);
-                            setPrintProgress(0);
-                          }, 600);
-                        })
-                        .catch(() => {
-                          clearInterval(progressInterval);
-                          setIsGeneratingPDF(false);
-                          showToast("Gagal mengunduh PDF", "error");
-                        });
-                    }} 
-                    className="p-2.5 bg-slate-950 hover:bg-blue-600/10 text-slate-600 hover:text-blue-400 rounded-xl border border-white/5 transition-all" 
-                    title="Cetak"
-                  >
-                    <Printer className="w-4 h-4" />
-                  </button>
+                   {/* DOWNLOAD PDF */}
+                   <button 
+                     onClick={() => {
+                       setIsGeneratingPDF(true);
+                       setPrintProgress(0);
+                       const progressInterval = setInterval(() => {
+                         setPrintProgress(prev => {
+                           if (prev >= 99.5) return 99.5;
+                           const diff = prev < 70 ? 3.0 : prev < 90 ? 1.5 : prev < 95 ? 0.8 : 0.2;
+                           return prev + diff;
+                         });
+                       }, 150);
+
+                       fetch(`/api/pdf?id=${inv.id}&mode=attachment`)
+                         .then(res => {
+                           if (!res.ok) throw new Error("Gagal");
+                           const contentDisposition = res.headers.get('Content-Disposition');
+                           let filename = `Invoice_${inv.invoiceNumber}.pdf`;
+                           if (contentDisposition) {
+                             const match = contentDisposition.match(/filename="(.+)"/);
+                             if (match) filename = match[1];
+                           }
+                           return res.blob().then(blob => ({ blob, filename }));
+                         })
+                         .then(({ blob, filename }) => {
+                           clearInterval(progressInterval);
+                           setPrintProgress(100);
+                           
+                           const url = window.URL.createObjectURL(blob);
+                           const link = document.createElement('a');
+                           link.href = url;
+                           link.download = filename;
+                           document.body.appendChild(link);
+                           link.click();
+                           document.body.removeChild(link);
+                           window.URL.revokeObjectURL(url);
+                           
+                           setTimeout(() => {
+                             setIsGeneratingPDF(false);
+                             setPrintProgress(0);
+                           }, 600);
+                         })
+                         .catch(() => {
+                           clearInterval(progressInterval);
+                           setIsGeneratingPDF(false);
+                           showToast("Gagal mengunduh PDF", "error");
+                         });
+                     }} 
+                     className="p-2.5 bg-slate-950 hover:bg-indigo-600/10 text-slate-600 hover:text-indigo-400 rounded-xl border border-white/5 transition-all" 
+                     title="Download PDF"
+                   >
+                     <Download className="w-4 h-4" />
+                   </button>
                   <button onClick={() => router.push(`/invoice/edit/${inv.id}`)} className="p-2.5 bg-slate-950 hover:bg-indigo-600/10 text-slate-600 hover:text-indigo-400 rounded-xl border border-white/5 transition-all" title="Edit">
                     <Edit2 className="w-4 h-4" />
                   </button>
