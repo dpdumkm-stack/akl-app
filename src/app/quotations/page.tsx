@@ -56,6 +56,7 @@ export default function QuotationArchivePage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [loadData]);
 
@@ -63,8 +64,9 @@ export default function QuotationArchivePage() {
     .filter(q => 
       q.namaKlien?.toLowerCase().includes(search.toLowerCase()) ||
       q.nomorSurat?.toLowerCase().includes(search.toLowerCase())
-    )
-    .slice(0, search ? undefined : 5);
+    );
+
+  const displayData = search ? filteredData : filteredData.slice(0, 10);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type });
@@ -86,20 +88,15 @@ export default function QuotationArchivePage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Apakah Anda yakin ingin menghapus penawaran ini? Tindakan ini tidak dapat dibatalkan.")) return;
-    // Assume there is a delete API
+  const handleDelete = async (id: string, nomor: string) => {
+    if (!window.confirm(`Hapus penawaran ${nomor}? Tindakan ini tidak dapat dibatalkan.`)) return;
     try {
       const res = await fetch(`/api/quotations/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      
-      const ct = res.headers.get("content-type");
-      if (ct && ct.includes("application/json")) {
-        const d = await res.json();
-        if (d.success) {
-          showToast("Penawaran dihapus.");
-          loadData();
-        }
+      if (res.ok) {
+        showToast("Penawaran dihapus.");
+        loadData();
+      } else {
+        showToast("Gagal menghapus.", "error");
       }
     } catch (e) {
       showToast("Gagal menghapus.", "error");
@@ -162,11 +159,11 @@ export default function QuotationArchivePage() {
         {/* Data List Container */}
         <div className="bg-slate-900/40 border border-white/5 rounded-[40px] overflow-hidden shadow-2xl backdrop-blur-sm">
           <div className="hidden md:grid grid-cols-12 gap-4 px-8 py-5 border-b border-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-            <div className="col-span-5">Informasi Klien</div>
+            <div className="col-span-4">Informasi Klien</div>
             <div className="col-span-2 text-center">Nomor Surat</div>
             <div className="col-span-2 text-center">Tanggal</div>
             <div className="col-span-2 text-right">Total Harga</div>
-            <div className="col-span-1"></div>
+            <div className="col-span-2 text-right">Aksi</div>
           </div>
 
           <div className="divide-y divide-white/[0.03]">
@@ -175,17 +172,17 @@ export default function QuotationArchivePage() {
                 <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Memuat Arsip...</p>
               </div>
-            ) : filteredData.length === 0 ? (
+            ) : displayData.length === 0 ? (
               <div className="py-24 text-center space-y-4">
                  <div className="w-16 h-16 bg-slate-950 rounded-full flex items-center justify-center mx-auto border border-white/5">
                     <FileText className="w-8 h-8 text-slate-800" />
                  </div>
                  <p className="text-slate-600 font-medium italic">Tidak ada data penawaran yang ditemukan.</p>
               </div>
-            ) : filteredData.slice(0, search ? undefined : 5).map(q => (
+            ) : displayData.map(q => (
               <div key={q.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center px-8 py-6 hover:bg-white/[0.02] transition-all group">
                 {/* Client Info */}
-                <div className="col-span-5 flex items-center gap-5">
+                <div className="col-span-4 flex items-center gap-5">
                    <div className="w-12 h-12 rounded-2xl bg-slate-950 border border-white/5 flex items-center justify-center text-xs font-black text-slate-500 group-hover:border-blue-500/30 group-hover:text-blue-400 transition-all uppercase">
                       {q.namaKlien?.substring(0, 2)}
                    </div>
@@ -221,8 +218,18 @@ export default function QuotationArchivePage() {
                 </div>
 
                 {/* Actions */}
-                <div className="col-span-1 flex justify-end gap-1">
-                  <div className="flex items-center gap-2">
+                <div className="col-span-2 flex justify-end gap-1">
+                  <div className="flex items-center gap-1.5">
+                    {/* PRINT VIEW */}
+                    <button 
+                      onClick={() => window.open(`/print/${q.id}`, '_blank')}
+                      className="p-2 bg-slate-950 hover:bg-blue-600/10 text-slate-600 hover:text-blue-400 rounded-lg transition-all border border-white/5" 
+                      title="Cetak"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* DOWNLOAD PDF */}
                     <button 
                       onClick={() => {
                         setIsGeneratingPDF(true);
@@ -270,26 +277,36 @@ export default function QuotationArchivePage() {
                             showToast("Gagal mengunduh PDF", "error");
                           });
                       }}
-                      className="p-2.5 bg-slate-950 hover:bg-blue-600/10 text-slate-600 hover:text-blue-400 rounded-xl transition-all border border-white/5" 
-                      title="Print"
+                      className="p-2 bg-slate-950 hover:bg-indigo-600/10 text-slate-600 hover:text-indigo-400 rounded-lg transition-all border border-white/5" 
+                      title="Download PDF"
                     >
-                      <Printer className="w-4 h-4" />
+                      <Download className="w-3.5 h-3.5" />
                     </button>
+
                     {!q.isInvoiced && (
                       <button 
                         onClick={() => handleConvertToInvoice(q.id, q.namaKlien)}
-                        className="p-2.5 bg-slate-950 hover:bg-emerald-600/10 text-slate-600 hover:text-emerald-400 rounded-xl transition-all border border-white/5"
+                        className="p-2 bg-slate-950 hover:bg-emerald-600/10 text-slate-600 hover:text-emerald-400 rounded-lg transition-all border border-white/5"
                         title="Terbitkan Invoice"
                       >
-                        <Receipt className="w-4 h-4" />
+                        <Receipt className="w-3.5 h-3.5" />
                       </button>
                     )}
+
                     <button 
                       onClick={() => router.push(`/quotations/edit/${q.id}`)}
-                      className="p-2.5 bg-slate-950 hover:bg-indigo-600/10 text-slate-600 hover:text-indigo-400 rounded-xl transition-all border border-white/5"
+                      className="p-2 bg-slate-950 hover:bg-amber-600/10 text-slate-600 hover:text-amber-400 rounded-lg transition-all border border-white/5"
                       title="Edit"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button 
+                      onClick={() => handleDelete(q.id, q.nomorSurat)}
+                      className="p-2 bg-slate-950 hover:bg-red-600/10 text-slate-600 hover:text-red-400 rounded-lg transition-all border border-white/5"
+                      title="Hapus"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
