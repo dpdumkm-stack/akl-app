@@ -26,7 +26,7 @@ fi
 
 # Push schema ke database (buat tabel jika belum ada)
 echo "Running prisma db push..."
-npx prisma db push --accept-data-loss
+prisma db push --accept-data-loss
 echo "Database schema OK."
 
 # Jalankan seed hanya jika database baru (file baru dibuat = ukuran sangat kecil)

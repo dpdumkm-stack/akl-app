@@ -26,7 +26,7 @@ ENV NODE_ENV=production \
 
 WORKDIR /app
 
-# Instal dependensi runner: Chromium (PDF), Font, dan Curl (Healthcheck)
+# Instal dependensi runner: Chromium (PDF), Font, Curl (Healthcheck), dan OpenSSL (Prisma)
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-freefont-ttf \
@@ -35,8 +35,12 @@ RUN apt-get update && apt-get install -y \
     libxss1 \
     libasound2 \
     curl \
+    openssl \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
+
+# Instal Prisma CLI secara global agar bisa menjalankan 'prisma db push' di entrypoint
+RUN npm install -g prisma@6.19.3
 
 # Copy hasil standalone build
 COPY --from=builder /app/public ./public
