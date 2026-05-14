@@ -280,8 +280,14 @@ export default function QuotationApp() {
       const a = document.createElement('a');
       a.href = url;
       const currentData = dataRef.current;
-      const clientName = (currentData.namaKlien || 'Client').replace(/[^\w\s-]/gi, '').replace(/\s+/g, '_');
-      a.download = `Penawaran_${clientName}.pdf`;
+      
+      // Logika Penamaan File: Nomor Surat + Nama (PT/UP)
+      const docNumber = (currentData.nomorSurat || 'DRAFT').replace(/[^\w\s-]/gi, '').replace(/\s+/g, '-');
+      const clientName = (currentData.companyName || currentData.namaKlien || currentData.up || 'Client')
+          .replace(/[^\w\s-]/gi, '')
+          .replace(/\s+/g, '_');
+      
+      a.download = `${docNumber}_${clientName}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);

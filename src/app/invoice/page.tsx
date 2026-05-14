@@ -205,7 +205,7 @@ export default function InvoicePage() {
     } catch { showToast("Gagal menghapus", "error"); }
   };
 
-  const handleDownloadPDF = async (id: string, invoiceNumber: string) => {
+  const handleDownloadPDF = async (id: string, invoiceNumber: string, clientName?: string) => {
     if (isPrintingRef.current) return;
     
     isPrintingRef.current = true;
@@ -238,7 +238,12 @@ export default function InvoicePage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Invoice_${invoiceNumber.replace(/\//g, "-")}.pdf`;
+      const safeInvoiceNumber = invoiceNumber.replace(/\//g, "-").replace(/[^\w\s-]/gi, '').replace(/\s+/g, '-');
+      const safeClientName = (clientName || form.companyName || form.clientName || 'Client')
+          .replace(/[^\w\s-]/gi, '')
+          .replace(/\s+/g, '_');
+          
+      a.download = `Invoice_${safeInvoiceNumber}_${safeClientName}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -456,7 +461,7 @@ export default function InvoicePage() {
                             </button>
                           </>
                         )}
-                        <button onClick={() => handleDownloadPDF(inv.id, inv.invoiceNumber)} className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl transition-all" title="Download PDF">
+                        <button onClick={() => handleDownloadPDF(inv.id!, inv.invoiceNumber, inv.companyName || inv.clientName)} className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl transition-all" title="Download PDF">
                           <Download className="w-4 h-4" />
                         </button>
                         <button onClick={() => handleEdit(inv)} className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl transition-all" title="Edit">
@@ -763,7 +768,7 @@ export default function InvoicePage() {
 
                 {form.id && (
                   <button
-                    onClick={() => handleDownloadPDF(form.id, form.invoiceNumber)}
+                    onClick={() => handleDownloadPDF(form.id!, form.invoiceNumber, form.companyName || form.clientName)}
                     className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2 transition-all"
                   >
                     <Download className="w-4 h-4" /> Download PDF
