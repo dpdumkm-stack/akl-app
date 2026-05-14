@@ -57,6 +57,7 @@ export default function EditQuotationPage({ params }: { params: Promise<{ id: st
   }, [id, router, showToast]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (status === "authenticated") {
       loadQuotation();

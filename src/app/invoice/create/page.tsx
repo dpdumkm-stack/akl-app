@@ -233,6 +233,8 @@ export default function CreateInvoicePage() {
                 onFileUpload={onFileUpload} 
                 showToast={showToast} 
                 setConfirmModal={setConfirmModal}
+                globalLogoUrl={globalSettings.logo}
+                globalTTDUrl={globalSettings.ttd}
               />
             </div>
 

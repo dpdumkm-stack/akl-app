@@ -27,6 +27,11 @@ export default function EditInvoicePage({ params }: { params: Promise<{ id: stri
   const [confirmModal, setConfirmModal] = useState<any>(null);
   const [globalSettings, setGlobalSettings] = useState<{ logo: string | null, ttd: string | null }>({ logo: null, ttd: null });
 
+  const showToast = useCallback((msg: string, type: "success" | "error" = "success") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
   const loadInvoice = useCallback(async () => {
     setLoading(true);
     try {
@@ -47,6 +52,7 @@ export default function EditInvoicePage({ params }: { params: Promise<{ id: stri
   }, [id, router]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (status === "authenticated") loadInvoice();
     const fetchSettings = async () => {
         const { getGlobalSettings } = await import("@/app/actions");
@@ -60,10 +66,6 @@ export default function EditInvoicePage({ params }: { params: Promise<{ id: stri
     fetchSettings();
   }, [status, loadInvoice]);
 
-  const showToast = (msg: string, type: "success" | "error" = "success") => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  };
 
   const handleSave = async () => {
     if (!form.clientName || form.items.length === 0) return showToast("Mohon lengkapi data", "error");
@@ -219,6 +221,8 @@ export default function EditInvoicePage({ params }: { params: Promise<{ id: stri
                 onFileUpload={onFileUpload} 
                 showToast={showToast} 
                 setConfirmModal={setConfirmModal}
+                globalLogoUrl={globalSettings.logo}
+                globalTTDUrl={globalSettings.ttd}
               />
             </div>
 
