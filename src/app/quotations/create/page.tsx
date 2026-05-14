@@ -10,6 +10,7 @@ import A4Preview from "@/components/A4Preview";
 import PrintingProgress from "@/components/PrintingProgress";
 import DocumentPreviewStudio from "@/components/editor/DocumentPreviewStudio";
 import { AlertCircle, FileText, ArrowLeft, Save, LayoutDashboard, Eye, Edit3, RefreshCw, Copy, Check } from "lucide-react";
+import { getGlobalSettings } from "@/app/actions";
 
 const emptyQuotation = (): QuotationData => ({
   nomorSurat: formatQuotationNumber(0),
@@ -48,6 +49,19 @@ export default function CreateQuotationPage() {
   const [printProgress, setPrintProgress] = useState(0);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<any>(null);
+  const [globalLogo, setGlobalLogo] = useState<string | null>(null);
+  const [globalTTD, setGlobalTTD] = useState<string | null>(null);
+
+  useEffect(() => {
+    getGlobalSettings().then(res => {
+      if (res.success && 'data' in res) {
+        const logo = (res.data as any[]).find(s => s.id.toUpperCase() === 'LOGO')?.value;
+        const ttd = (res.data as any[]).find(s => s.id.toUpperCase() === 'TTD')?.value;
+        if (logo) setGlobalLogo(logo);
+        if (ttd) setGlobalTTD(ttd);
+      }
+    });
+  }, []);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type });
@@ -153,8 +167,8 @@ export default function CreateQuotationPage() {
                   onDownloadPDF={handleGeneratePDF}
                   showToast={showToast}
                   setConfirmModal={setConfirmModal}
-                  globalLogoUrl={data.logoUrl}
-                  globalTTDUrl={data.ttdStempelUrl}
+                  globalLogoUrl={globalLogo}
+                  globalTTDUrl={globalTTD}
                   isSaving={isSaving}
                   isGeneratingPDF={isGeneratingPDF}
                />
@@ -166,6 +180,8 @@ export default function CreateQuotationPage() {
                   <A4Preview 
                     data={data} 
                     isGeneratingPDF={false} 
+                    globalLogoUrl={globalLogo}
+                    globalTTDUrl={globalTTD}
                   />
               </DocumentPreviewStudio>
            </div>

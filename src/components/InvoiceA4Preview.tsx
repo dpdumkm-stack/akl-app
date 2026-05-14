@@ -109,15 +109,25 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: pageIndex === 0 ? '14px 30px 10px 30px' : '10px 30px' }}>
               <div style={{ flexShrink: 0 }}>
-                {(data.logoUrl || globalLogoUrl) ? (
-                  <img 
-                    src={data.logoUrl || globalLogoUrl || ""} 
-                    style={{ maxHeight: pageIndex === 0 ? '80px' : '40px', maxWidth: '130px', objectFit: 'contain' }} 
-                    alt="Logo" 
-                  />
-                ) : (
-                  <div style={{ width: pageIndex === 0 ? '90px' : '45px', height: pageIndex === 0 ? '80px' : '40px', backgroundColor: '#1e3a8a', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>AKL</div>
-                )}
+                {(() => {
+                  const logoToDisplay = (data.logoUrl && data.logoUrl !== "" && data.logoUrl !== "null" && data.logoUrl !== "undefined") 
+                      ? data.logoUrl 
+                      : globalLogoUrl;
+                  
+                  if (logoToDisplay && logoToDisplay !== "" && logoToDisplay !== "null" && logoToDisplay !== "undefined") {
+                      return (
+                          <img 
+                            src={logoToDisplay} 
+                            style={{ maxHeight: pageIndex === 0 ? '80px' : '40px', maxWidth: '130px', objectFit: 'contain' }} 
+                            alt="Logo" 
+                          />
+                      );
+                  }
+                  
+                  return (
+                      <div style={{ width: pageIndex === 0 ? '90px' : '45px', height: pageIndex === 0 ? '80px' : '40px', backgroundColor: '#1e3a8a', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>AKL</div>
+                  );
+                })()}
               </div>
 
               <div style={{ textAlign: 'right' }}>

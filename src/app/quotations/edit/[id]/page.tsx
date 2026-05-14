@@ -9,7 +9,7 @@ import A4Preview from "@/components/A4Preview";
 import PrintingProgress from "@/components/PrintingProgress";
 import DocumentPreviewStudio from "@/components/editor/DocumentPreviewStudio";
 import { AlertCircle, ArrowLeft, Save, LayoutDashboard, RefreshCw, Eye, Edit3, FileText, Copy } from "lucide-react";
-import { saveQuotation } from "@/app/actions";
+import { saveQuotation, getGlobalSettings } from "@/app/actions";
 
 export default function EditQuotationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -24,6 +24,8 @@ export default function EditQuotationPage({ params }: { params: Promise<{ id: st
   const [confirmModal, setConfirmModal] = useState<any>(null);
   const [data, setData] = useState<QuotationData | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [globalLogo, setGlobalLogo] = useState<string | null>(null);
+  const [globalTTD, setGlobalTTD] = useState<string | null>(null);
 
   const showToast = useCallback((msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type });
@@ -56,7 +58,17 @@ export default function EditQuotationPage({ params }: { params: Promise<{ id: st
 
   useEffect(() => {
     setMounted(true);
-    if (status === "authenticated") loadQuotation();
+    if (status === "authenticated") {
+      loadQuotation();
+      getGlobalSettings().then(res => {
+        if (res.success && 'data' in res) {
+          const logo = (res.data as any[]).find(s => s.id.toUpperCase() === 'LOGO')?.value;
+          const ttd = (res.data as any[]).find(s => s.id.toUpperCase() === 'TTD')?.value;
+          if (logo) setGlobalLogo(logo);
+          if (ttd) setGlobalTTD(ttd);
+        }
+      });
+    }
   }, [status, loadQuotation]);
 
   const handleSave = async () => {
@@ -208,8 +220,8 @@ export default function EditQuotationPage({ params }: { params: Promise<{ id: st
                   onDownloadPDF={handleGeneratePDF}
                   showToast={showToast}
                   setConfirmModal={setConfirmModal}
-                  globalLogoUrl={data.logoUrl}
-                  globalTTDUrl={data.ttdStempelUrl}
+                  globalLogoUrl={globalLogo}
+                  globalTTDUrl={globalTTD}
                   isSaving={isSaving}
                   isGeneratingPDF={isGeneratingPDF}
                />
@@ -218,7 +230,12 @@ export default function EditQuotationPage({ params }: { params: Promise<{ id: st
            {/* Studio Preview */}
            <div className={`h-[calc(100vh-140px)] ${viewMode === 'edit' ? 'hidden lg:block' : 'block'}`}>
                 <DocumentPreviewStudio title="Quotation Studio" initialZoom={0.75}>
-                    <A4Preview data={data} isGeneratingPDF={false} />
+                    <A4Preview 
+                      data={data} 
+                      isGeneratingPDF={false} 
+                      globalLogoUrl={globalLogo}
+                      globalTTDUrl={globalTTD}
+                    />
                 </DocumentPreviewStudio>
            </div>
         </div>

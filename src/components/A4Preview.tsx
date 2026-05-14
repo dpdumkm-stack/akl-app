@@ -115,15 +115,25 @@ const A4Preview = ({
                             {/* DYNAMIC HEADER */}
                             <div style={{ padding: '15px 40px 0px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ width: '120px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                    {(data.logoUrl || globalLogoUrl) ? (
-                                        <img 
-                                            src={data.logoUrl || globalLogoUrl || ""} 
-                                            style={{ maxHeight: pageIndex === 0 ? '80px' : '40px', maxWidth: '100px', objectFit: 'contain' }} 
-                                            alt="Logo" 
-                                        />
-                                    ) : (
-                                        <div style={{ width: pageIndex === 0 ? '80px' : '40px', height: pageIndex === 0 ? '80px' : '40px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#94a3b8', fontWeight: 'bold' }}>LOGO</div>
-                                    )}
+                                    {(() => {
+                                        const logoToDisplay = (data.logoUrl && data.logoUrl !== "" && data.logoUrl !== "null" && data.logoUrl !== "undefined") 
+                                            ? data.logoUrl 
+                                            : globalLogoUrl;
+                                        
+                                        if (logoToDisplay && logoToDisplay !== "" && logoToDisplay !== "null" && logoToDisplay !== "undefined") {
+                                            return (
+                                                <img 
+                                                    src={logoToDisplay} 
+                                                    style={{ maxHeight: pageIndex === 0 ? '80px' : '40px', maxWidth: '100px', objectFit: 'contain' }} 
+                                                    alt="Logo" 
+                                                />
+                                            );
+                                        }
+                                        
+                                        return (
+                                            <div style={{ width: pageIndex === 0 ? '80px' : '40px', height: pageIndex === 0 ? '80px' : '40px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#94a3b8', fontWeight: 'bold' }}>LOGO</div>
+                                        );
+                                    })()}
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <h1 style={{ fontSize: pageIndex === 0 ? '22px' : '14px', fontWeight: '900', color: '#1e3a8a', margin: '0 0 2px 0', letterSpacing: '-0.5px', textTransform: 'uppercase' }}>PT. APINDO KARYA LESTARI</h1>

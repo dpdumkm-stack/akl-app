@@ -52,8 +52,8 @@ export default function EditInvoicePage({ params }: { params: Promise<{ id: stri
         const { getGlobalSettings } = await import("@/app/actions");
         const res = await getGlobalSettings();
         if (res.success && 'data' in res) {
-            const logo = res.data.find((s: any) => s.id === 'LOGO')?.value || null;
-            const ttd = res.data.find((s: any) => s.id === 'TTD')?.value || null;
+            const logo = res.data.find((s: any) => s.id.toUpperCase() === 'LOGO')?.value || null;
+            const ttd = res.data.find((s: any) => s.id.toUpperCase() === 'TTD')?.value || null;
             setGlobalSettings({ logo, ttd });
         }
     };
