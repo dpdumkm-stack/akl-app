@@ -31,14 +31,19 @@ async function checkAuth() {
 }
 
 async function syncClient(data: { companyName?: string | null, clientName?: string | null, address?: string | null, phone?: string | null }) {
-    if (!data.companyName && !data.clientName) return;
+    const company = (data.companyName || "").trim();
+    const client = (data.clientName || "").trim();
     
+    if (!company && !client) return;
+    
+    console.log(`[syncClient] Menjalankan Sinkronisasi: "${company}" | "${client}"`);
+
     try {
         await prisma.client.upsert({
             where: { 
                 companyName_clientName: { 
-                    companyName: data.companyName || "", 
-                    clientName: data.clientName || "" 
+                    companyName: company, 
+                    clientName: client 
                 } 
             },
             update: {
@@ -46,14 +51,15 @@ async function syncClient(data: { companyName?: string | null, clientName?: stri
                 phone: data.phone || undefined
             },
             create: {
-                companyName: data.companyName || "",
-                clientName: data.clientName || "",
+                companyName: company,
+                clientName: client,
                 address: data.address || "",
                 phone: data.phone || ""
             }
         });
+        console.log(`[syncClient] Berhasil sinkron klien: ${company}`);
     } catch (e) {
-        console.error("[syncClient] Error:", e);
+        console.error("[syncClient] GAGAL SINKRON KLIEN:", e);
     }
 }
 
