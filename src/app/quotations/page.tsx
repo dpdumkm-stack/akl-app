@@ -220,9 +220,9 @@ export default function QuotationArchivePage() {
                 {/* Actions */}
                 <div className="col-span-2 flex justify-end gap-1">
                   <div className="flex items-center gap-1.5">
-                    {/* PRINT VIEW */}
+                    {/* PRINT VIEW (INLINE PDF) */}
                     <button 
-                      onClick={() => window.open(`/print/${q.id}`, '_blank')}
+                      onClick={() => window.open(`/api/pdf?id=${q.id}&mode=inline`, '_blank')}
                       className="p-2 bg-slate-950 hover:bg-blue-600/10 text-slate-600 hover:text-blue-400 rounded-lg transition-all border border-white/5" 
                       title="Cetak"
                     >
