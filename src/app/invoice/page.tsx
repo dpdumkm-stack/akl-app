@@ -657,7 +657,19 @@ export default function InvoicePage() {
                 </div>
 
                 <div className="relative" ref={clientDropdownRef}>
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1.5">Nama Klien *</label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Nama Klien *</label>
+                    <button 
+                      onClick={() => {
+                        setShowClients(!showClients);
+                        if (clients.length === 0) loadClients();
+                      }}
+                      className="text-[9px] font-black text-blue-500 hover:text-blue-400 uppercase tracking-tighter flex items-center gap-1"
+                    >
+                      <Database className="w-2.5 h-2.5" />
+                      Database
+                    </button>
+                  </div>
                   <input 
                     value={form.clientName} 
                     onFocus={() => {

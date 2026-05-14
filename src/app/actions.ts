@@ -5,6 +5,7 @@ import { QuotationData } from "@/lib/types";
 import { getServerSession } from "next-auth/next";
 import { logActivity } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
+import { syncClient } from "@/lib/client-service";
 
 /**
  * Memastikan objek murni (Plain Object) yang bisa diserialisasi oleh Next.js.
@@ -30,38 +31,7 @@ async function checkAuth() {
     return session;
 }
 
-async function syncClient(data: { companyName?: string | null, clientName?: string | null, address?: string | null, phone?: string | null }) {
-    const company = (data.companyName || "").trim();
-    const client = (data.clientName || "").trim();
-    
-    if (!company && !client) return;
-    
-    console.log(`[syncClient] Menjalankan Sinkronisasi: "${company}" | "${client}"`);
 
-    try {
-        await prisma.client.upsert({
-            where: { 
-                companyName_clientName: { 
-                    companyName: company, 
-                    clientName: client 
-                } 
-            },
-            update: {
-                address: data.address || undefined,
-                phone: data.phone || undefined
-            },
-            create: {
-                companyName: company,
-                clientName: client,
-                address: data.address || "",
-                phone: data.phone || ""
-            }
-        });
-        console.log(`[syncClient] Berhasil sinkron klien: ${company}`);
-    } catch (e) {
-        console.error("[syncClient] GAGAL SINKRON KLIEN:", e);
-    }
-}
 
 export async function saveQuotation(data: QuotationData, totalHarga: number) {
   try {

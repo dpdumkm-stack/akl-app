@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Edit3, Settings2, Plus, Package, RefreshCw } from "lucide-react";
+import { Edit3, Settings2, Plus, Package, RefreshCw, Database } from "lucide-react";
 import { QuotationData } from "@/lib/types";
 import { getNextQuotationNumber } from "@/app/actions";
 import { formatQuotationNumber } from "@/lib/utils";
@@ -149,9 +149,21 @@ export default function UmumSection({
                 </div>
 
                 <div className="space-y-3">
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                        Penerima Dokumen <span className="text-red-400 font-normal ml-1 lowercase">(Minimal isi salah satu)</span>
-                    </label>
+                    <div className="flex justify-between items-center mb-1 ml-1">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            Penerima Dokumen <span className="text-red-400 font-normal ml-1 lowercase">(Minimal isi salah satu)</span>
+                        </label>
+                        <button 
+                            onClick={() => {
+                                setShowClients(!showClients);
+                                if (clients.length === 0) loadClients();
+                            }}
+                            className="text-[9px] font-black text-blue-500 hover:text-blue-700 uppercase tracking-tighter flex items-center gap-1"
+                        >
+                            <Database className="w-2.5 h-2.5" />
+                            Database Klien
+                        </button>
+                    </div>
                     <div className="relative" ref={dropdownRef}>
                         <input 
                             type="text" 
