@@ -47,3 +47,4 @@ database.db
 database.db-journal
 *.db
 *.db-journal
+/data

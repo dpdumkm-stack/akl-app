@@ -10,7 +10,7 @@ echo "DB_PATH: $DB_PATH"
 if [ -n "$DB_PATH" ]; then
   DB_FILE="$DB_PATH"
 else
-  DB_FILE="/app/database.db"
+  DB_FILE="/app/data/database.db"
 fi
 
 echo "Using database file: $DB_FILE"
