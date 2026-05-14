@@ -8,6 +8,7 @@ import {
   AlertCircle, TrendingUp, Users, LogOut, Settings,
   ChevronRight, Layers, Bell
 } from "lucide-react";
+import { convertToInvoice } from "@/app/actions";
 
 interface QuotationSummary {
   id: string;
@@ -73,9 +74,11 @@ export default function DashboardPage() {
   });
   const [recentQuotations, setRecentQuotations] = useState<QuotationSummary[]>([]);
   const [recentInvoices, setRecentInvoices] = useState<InvoiceSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const hasLoaded = React.useRef(false);
 
   const loadData = useCallback(async () => {
+    if (hasLoaded.current) return;
     setLoading(true);
     try {
       const [qRes, iRes] = await Promise.all([
@@ -107,47 +110,45 @@ export default function DashboardPage() {
 
       setRecentQuotations(quotations.slice(0, 4));
       setRecentInvoices(invoices.slice(0, 4));
+      hasLoaded.current = true;
     } catch (e) {
       console.error(e);
     }
     setLoading(false);
   }, []);
 
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const [systemError, setSystemError] = useState<string | null>(null);
+
   const handleConvertToInvoice = async (id: string, name: string) => {
-    if (!confirm(`Terbitkan Invoice untuk ${name}?`)) return;
+    setSystemError(`Mencoba menerbitkan invoice untuk: ${name} (ID: ${id})...`);
     
-    setLoading(true);
     try {
-      const { convertToInvoice } = await import("@/app/actions");
       const res = await convertToInvoice(id);
       if (res.success) {
-        alert("Invoice berhasil diterbitkan!");
-        router.push("/invoice");
+        setSystemError(`SUKSES: Invoice diterbitkan. Mengalihkan...`);
+        setTimeout(() => window.location.href = "/invoice", 500);
       } else {
-        alert(res.message || "Gagal menerbitkan invoice.");
+        const errMsg = `GAGAL: ${res.message}`;
+        setSystemError(errMsg);
+        window.alert(errMsg);
       }
-    } catch (e) {
-      console.error(e);
-      alert("Terjadi kesalahan sistem.");
+    } catch (e: any) {
+      const errMsg = `CRITICAL ERROR: ${e.message}`;
+      setSystemError(errMsg);
+      window.alert(errMsg);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
-    if (status === "authenticated") loadData();
-    else if (status === "unauthenticated") router.push("/login");
-  }, [status, loadData, router]);
-
-  if (status === "loading" || loading) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-slate-500 text-sm font-medium">Memuat dashboard...</p>
-        </div>
-      </div>
-    );
-  }
+    loadData();
+  }, [loadData]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-gray-900 font-sans">
@@ -197,15 +198,22 @@ export default function DashboardPage() {
           </div>
         </nav>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className="relative z-[60] max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Welcome */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-white">
-              Selamat datang, <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">{session?.user?.name ?? "Admin"}</span> 👋
+            <h1 className="text-3xl font-black text-slate-900">
+              Selamat datang, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-red-600">{session?.user?.name ?? "Admin"}</span> 👋
             </h1>
-            <p className="text-slate-400 mt-1 text-sm">PT. Apindo Karya Lestari — Sistem Manajemen Penawaran &amp; Invoice</p>
+            <p className="text-slate-500 mt-1 text-sm">PT. Apindo Karya Lestari — Sistem Manajemen Penawaran &amp; Invoice</p>
           </div>
+          
+          <button 
+            onClick={() => window.alert("SISTEM KLIK AKTIF!")}
+            className="px-4 py-2 bg-red-600 text-white font-black rounded-xl shadow-lg z-[100]"
+          >
+            TEST KLIK SISTEM
+          </button>
           <div className="flex items-center gap-2 px-4 py-2 bg-slate-900/50 border border-slate-800 rounded-2xl">
              <div className="flex flex-col items-end">
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Conversion Rate</span>
@@ -329,28 +337,25 @@ export default function DashboardPage() {
               {recentQuotations.length === 0 ? (
                 <p className="text-slate-600 text-xs text-center py-4">Belum ada penawaran</p>
               ) : recentQuotations.map(q => (
-                <div key={q.id} className="flex items-center justify-between py-2.5 px-3 bg-slate-800/40 rounded-xl hover:bg-slate-800 transition-colors cursor-pointer" onClick={() => router.push("/")}>
+                <div key={q.id} className="flex items-center justify-between py-2.5 px-3 bg-slate-200 border border-slate-300 rounded-xl group relative">
                   <div className="min-w-0">
-                    <p className="text-white font-semibold text-xs truncate">{q.namaKlien}</p>
+                    <p className="text-slate-900 font-bold text-xs truncate">{q.namaKlien}</p>
                     <p className="text-slate-500 text-[10px]">{q.nomorSurat}</p>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-violet-400 text-xs font-bold">{fmtCompact(q.totalHarga)}</span>
-                    {q.isInvoiced ? (
-                       <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md text-[9px] font-black uppercase tracking-tighter">Invoiced</span>
-                    ) : (
-                       <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleConvertToInvoice(q.id, q.namaKlien);
-                        }}
-                        className="p-1.5 bg-violet-600/10 text-violet-400 hover:bg-violet-600 hover:text-white rounded-lg transition-all"
-                        title="Terbitkan Invoice"
-                       >
-                         <Receipt className="w-3.5 h-3.5" />
-                       </button>
-                    )}
-                    <ChevronRight className="w-3 h-3 text-slate-600" />
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="text-blue-600 text-xs font-black">{fmtCompact(q.totalHarga)}</span>
+                      {q.isInvoiced ? (
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-md text-[9px] font-black uppercase tracking-tighter">Terbit</span>
+                      ) : (
+                        <button 
+                          type="button"
+                          onClick={() => handleConvertToInvoice(q.id, q.namaKlien)}
+                          className="relative z-[200] p-2.5 bg-red-600 text-white hover:bg-red-700 rounded-xl transition-all shadow-md active:scale-90"
+                          title="Terbitkan Invoice"
+                        >
+                          <Receipt className="w-4 h-4" />
+                        </button>
+                      )}
                   </div>
                 </div>
               ))}
@@ -424,10 +429,36 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Log Diagnostik Persistent */}
+        <div className="mt-12 bg-black border border-slate-800 rounded-2xl p-6 shadow-2xl">
+            <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
+                <div className="w-3 h-3 bg-red-500 rounded-full" />
+                <div className="w-3 h-3 bg-amber-500 rounded-full" />
+                <div className="w-3 h-3 bg-emerald-500 rounded-full" />
+                <span className="ml-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">System Diagnostic Log</span>
+            </div>
+            <div className="font-mono text-xs space-y-2">
+                <p className="text-emerald-500">[SYSTEM] Dashboard initialized.</p>
+                {systemError ? (
+                    <p className="text-red-400 animate-pulse font-bold">{systemError}</p>
+                ) : (
+                    <p className="text-slate-600">Menunggu aksi pengguna...</p>
+                )}
+            </div>
+        </div>
+
         {/* Footer */}
         <div className="text-center py-4">
           <p className="text-xs text-slate-700 font-medium">© 2026 PT. Apindo Karya Lestari — Studio AKL v2.0</p>
         </div>
+
+        {/* Toast Notification */}
+        {toast && (
+          <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-300 flex items-center gap-3 border ${toast.type === 'error' ? 'bg-red-900 border-red-800 text-red-200' : 'bg-emerald-900 border-emerald-800 text-emerald-200'}`}>
+            {toast.type === 'error' ? <AlertCircle className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
+            <p className="text-sm font-bold">{toast.msg}</p>
+          </div>
+        )}
       </div>
     </div>
   );

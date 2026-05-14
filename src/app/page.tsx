@@ -10,7 +10,7 @@ import FormEditor from "@/components/FormEditor";
 import A4Preview from "@/components/A4Preview";
 import HistoryDrawer from "@/components/HistoryDrawer";
 import PrintingProgress from "@/components/PrintingProgress";
-import { History, AlertCircle, Lock, FilePlus, FileText, LayoutDashboard } from "lucide-react";
+import { History, AlertCircle, Lock, FilePlus, FileText, LayoutDashboard, Users } from "lucide-react";
 
 import { 
     saveQuotation, 
@@ -425,6 +425,14 @@ export default function QuotationApp() {
                     >
                         <LayoutDashboard className="w-5 h-5" />
                         <span className="hidden md:inline text-xs font-bold">Dashboard</span>
+                    </button>
+                    <button 
+                        onClick={() => router.push("/clients")}
+                        className="p-2.5 bg-white border border-slate-200 text-slate-600 rounded-2xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all flex items-center gap-2 shadow-sm"
+                        title="Master Klien"
+                    >
+                        <Users className="w-5 h-5" />
+                        <span className="hidden md:inline text-xs font-bold">Klien</span>
                     </button>
                     <button 
                         onClick={() => router.push("/invoice")}

@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { 
   FileText, Plus, Trash2, Edit2, CheckCircle, 
   Clock, XCircle, ArrowLeft, Download, Save, X,
-  Banknote, Check, Wallet, Info, Database, RefreshCw
+  Banknote, Check, Wallet, Info, Database, RefreshCw, AlertCircle, Users, TrendingUp, Search,
+  Printer, Eye, RotateCcw
 } from "lucide-react";
 import PrintingProgress from "@/components/PrintingProgress";
 import InvoiceA4Preview from "@/components/InvoiceA4Preview";
@@ -76,7 +77,13 @@ export default function InvoicePage() {
   const [form, setForm] = useState<any>(emptyForm());
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
+   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const filteredInvoices = invoices.filter(inv => {
+    if (statusFilter === "ALL") return true;
+    return inv.status === statusFilter;
+  });
 
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [printProgress, setPrintProgress] = useState(0);
@@ -94,6 +101,8 @@ export default function InvoicePage() {
   const [showClients, setShowClients] = useState(false);
   const [clientLoading, setClientLoading] = useState(false);
   const clientDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [clientSearch, setClientSearch] = useState("");
 
   const loadClients = async () => {
     setClientLoading(true);
@@ -115,7 +124,9 @@ export default function InvoicePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handlePickClient = (c: any) => {
+  const [suggestedQuotation, setSuggestedQuotation] = useState<any | null>(null);
+
+  const handlePickClient = async (c: any) => {
     setForm(prev => ({
       ...prev,
       clientName: c.companyName || c.clientName,
@@ -123,6 +134,50 @@ export default function InvoicePage() {
       clientAddress: c.address
     }));
     setShowClients(false);
+    setSuggestedQuotation(null);
+
+    try {
+        const [histRes, qRes] = await Promise.all([
+            fetch(`/api/clients/history?companyName=${encodeURIComponent(c.companyName || "")}&clientName=${encodeURIComponent(c.clientName || "")}`),
+            fetch(`/api/quotations/latest-by-client?companyName=${encodeURIComponent(c.companyName || "")}&clientName=${encodeURIComponent(c.clientName || "")}`)
+        ]);
+        
+        const hData = await histRes.json();
+        if (hData.success) {
+            const { pendingQuotations, paidInvoices, pendingInvoices } = hData.stats;
+            showToast(
+                `📊 Info Klien: ${pendingQuotations} Penawaran, ${paidInvoices} Lunas, ${pendingInvoices} Pending.`,
+                "success"
+            );
+        }
+
+        const qData = await qRes.json();
+        if (qData.success && qData.quotation) {
+            setSuggestedQuotation(qData.quotation);
+            showToast(`✨ Ditemukan Penawaran #${qData.quotation.nomorSurat}. Anda bisa menarik data pekerjaannya.`, "success");
+        }
+    } catch (e) {
+        console.error("Gagal sinkronisasi data:", e);
+    }
+  };
+
+  const handleApplyQuotation = () => {
+    if (!suggestedQuotation) return;
+    
+    setForm(prev => ({
+        ...prev,
+        quotationId: suggestedQuotation.id,
+        items: suggestedQuotation.items.map((it: any) => ({
+            id: Math.random().toString(36).substr(2, 9),
+            description: it.description,
+            quantity: it.quantity,
+            unitPrice: it.unitPrice,
+            lineTotal: Number(it.quantity) * Number(it.unitPrice)
+        }))
+    }));
+    
+    setSuggestedQuotation(null);
+    showToast("Data pekerjaan berhasil ditarik dari Penawaran!", "success");
   };
 
   // Clean up interval on unmount
@@ -306,6 +361,8 @@ export default function InvoicePage() {
   };
 
   const handleQuickPayment = async (inv: Invoice, isFull: boolean = false) => {
+    if (isFull && !window.confirm(`Konfirmasi: Tandai LUNAS untuk ${inv.invoiceNumber}?`)) return;
+    
     setUpdatingPayment(true);
     try {
       const res = await fetch("/api/invoice/payment", {
@@ -328,6 +385,29 @@ export default function InvoicePage() {
       }
     } catch {
       showToast("Gagal update pembayaran", "error");
+    }
+    setUpdatingPayment(false);
+  };
+
+  const handleRevertPayment = async (inv: Invoice) => {
+    if (!window.confirm(`PERINGATAN: Batalkan status LUNAS untuk ${inv.invoiceNumber}?\nStatus akan kembali menjadi PENDING.`)) return;
+    
+    setUpdatingPayment(true);
+    try {
+      const res = await fetch("/api/invoice/payment/revert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: inv.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Status dikembalikan ke PENDING");
+        loadInvoices();
+      } else {
+        showToast(data.error || "Gagal membatalkan status", "error");
+      }
+    } catch {
+      showToast("Gagal membatalkan status", "error");
     }
     setUpdatingPayment(false);
   };
@@ -360,21 +440,29 @@ export default function InvoicePage() {
               <p className="text-[10px] text-slate-500 uppercase tracking-widest">PT. Apindo Karya Lestari</p>
             </div>
           </div>
-          {view === "list" ? (
-            <button
-              onClick={() => { setForm(emptyForm()); setView("form"); }}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-lg shadow-emerald-900/40"
-            >
-              <Plus className="w-4 h-4" /> Buat Invoice
-            </button>
-          ) : (
-            <button
-              onClick={() => setView("list")}
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => router.push("/clients")}
               className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-4 py-2 rounded-xl transition-all"
             >
-              <X className="w-4 h-4" /> Batal
+              <Users className="w-4 h-4" /> Klien
             </button>
-          )}
+            {view === "list" ? (
+              <button
+                onClick={() => { setForm(emptyForm()); setView("form"); }}
+                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-lg shadow-emerald-900/40"
+              >
+                <Plus className="w-4 h-4" /> Buat Invoice
+              </button>
+            ) : (
+              <button
+                onClick={() => setView("list")}
+                className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-4 py-2 rounded-xl transition-all"
+              >
+                <X className="w-4 h-4" /> Batal
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -414,30 +502,51 @@ export default function InvoicePage() {
         {/* LIST VIEW */}
         {view === "list" && (
           <div>
-            <div className="mb-6">
-              <h2 className="text-2xl font-black text-white">Daftar Invoice</h2>
-              <p className="text-slate-400 text-sm mt-1">{invoices.length} invoice ditemukan</p>
+            <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-black text-white">Daftar Invoice</h2>
+                <p className="text-slate-400 text-sm mt-1">{filteredInvoices.length} invoice ditampilkan</p>
+              </div>
+              
+              <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-2xl gap-1">
+                {[
+                  { id: 'ALL', label: 'Semua' },
+                  { id: 'PENDING', label: 'Pending' },
+                  { id: 'PAID', label: 'Lunas' },
+                  { id: 'CANCELLED', label: 'Batal' }
+                ].map(f => (
+                  <button 
+                    key={f.id}
+                    onClick={() => setStatusFilter(f.id)}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === f.id ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {loading ? (
               <div className="flex items-center justify-center py-24">
                 <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
               </div>
-            ) : invoices.length === 0 ? (
-              <div className="text-center py-24 text-slate-500">
-                <FileText className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                <p className="font-bold text-lg text-slate-400">Belum ada invoice</p>
-                <p className="text-sm mt-1">Klik "Buat Invoice" untuk membuat invoice pertama</p>
+            ) : filteredInvoices.length === 0 ? (
+              <div className="text-center py-24 text-slate-500 bg-slate-900/50 border border-dashed border-slate-800 rounded-[32px]">
+                <FileText className="w-16 h-16 mx-auto mb-4 opacity-10" />
+                <p className="font-bold text-lg text-slate-400">Tidak ada data</p>
+                <p className="text-sm mt-1">Sesuaikan filter atau buat invoice baru</p>
               </div>
             ) : (
               <div className="space-y-3">
-                {invoices.map(inv => {
+                {filteredInvoices.map(inv => {
                   const badge = statusBadge(inv.status);
                   const BadgeIcon = badge.icon;
                   
                   const totalProject = (Number(inv.subtotal) || 0) - (Number(inv.discountAmount) || 0) + (Number(inv.taxAmount) || 0);
                   const paidAmount = Number(inv.downPayment) || 0;
                   const progressPercent = Math.min(100, Math.round((paidAmount / totalProject) * 100)) || 0;
+                  
+                  const isOverdue = inv.status === 'PENDING' && inv.dueDate && new Date(inv.dueDate) < new Date();
                   
                   return (
                     <div key={inv.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center gap-4 hover:border-slate-700 transition-all group relative overflow-hidden">
@@ -461,25 +570,39 @@ export default function InvoicePage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-slate-300 font-semibold text-sm">{inv.clientName}</p>
+                          <p className="text-slate-300 font-semibold text-sm">{inv.clientName}</p>
                         <div className="flex items-center gap-4 mt-1">
                            <p className="text-slate-500 text-xs">{new Date(inv.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>
                            <div className="flex items-center gap-1 text-slate-500 text-[10px] font-bold uppercase tracking-tighter">
                              <Info className="w-3 h-3" />
                              {inv.invoiceType === 'DP' ? 'Tagihan DP' : 'Tagihan Pelunasan'}
                            </div>
+                           {isOverdue && (
+                             <div className="flex items-center gap-1 text-red-500 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                               <AlertCircle className="w-3 h-3" />
+                               Terlambat!
+                             </div>
+                           )}
                         </div>
                       </div>
 
                       <div className="text-right">
-                        <p className="text-emerald-400 font-black text-lg">{fmt(inv.total)}</p>
+                        <p className={`font-black text-lg ${isOverdue ? 'text-red-500' : 'text-emerald-400'}`}>{fmt(inv.total)}</p>
                         <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
                           {inv.invoiceType === 'DP' ? 'Nilai DP' : 'Sisa Tagihan'}
                         </p>
                       </div>
 
                       <div className="flex gap-2">
-                        {inv.status !== 'PAID' && (
+                        {inv.status === 'PAID' ? (
+                          <button 
+                            onClick={() => handleRevertPayment(inv)}
+                            className="p-2.5 bg-orange-600/10 hover:bg-orange-600 text-orange-500 hover:text-white rounded-xl transition-all" 
+                            title="Batalkan Lunas (Buka Kembali)"
+                          >
+                            <RotateCcw className="w-4 h-4" />
+                          </button>
+                        ) : (
                           <>
                             <button 
                               onClick={() => setPaymentInv(inv)}
@@ -497,7 +620,18 @@ export default function InvoicePage() {
                             </button>
                           </>
                         )}
-                        <button onClick={() => handleDownloadPDF(inv.id!, inv.invoiceNumber, inv.companyName || inv.clientName)} className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl transition-all" title="Download PDF">
+                        <button 
+                          onClick={() => window.open(`/api/pdf?id=${inv.id}&mode=inline`, '_blank')} 
+                          className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl transition-all" 
+                          title="Buka / Cetak Langsung"
+                        >
+                          <Printer className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDownloadPDF(inv.id!, inv.invoiceNumber, inv.companyName || inv.clientName)} 
+                          className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl transition-all" 
+                          title="Download PDF"
+                        >
                           <Download className="w-4 h-4" />
                         </button>
                         <button onClick={() => handleEdit(inv)} className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl transition-all" title="Edit">
@@ -660,14 +794,15 @@ export default function InvoicePage() {
                   <div className="flex justify-between items-center mb-1.5">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Nama Klien *</label>
                     <button 
+                      type="button"
                       onClick={() => {
                         setShowClients(!showClients);
-                        if (clients.length === 0) loadClients();
+                        if (!showClients) loadClients();
                       }}
-                      className="text-[9px] font-black text-blue-500 hover:text-blue-400 uppercase tracking-tighter flex items-center gap-1"
+                      className="text-[9px] font-black text-blue-500 hover:text-blue-400 uppercase tracking-tighter flex items-center gap-1 group"
                     >
-                      <Database className="w-2.5 h-2.5" />
-                      Database
+                      <Database className={`w-2.5 h-2.5 transition-transform ${showClients ? 'rotate-180' : ''}`} />
+                      {showClients ? 'Tutup' : 'Database'}
                     </button>
                   </div>
                   <input 
@@ -676,32 +811,72 @@ export default function InvoicePage() {
                         setShowClients(true);
                         if (clients.length === 0) loadClients();
                     }}
-                    onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))}
+                    onChange={e => {
+                        const val = e.target.value;
+                        setForm(f => ({ ...f, clientName: val }));
+                        if (val.length > 0) setShowClients(true);
+                        if (clients.length === 0) loadClients();
+                    }}
                     placeholder="PT. Nama Perusahaan..."
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-bold text-xs outline-none focus:border-blue-500 transition-colors placeholder:text-slate-600" 
                   />
 
-                  {showClients && clients.length > 0 && (
-                    <div className="absolute z-[60] w-full mt-2 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-h-64 overflow-y-auto p-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-2 mb-1 border-b border-slate-800 flex justify-between items-center">
-                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Pilih Klien Terdaftar</p>
-                            {clientLoading && <RefreshCw className="w-2.5 h-2.5 animate-spin text-blue-500" />}
+                  {showClients && (
+                    <div className="absolute z-[60] w-full mt-2 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-h-80 overflow-y-auto p-2 animate-in fade-in slide-in-from-top-2 duration-200 shadow-blue-500/10">
+                        <div className="p-2 mb-2 border-b border-slate-800">
+                            <div className="flex justify-between items-center mb-2">
+                                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Pilih Klien Terdaftar</p>
+                                {clientLoading && <RefreshCw className="w-2.5 h-2.5 animate-spin text-blue-500" />}
+                            </div>
+                            <div className="relative">
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500" />
+                                <input 
+                                    autoFocus
+                                    type="text" 
+                                    placeholder="Cari nama klien..." 
+                                    value={clientSearch}
+                                    onChange={e => setClientSearch(e.target.value)}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-[10px] font-bold text-white outline-none focus:border-blue-500 transition-colors"
+                                />
+                            </div>
                         </div>
                         <div className="space-y-1">
-                            {clients.filter(c => 
-                                !form.clientName || 
-                                (c.companyName || "").toLowerCase().includes(form.clientName.toLowerCase()) ||
-                                (c.clientName || "").toLowerCase().includes(form.clientName.toLowerCase())
-                            ).map((c, i) => (
-                                <div 
-                                    key={i} 
-                                    onClick={() => handlePickClient(c)}
-                                    className="p-3 hover:bg-blue-600 group rounded-xl cursor-pointer transition-all border border-transparent hover:border-blue-500"
-                                >
-                                    <p className="text-xs font-black text-white group-hover:text-white">{c.companyName || c.clientName}</p>
-                                    <p className="text-[10px] text-slate-400 group-hover:text-blue-100 truncate">{c.address}</p>
+                            {clients.length === 0 && !clientLoading ? (
+                                <div className="p-4 text-center">
+                                    <Database className="w-6 h-6 text-slate-700 mx-auto mb-2" />
+                                    <p className="text-[10px] font-bold text-slate-600 uppercase">Belum ada klien terdaftar</p>
                                 </div>
-                            ))}
+                            ) : (
+                                <>
+                                    {clients.filter(c => {
+                                        const query = clientSearch || form.clientName || "";
+                                        return (c.companyName || "").toLowerCase().includes(query.toLowerCase()) ||
+                                               (c.clientName || "").toLowerCase().includes(query.toLowerCase());
+                                    }).length === 0 ? (
+                                        <div className="p-4 text-center text-slate-600 text-[10px] font-bold uppercase">
+                                            Tidak ada hasil untuk "{clientSearch || form.clientName}"
+                                        </div>
+                                    ) : (
+                                        clients.filter(c => {
+                                            const query = clientSearch || form.clientName || "";
+                                            return (c.companyName || "").toLowerCase().includes(query.toLowerCase()) ||
+                                                   (c.clientName || "").toLowerCase().includes(query.toLowerCase());
+                                        }).map((c, i) => (
+                                            <div 
+                                                key={i} 
+                                                onClick={() => {
+                                                    handlePickClient(c);
+                                                    setClientSearch("");
+                                                }}
+                                                className="p-3 hover:bg-blue-600 group rounded-xl cursor-pointer transition-all border border-transparent hover:border-blue-500"
+                                            >
+                                                <p className="text-xs font-black text-white group-hover:text-white">{c.companyName || c.clientName}</p>
+                                                <p className="text-[10px] text-slate-400 group-hover:text-blue-100 truncate">{c.address}</p>
+                                            </div>
+                                        ))
+                                    )}
+                                </>
+                            )}
                         </div>
                     </div>
                   )}
@@ -728,6 +903,27 @@ export default function InvoicePage() {
                   </select>
                 </div>
               </div>
+              
+              {suggestedQuotation && (
+                <div className="bg-blue-600/10 border border-blue-500/30 rounded-2xl p-5 mb-6 flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-900/40">
+                      <TrendingUp className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Penawaran Ditemukan</p>
+                      <p className="text-sm font-bold text-white">Gunakan data pekerjaan dari Penawaran #{suggestedQuotation.nomorSurat}?</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Sistem mendeteksi ada penawaran terbaru untuk klien ini.</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleApplyQuotation}
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-900/40 active:scale-95"
+                  >
+                    Tarik Data Pekerjaan
+                  </button>
+                </div>
+              )}
 
               {/* Items */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Edit3, Settings2, Plus, Package, RefreshCw, Database } from "lucide-react";
+import { Edit3, Settings2, Plus, Package, RefreshCw, Database, Search } from "lucide-react";
 import { QuotationData } from "@/lib/types";
 import { getNextQuotationNumber } from "@/app/actions";
 import { formatQuotationNumber } from "@/lib/utils";
@@ -11,16 +11,19 @@ interface UmumSectionProps {
     setData: React.Dispatch<React.SetStateAction<QuotationData>>;
     nomorUrut: number;
     setNomorUrut: (n: number) => void;
+    showToast: (msg: string, type?: 'success' | 'error') => void;
 }
 
 export default function UmumSection({
-    data, setData, nomorUrut, setNomorUrut
+    data, setData, nomorUrut, setNomorUrut, showToast
 }: UmumSectionProps) {
     const [isSyncing, setIsSyncing] = React.useState(false);
     const [clients, setClients] = React.useState<any[]>([]);
     const [showClients, setShowClients] = React.useState(false);
     const [clientLoading, setClientLoading] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+    const [clientSearch, setClientSearch] = React.useState("");
 
     const loadClients = async () => {
         setClientLoading(true);
@@ -42,7 +45,7 @@ export default function UmumSection({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handlePickClient = (c: any) => {
+    const handlePickClient = async (c: any) => {
         setData(prev => ({
             ...prev,
             namaKlien: c.companyName || c.clientName,
@@ -52,6 +55,22 @@ export default function UmumSection({
             lokasi: c.address
         }));
         setShowClients(false);
+        setClientSearch("");
+
+        // Fetch History Stats
+        try {
+            const res = await fetch(`/api/clients/history?companyName=${encodeURIComponent(c.companyName || "")}&clientName=${encodeURIComponent(c.clientName || "")}`);
+            const d = await res.json();
+            if (d.success) {
+                const { pendingQuotations, paidInvoices, pendingInvoices } = d.stats;
+                showToast(
+                    `📊 Info Klien: ${pendingQuotations} Penawaran, ${paidInvoices} Lunas, ${pendingInvoices} Pending.`,
+                    "success"
+                );
+            }
+        } catch (e) {
+            console.error("Gagal ambil history:", e);
+        }
     };
 
     const handleSyncNumber = async () => {
@@ -154,14 +173,15 @@ export default function UmumSection({
                             Penerima Dokumen <span className="text-red-400 font-normal ml-1 lowercase">(Minimal isi salah satu)</span>
                         </label>
                         <button 
+                            type="button"
                             onClick={() => {
                                 setShowClients(!showClients);
-                                if (clients.length === 0) loadClients();
+                                if (!showClients) loadClients();
                             }}
-                            className="text-[9px] font-black text-blue-500 hover:text-blue-700 uppercase tracking-tighter flex items-center gap-1"
+                            className="text-[9px] font-black text-blue-500 hover:text-blue-700 uppercase tracking-tighter flex items-center gap-1 group"
                         >
-                            <Database className="w-2.5 h-2.5" />
-                            Database Klien
+                            <Database className={`w-2.5 h-2.5 transition-transform ${showClients ? 'rotate-180' : ''}`} />
+                            {showClients ? 'Tutup Database' : 'Database Klien'}
                         </button>
                     </div>
                     <div className="relative" ref={dropdownRef}>
@@ -173,31 +193,68 @@ export default function UmumSection({
                                 setShowClients(true);
                                 if (clients.length === 0) loadClients();
                             }}
-                            onChange={(e) => setData({ ...data, namaKlien: e.target.value })} 
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setData({ ...data, namaKlien: val });
+                                if (val.length > 0) setShowClients(true);
+                                if (clients.length === 0) loadClients();
+                            }} 
                             className={`w-full p-4 bg-slate-50 border-none rounded-2xl font-black text-base focus:bg-white shadow-inner outline-none focus:ring-2 transition-all ${!data.namaKlien && !data.up ? 'ring-1 ring-red-200 focus:ring-red-500' : 'focus:ring-blue-500'}`} 
                         />
 
-                        {showClients && clients.length > 0 && (
-                            <div className="absolute z-[60] w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl max-h-64 overflow-y-auto p-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="p-2 mb-1 border-b border-slate-50 flex justify-between items-center">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pilih Klien Terdaftar</p>
-                                    {clientLoading && <RefreshCw className="w-2.5 h-2.5 animate-spin text-blue-500" />}
+                        {showClients && (
+                            <div className="absolute z-[60] w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl max-h-80 overflow-y-auto p-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="p-2 mb-2 border-b border-slate-100">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pilih Klien Terdaftar</p>
+                                        {clientLoading && <RefreshCw className="w-2.5 h-2.5 animate-spin text-blue-500" />}
+                                    </div>
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                                        <input 
+                                            autoFocus
+                                            type="text" 
+                                            placeholder="Cari nama klien..." 
+                                            value={clientSearch}
+                                            onChange={e => setClientSearch(e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
-                                    {clients.filter(c => 
-                                        !data.namaKlien || 
-                                        (c.companyName || "").toLowerCase().includes(data.namaKlien.toLowerCase()) ||
-                                        (c.clientName || "").toLowerCase().includes(data.namaKlien.toLowerCase())
-                                    ).map((c, i) => (
-                                        <div 
-                                            key={i} 
-                                            onClick={() => handlePickClient(c)}
-                                            className="p-3 hover:bg-blue-600 group rounded-xl cursor-pointer transition-all border border-transparent hover:border-blue-400"
-                                        >
-                                            <p className="text-xs font-black text-slate-800 group-hover:text-white">{c.companyName || c.clientName}</p>
-                                            <p className="text-[10px] text-slate-500 group-hover:text-blue-100 truncate">{c.address}</p>
+                                    {clients.length === 0 && !clientLoading ? (
+                                        <div className="p-4 text-center">
+                                            <Database className="w-6 h-6 text-slate-200 mx-auto mb-2" />
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Belum ada klien terdaftar</p>
                                         </div>
-                                    ))}
+                                    ) : (
+                                        <>
+                                            {clients.filter(c => {
+                                                const query = clientSearch || data.namaKlien || "";
+                                                return (c.companyName || "").toLowerCase().includes(query.toLowerCase()) ||
+                                                       (c.clientName || "").toLowerCase().includes(query.toLowerCase());
+                                            }).length === 0 ? (
+                                                <div className="p-4 text-center text-slate-400 text-[10px] font-bold uppercase">
+                                                    Tidak ada hasil untuk "{clientSearch || data.namaKlien}"
+                                                </div>
+                                            ) : (
+                                                clients.filter(c => {
+                                                    const query = clientSearch || data.namaKlien || "";
+                                                    return (c.companyName || "").toLowerCase().includes(query.toLowerCase()) ||
+                                                           (c.clientName || "").toLowerCase().includes(query.toLowerCase());
+                                                }).map((c, i) => (
+                                                    <div 
+                                                        key={i} 
+                                                        onClick={() => handlePickClient(c)}
+                                                        className="p-3 hover:bg-blue-600 group rounded-xl cursor-pointer transition-all border border-transparent hover:border-blue-400"
+                                                    >
+                                                        <p className="text-xs font-black text-slate-800 group-hover:text-white">{c.companyName || c.clientName}</p>
+                                                        <p className="text-[10px] text-slate-500 group-hover:text-blue-100 truncate">{c.address}</p>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}

@@ -39,10 +39,11 @@ async function getBrowser() {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');
+  const mode = searchParams.get('mode') || 'attachment';
 
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
   
-  logActivity(`Memulai pembuatan PDF untuk ID: ${id}`, 'INFO');
+  logActivity(`Memulai pembuatan PDF untuk ID: ${id} (Mode: ${mode})`, 'INFO');
 
   console.time(`[PDF] Total Generation Time for ${id}`);
   
@@ -116,10 +117,10 @@ export async function GET(req: NextRequest) {
     console.timeEnd(`[PDF] Total Generation Time for ${id}`);
 
     return new NextResponse(pdfBuffer as any, {
-
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="Penawaran_${id}.pdf"`,
+        'Content-Disposition': `${mode}; filename="Dokumen_${id}.pdf"`,
+        'Cache-Control': 'no-cache'
       },
     });
   } catch (error: any) {

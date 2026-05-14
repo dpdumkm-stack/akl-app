@@ -68,3 +68,19 @@ The table `main.Quotation` does not exist in the current database.
 [14/5/2026, 12.38.22] [SUCCESS] Berhasil simpan Penawaran: 005/PH-AKL/V/2026 (ID: 2d7f2b60-e48a-431c-86f6-b87006064620)
 [14/5/2026, 12.38.22] [INFO] Memulai pembuatan PDF untuk ID: 2d7f2b60-e48a-431c-86f6-b87006064620
 [14/5/2026, 12.38.44] [SUCCESS] Berhasil membuat PDF untuk ID: 2d7f2b60-e48a-431c-86f6-b87006064620
+[14/5/2026, 18.43.53] [INFO] Memulai simpan Penawaran: 006/PH-AKL/V/2026
+[14/5/2026, 18.43.53] [SUCCESS] Berhasil simpan Penawaran: 006/PH-AKL/V/2026 (ID: 0af35223-f086-4a1c-ab7b-c6182d5d8816)
+[14/5/2026, 18.43.56] [INFO] Memulai simpan Penawaran: 006/PH-AKL/V/2026
+[14/5/2026, 18.43.56] [SUCCESS] Berhasil simpan Penawaran: 006/PH-AKL/V/2026 (ID: 0af35223-f086-4a1c-ab7b-c6182d5d8816)
+[14/5/2026, 18.44.05] [INFO] Memulai pembuatan PDF untuk ID: 0af35223-f086-4a1c-ab7b-c6182d5d8816
+[14/5/2026, 18.44.48] [SUCCESS] Berhasil membuat PDF untuk ID: 0af35223-f086-4a1c-ab7b-c6182d5d8816
+[14/5/2026, 19.43.19] [INFO] Memulai pembuatan PDF untuk ID: b4b274ab-562e-465a-a16a-3bf87ae827aa
+[14/5/2026, 19.43.30] [SUCCESS] Berhasil membuat PDF untuk ID: b4b274ab-562e-465a-a16a-3bf87ae827aa
+[14/5/2026, 19.44.09] [INFO] Memulai pembuatan PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505
+[14/5/2026, 19.44.13] [SUCCESS] Berhasil membuat PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505
+[14/5/2026, 19.45.09] [INFO] Memulai pembuatan PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505
+[14/5/2026, 19.45.24] [SUCCESS] Berhasil membuat PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505
+[14/5/2026, 19.52.21] [INFO] Memulai pembuatan PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505 (Mode: inline)
+[14/5/2026, 19.52.29] [SUCCESS] Berhasil membuat PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505
+[14/5/2026, 19.57.41] [INFO] Memulai pembuatan PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505 (Mode: inline)
+[14/5/2026, 19.57.52] [SUCCESS] Berhasil membuat PDF untuk ID: f427da4d-b9d8-48c1-82b7-2fa4ff227505
