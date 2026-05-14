@@ -33,5 +33,5 @@ echo "Database schema OK."
 DB_SIZE=$(du -b "$DB_FILE" 2>/dev/null | cut -f1 || echo "0")
 echo "Database file size: $DB_SIZE bytes"
 
-echo "Starting Next.js..."
-exec npm run start
+echo "Starting Next.js (Standalone Mode)..."
+exec node server.js

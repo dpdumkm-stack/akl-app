@@ -1,7 +1,6 @@
 # --- TAHAP 1: BUILD ---
 FROM node:20-slim AS builder
 
-# Instal dependensi sistem yang dibutuhkan untuk build Prisma/Sharp (jika ada)
 RUN apt-get update && apt-get install -y openssl python3 make g++ sqlite3 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -25,6 +24,8 @@ ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME="0.0.0.0"
 
+WORKDIR /app
+
 # Instal dependensi runner: Chromium (PDF), Font, dan Curl (Healthcheck)
 RUN apt-get update && apt-get install -y \
     chromium \
@@ -37,13 +38,10 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-
-# Copy hasil build dari tahap sebelumnya
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
+# Copy hasil standalone build
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 
 # Copy entrypoint script
