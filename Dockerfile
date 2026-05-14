@@ -18,7 +18,14 @@ RUN npm run build
 # --- TAHAP 2: RUNNER ---
 FROM node:20-slim AS runner
 
-# Instal Chromium dan Font untuk Puppeteer di Linux
+# Set variabel lingkungan untuk Cloud / Docker
+ENV NODE_ENV=production \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
+    PORT=3000 \
+    HOSTNAME="0.0.0.0"
+
+# Instal dependensi runner: Chromium (PDF), Font, dan Curl (Healthcheck)
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-freefont-ttf \
@@ -26,14 +33,9 @@ RUN apt-get update && apt-get install -y \
     libatk-bridge2.0-0 \
     libxss1 \
     libasound2 \
+    curl \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
-
-# Set variabel lingkungan untuk Cloud / Docker
-ENV NODE_ENV=production \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
-    PORT=3000
 
 WORKDIR /app
 
