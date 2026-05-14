@@ -44,6 +44,7 @@ model Quotation {
   kenakanPPN            Boolean  @default(false)
   diskon                Float    @default(0)
   totalHarga            Float    @default(0)
+  isInvoiced            Boolean  @default(false)
 
   // Disimpan sebagai String JSON (karena SQLite tidak natively support String[])
   termin                String   
@@ -111,6 +112,7 @@ model Invoice {
   clientAddress     String?
   items             InvoiceItem[]
   subtotal          Decimal       @default(0)
+  quotationId       String?       // ID Penawaran asal (untuk integrasi)
   taxRate           Decimal       @default(0.11) // 11% PPN
   taxApplied        Boolean       @default(false)
   taxAmount         Decimal       @default(0)

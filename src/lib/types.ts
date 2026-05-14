@@ -36,6 +36,7 @@ export interface QuotationData {
   isMaterialOnlyMode: boolean;
   diskon: number;
   kenakanPPN: boolean;
+  isInvoiced?: boolean;
 }
 
 export interface InvoiceItemData {
@@ -64,5 +65,6 @@ export interface InvoiceData {
   paymentMethod: 'CASH' | 'CHEQUE' | 'BILYET GIRO' | 'TRANSFER';
   total: number;
   invoiceType: 'DP' | 'PELUNASAN';
+  quotationId?: string;
   status: 'PENDING' | 'PAID' | 'CANCELLED';
 }
