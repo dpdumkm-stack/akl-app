@@ -31,6 +31,7 @@ export interface QuotationData {
   items: QuotationItem[];
   showLingkupKerja: boolean;
   showSyaratGaransi: boolean;
+  showTermin?: boolean;
   isHargaSatuanMode: boolean;
   isJasaBahanMode: boolean;
   isMaterialOnlyMode: boolean;

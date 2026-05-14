@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import puppeteer, { Browser } from 'puppeteer';
 import { logActivity } from "@/lib/logger";
+import { prisma } from "@/lib/prisma";
 
 let cachedBrowser: Browser | null = null;
 

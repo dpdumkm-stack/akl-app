@@ -440,12 +440,12 @@ function ServiceCard({ title, subtitle, icon, color, onClick, isPlaceholder, sta
       className={`relative group flex flex-col p-8 rounded-[32px] bg-gradient-to-br ${colors[color]} shadow-2xl transition-all duration-500 hover:translate-y-[-4px] ${isPlaceholder ? 'opacity-50 cursor-not-allowed filter grayscale-[0.3]' : 'active:scale-95'}`}
     >
       <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-        {React.cloneElement(icon as React.ReactElement, { className: 'w-24 h-24' })}
+        {React.cloneElement(icon as React.ReactElement<any>, { className: 'w-24 h-24' })}
       </div>
       
       <div className="relative z-10">
         <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6 shadow-inner">
-          {React.cloneElement(icon as React.ReactElement, { className: 'w-7 h-7 text-white' })}
+          {React.cloneElement(icon as React.ReactElement<any>, { className: 'w-7 h-7 text-white' })}
         </div>
         <h3 className="text-xl font-black text-white mb-1 tracking-tight uppercase">{title}</h3>
         <p className="text-xs text-white/60 font-medium mb-6 uppercase tracking-wider">{subtitle}</p>

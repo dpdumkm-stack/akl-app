@@ -59,7 +59,6 @@ export default async function PrintPage({ params }: { params: Promise<{ id: stri
         <A4Preview
           data={quotation as QuotationData}
           isGeneratingPDF={true}
-          viewMode="preview"
           globalLogoUrl={globalLogo}
           globalTTDUrl={globalTTD}
         />

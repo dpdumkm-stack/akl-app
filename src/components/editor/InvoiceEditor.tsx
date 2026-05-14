@@ -3,7 +3,8 @@ import { useSession } from 'next-auth/react';
 import { InvoiceData, InvoiceItemData } from '@/lib/types';
 import { getNextInvoiceNumber } from '@/lib/invoice-number-service';
 import InvoiceItemRow from '@/components/editor/InvoiceItemRow';
-import { saveInvoice } from '@/app/actions'; // assume action exists similar to saveQuotation
+import { saveInvoice } from '@/app/actions';
+import { Save } from 'lucide-react';
 
 export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
   const { data: session } = useSession();
