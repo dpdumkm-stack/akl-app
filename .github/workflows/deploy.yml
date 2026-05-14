@@ -7,6 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  # Gunakan variabel env untuk menyimpan nama image huruf kecil
   IMAGE_NAME: ${{ github.repository }}
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -33,7 +34,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          # Memaksa tag menjadi lowercase karena GHCR tidak mengizinkan huruf kapital
+          tags: ${{ env.REGISTRY }}/dpdumkm-stack/akl-app:latest
 
   deploy:
     needs: build-and-push
@@ -50,19 +52,22 @@ jobs:
             # Masuk ke folder proyek
             cd /var/www/akl-app
             
-            # Login ke GHCR di VPS (agar bisa pull image private jika perlu)
+            # Anti-Error 128 (Git Dubious Ownership)
+            git config --global --add safe.directory /var/www/akl-app
+            
+            # Login ke GHCR di VPS
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # Ambil kode terbaru (hanya untuk docker-compose.yml dan env)
+            # Ambil kode terbaru
             git pull origin main
             
             # Pull image terbaru dari GHCR
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            docker pull ghcr.io/dpdumkm-stack/akl-app:latest
             
             # Restart container menggunakan image baru
             docker-compose up -d --force-recreate
             
-            # Hapus image lama yang sudah tidak terpakai (cleanup)
+            # Hapus image lama yang sudah tidak terpakai
             docker image prune -f
             
             echo "✨ Deployment Selesai & Berhasil!"

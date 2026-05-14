@@ -357,6 +357,7 @@ export async function saveInvoice(data: any) {
       date: data.date ? new Date(data.date) : new Date(),
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       clientName: sanitize(data.clientName),
+      companyName: sanitize(data.companyName),
       clientAddress: sanitize(data.clientAddress),
       taxApplied: !!data.taxApplied,
       taxRate: Number(data.taxRate) || 0.11,
@@ -401,9 +402,9 @@ export async function saveInvoice(data: any) {
     }
     // Sync Client Database
     await syncClient({
-        companyName: payload.companyName,
-        clientName: payload.clientName,
-        address: payload.clientAddress,
+        companyName: data.companyName,
+        clientName: data.clientName,
+        address: data.clientAddress,
     });
 
     logActivity(`Berhasil simpan Invoice: ${invoice.invoiceNumber} (ID: ${invoice.id})`, 'SUCCESS');
