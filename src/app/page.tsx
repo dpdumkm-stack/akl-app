@@ -57,6 +57,10 @@ export default function QuotationApp() {
   const [mounted, setMounted] = useState(false);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isPrintingRef = useRef(false);
+  
+  // Track latest data with ref to prevent callback identity changes
+  const dataRef = useRef(data);
+  useEffect(() => { dataRef.current = data; }, [data]);
 
   const showToast = useCallback((msg: string, type: 'success' | 'error' = 'success') => {
 
@@ -105,8 +109,12 @@ export default function QuotationApp() {
     return true;
   }, [data.namaKlien, data.up, data.items, showToast]);
 
+  // Use refs to stabilize functions used inside other callbacks/effects
+  const validateDataRef = useRef(validateData);
+  useEffect(() => { validateDataRef.current = validateData; }, [validateData]);
+
   const handleSave = useCallback(async () => {
-    if (!validateData()) return { success: false, message: "Validasi Gagal" };
+    if (!validateDataRef.current()) return { success: false, message: "Validasi Gagal" };
     
     setIsSaving(true);
     try {
@@ -140,6 +148,9 @@ export default function QuotationApp() {
         setIsSaving(false);
       }
   }, [data, validateData, showToast]);
+
+  const handleSaveRef = useRef(handleSave);
+  useEffect(() => { handleSaveRef.current = handleSave; }, [handleSave]);
 
 
   const createNew = async () => {
@@ -234,33 +245,18 @@ export default function QuotationApp() {
   }, [isDirty, showToast]);
 
   const handleDownloadPDF = useCallback(async () => {
-    if (!validateData()) return;
+    if (!validateDataRef.current()) return;
     if (isPrintingRef.current) return; // Cegah double trigger
 
     isPrintingRef.current = true;
     setIsGeneratingPDF(true); 
     setPrintProgress(0);
     
-    if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-        progressIntervalRef.current = null;
-    }
-
-    // Mulai Simulasi Progress Dinamis
-    progressIntervalRef.current = setInterval(() => {
-        setPrintProgress(prev => {
-            if (prev < 70) return prev + 2.5;    // Akselerasi: Penyiapan & Simpan Data
-            if (prev < 85) return prev + 0.8;    // Stabil: Handshake ke PDF Server
-            if (prev < 95) return prev + 0.2;    // Slow: Rendering Halaman & Aset
-            if (prev < 99) return prev + 0.05;   // Creeping: Finalisasi Konversi Biner
-            return prev;
-        });
-    }, 150);
-
-
+    // Hapus simulasi progres dari sini, pindahkan ke useEffect di bawah
+    
     try {
       setPrintProgress(10);
-      const saveRes = await handleSave();
+      const saveRes = await handleSaveRef.current();
       if (!saveRes || !saveRes.success) {
           throw new Error("Gagal menyimpan dokumen sebelum cetak.");
       }
@@ -283,7 +279,8 @@ export default function QuotationApp() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const clientName = (data.namaKlien || 'Client').replace(/[^\w\s-]/gi, '').replace(/\s+/g, '_');
+      const currentData = dataRef.current;
+      const clientName = (currentData.namaKlien || 'Client').replace(/[^\w\s-]/gi, '').replace(/\s+/g, '_');
       a.download = `Penawaran_${clientName}.pdf`;
       document.body.appendChild(a);
       a.click();
@@ -293,7 +290,6 @@ export default function QuotationApp() {
 
       setTimeout(() => {
         setIsGeneratingPDF(false);
-        setPrintProgress(0);
         isPrintingRef.current = false;
       }, 1000);
 
@@ -301,21 +297,39 @@ export default function QuotationApp() {
       console.error(error);
       showToast(error.message || 'Gagal mengunduh PDF.', 'error');
       setIsGeneratingPDF(false);
-      setPrintProgress(0);
       isPrintingRef.current = false;
-    } finally {
-        if (progressIntervalRef.current) {
-            clearInterval(progressIntervalRef.current);
-            progressIntervalRef.current = null;
-        }
     }
-  }, [data.id, data.namaKlien, handleSave, validateData, showToast]);
-;
+  }, []); // COMPLETE STABILITY
+
 
   // Efek Pemuatan Awal & Manajemen Siklus Hidup
   useEffect(() => {
     setMounted(true);
     
+    // Progress Animation Side-Effect
+    if (isGeneratingPDF) {
+        progressIntervalRef.current = setInterval(() => {
+            setPrintProgress(prev => {
+                if (prev < 70) return prev + 1.5;
+                if (prev < 90) return prev + 0.5;
+                if (prev < 98) return prev + 0.1;
+                return prev;
+            });
+        }, 200);
+    } else {
+        if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+        }
+        setPrintProgress(0);
+    }
+
+    return () => {
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    };
+  }, [isGeneratingPDF]);
+
+  useEffect(() => {
     const loadDefaults = async () => {
         try {
             const settings = await getGlobalSettings();

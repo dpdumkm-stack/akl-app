@@ -38,12 +38,16 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     console.log(`[saveQuotation] START - ID: ${data.id}, Nomor: ${data.nomorSurat}, Payload Size: ${(payloadSize / 1024).toFixed(2)} KB`);
 
     // SCSA VALIDATION LOGIC: Minimal salah satu harus diisi
-    const company = data.companyName?.trim() || "";
-    const client = data.clientName?.trim() || "";
+    // Frontend mungkin mengirim namaKlien untuk Perusahaan dan up untuk Pribadi
+    const company = (data.companyName || data.namaKlien)?.trim() || "";
+    const client = (data.clientName || data.up)?.trim() || "";
 
     if (!company && !client) {
-        logActivity(`GAGAL simpan: Nama PT & Pribadi kosong`, 'ERROR');
-        return { success: false, message: "Mohon isi nama perusahaan atau nama pribadi" };
+        logActivity(`GAGAL simpan: Nama Perusahaan & UP kosong`, 'ERROR');
+        return { 
+            success: false, 
+            message: "Validasi Gagal: Mohon isi minimal salah satu antara Nama Perusahaan atau Nama Penerima (U.P.)" 
+        };
     }
 
     // Gabungkan untuk namaKlien (sebagai fallback tampilan lama)
@@ -141,7 +145,12 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
     logActivity(`GAGAL simpan Penawaran: ${error.message}`, 'ERROR');
     console.error("[saveQuotation] FATAL ERROR:", error);
     const isProd = process.env.NODE_ENV === 'production';
-    const msg = isProd ? "Gagal menyimpan data ke server. Silakan coba lagi." : (error?.message || "Unknown Database Error");
+    let msg = isProd ? "Gagal menyimpan data ke server. Silakan coba lagi." : (error?.message || "Unknown Database Error");
+    
+    if (error.message?.toLowerCase().includes("prisma") || error.message?.toLowerCase().includes("database") || error.code) {
+        msg = `Database/Server Error: ${msg} (Code: ${error.code || 'N/A'})`;
+    }
+    
     return { success: false, message: msg };
   }
 }

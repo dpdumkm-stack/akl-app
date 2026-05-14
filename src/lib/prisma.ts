@@ -8,8 +8,8 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 // 1. Tentukan path absolut database secara dinamis
 // Di produksi (Docker/VPS), gunakan DB_PATH dari env jika ada, 
 // atau fallback ke direktori 'prisma' di root project secara absolut.
-const DB_FILENAME = "dev.db";
-const defaultDbPath = path.join(process.cwd(), "prisma", DB_FILENAME);
+const DB_FILENAME = "database.db";
+const defaultDbPath = path.join(process.cwd(), DB_FILENAME);
 
 const absoluteDbPath = process.env.DB_PATH 
   ? (path.isAbsolute(process.env.DB_PATH) ? process.env.DB_PATH : path.resolve(process.env.DB_PATH))

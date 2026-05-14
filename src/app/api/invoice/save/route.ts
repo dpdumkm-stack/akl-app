@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       date,
       dueDate,
       clientName,
+      companyName,
       clientAddress,
       items,
       taxApplied,
@@ -29,6 +30,14 @@ export async function POST(req: NextRequest) {
       status,
       invoiceType,
     } = body;
+
+    // SCSA VALIDATION: Minimal salah satu harus diisi
+    if (!clientName?.trim() && !companyName?.trim()) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Validasi Gagal: Mohon isi minimal salah satu antara Nama Perusahaan atau Nama Klien." 
+      }, { status: 400 });
+    }
 
     // Calculate totals
     const subtotal = items.reduce((acc: number, item: any) => {
@@ -63,6 +72,8 @@ export async function POST(req: NextRequest) {
           date: date ? new Date(date) : new Date(),
           dueDate: dueDate ? new Date(dueDate) : null,
           clientName: clientName?.trim(),
+          companyName: companyName?.trim(),
+
           clientAddress: clientAddress?.trim(),
           subtotal,
           taxApplied: !!taxApplied,
@@ -84,6 +95,8 @@ export async function POST(req: NextRequest) {
           date: date ? new Date(date) : new Date(),
           dueDate: dueDate ? new Date(dueDate) : null,
           clientName: clientName?.trim(),
+          companyName: companyName?.trim(),
+
           clientAddress: clientAddress?.trim(),
           subtotal,
           taxApplied: !!taxApplied,

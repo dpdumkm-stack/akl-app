@@ -1,0 +1,70 @@
+[14/5/2026, 11.25.17] [INFO] Memulai simpan Penawaran: 003/PH-AKL/V/2026
+[14/5/2026, 11.25.17] [ERROR] GAGAL simpan: Nama PT & Pribadi kosong
+[14/5/2026, 11.25.45] [INFO] Memulai simpan Penawaran: 003/PH-AKL/V/2026
+[14/5/2026, 11.25.45] [ERROR] GAGAL simpan: Nama PT & Pribadi kosong
+[14/5/2026, 11.26.07] [INFO] Memulai simpan Penawaran: 003/PH-AKL/V/2026
+[14/5/2026, 11.26.07] [ERROR] GAGAL simpan: Nama PT & Pribadi kosong
+[14/5/2026, 11.26.10] [INFO] Memulai simpan Penawaran: 003/PH-AKL/V/2026
+[14/5/2026, 11.26.10] [ERROR] GAGAL simpan: Nama PT & Pribadi kosong
+[14/5/2026, 11.26.16] [INFO] Memulai simpan Penawaran: 003/PH-AKL/V/2026
+[14/5/2026, 11.26.16] [ERROR] GAGAL simpan: Nama PT & Pribadi kosong
+[14/5/2026, 11.56.25] [INFO] Memulai simpan Penawaran: 001/PH-AKL/V/2026
+[14/5/2026, 11.56.26] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0wx~ehy._.js:288:168
+
+  285         }
+  286     });
+  287 } else {
+→ 288     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create(
+The table `main.Quotation` does not exist in the current database.
+[14/5/2026, 11.56.35] [INFO] Memulai simpan Penawaran: 001/PH-AKL/V/2026
+[14/5/2026, 11.56.35] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0wx~ehy._.js:288:168
+
+  285         }
+  286     });
+  287 } else {
+→ 288     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create(
+The table `main.Quotation` does not exist in the current database.
+[14/5/2026, 11.56.43] [INFO] Memulai simpan Penawaran: 001/PH-AKL/V/2026
+[14/5/2026, 11.56.44] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__0wx~ehy._.js:288:168
+
+  285         }
+  286     });
+  287 } else {
+→ 288     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create(
+The table `main.Quotation` does not exist in the current database.
+[14/5/2026, 12.04.05] [INFO] Memulai simpan Penawaran: 001/PH-AKL/V/2026
+[14/5/2026, 12.04.05] [SUCCESS] Berhasil simpan Penawaran: 001/PH-AKL/V/2026 (ID: 712572b8-9609-4d34-9b6d-3c3704f585f8)
+[14/5/2026, 12.04.08] [INFO] Memulai simpan Penawaran: 001/PH-AKL/V/2026
+[14/5/2026, 12.04.09] [SUCCESS] Berhasil simpan Penawaran: 001/PH-AKL/V/2026 (ID: 712572b8-9609-4d34-9b6d-3c3704f585f8)
+[14/5/2026, 12.04.30] [INFO] Memulai pembuatan PDF untuk ID: 712572b8-9609-4d34-9b6d-3c3704f585f8
+[14/5/2026, 12.05.49] [SUCCESS] Berhasil membuat PDF untuk ID: 712572b8-9609-4d34-9b6d-3c3704f585f8
+[14/5/2026, 12.15.32] [INFO] Memulai simpan Penawaran: 002/PH-AKL/V/2026
+[14/5/2026, 12.15.32] [SUCCESS] Berhasil simpan Penawaran: 002/PH-AKL/V/2026 (ID: f9aaf2cc-e981-4cd4-a240-fac96a8344d5)
+[14/5/2026, 12.15.35] [INFO] Memulai simpan Penawaran: 002/PH-AKL/V/2026
+[14/5/2026, 12.15.36] [SUCCESS] Berhasil simpan Penawaran: 002/PH-AKL/V/2026 (ID: f9aaf2cc-e981-4cd4-a240-fac96a8344d5)
+[14/5/2026, 12.15.38] [INFO] Memulai pembuatan PDF untuk ID: f9aaf2cc-e981-4cd4-a240-fac96a8344d5
+[14/5/2026, 12.16.39] [SUCCESS] Berhasil membuat PDF untuk ID: f9aaf2cc-e981-4cd4-a240-fac96a8344d5
+[14/5/2026, 12.21.50] [INFO] Memulai simpan Penawaran: 003/PH-AKL/V/2026
+[14/5/2026, 12.21.50] [SUCCESS] Berhasil simpan Penawaran: 003/PH-AKL/V/2026 (ID: f1f5c1a4-8e43-48e0-b794-0d560e0ef1c5)
+[14/5/2026, 12.21.52] [INFO] Memulai simpan Penawaran: 003/PH-AKL/V/2026
+[14/5/2026, 12.21.53] [SUCCESS] Berhasil simpan Penawaran: 003/PH-AKL/V/2026 (ID: f1f5c1a4-8e43-48e0-b794-0d560e0ef1c5)
+[14/5/2026, 12.21.54] [INFO] Memulai pembuatan PDF untuk ID: f1f5c1a4-8e43-48e0-b794-0d560e0ef1c5
+[14/5/2026, 12.22.44] [SUCCESS] Berhasil membuat PDF untuk ID: f1f5c1a4-8e43-48e0-b794-0d560e0ef1c5
+[14/5/2026, 12.25.05] [INFO] Memulai simpan Penawaran: 004/PH-AKL/V/2026
+[14/5/2026, 12.25.05] [SUCCESS] Berhasil simpan Penawaran: 004/PH-AKL/V/2026 (ID: f1f5c1a4-8e43-48e0-b794-0d560e0ef1c5)
+[14/5/2026, 12.25.07] [INFO] Memulai simpan Penawaran: 004/PH-AKL/V/2026
+[14/5/2026, 12.25.08] [SUCCESS] Berhasil simpan Penawaran: 004/PH-AKL/V/2026 (ID: f1f5c1a4-8e43-48e0-b794-0d560e0ef1c5)
+[14/5/2026, 12.25.10] [INFO] Memulai pembuatan PDF untuk ID: f1f5c1a4-8e43-48e0-b794-0d560e0ef1c5
+[14/5/2026, 12.25.48] [SUCCESS] Berhasil membuat PDF untuk ID: f1f5c1a4-8e43-48e0-b794-0d560e0ef1c5
+[14/5/2026, 12.38.19] [INFO] Memulai simpan Penawaran: 005/PH-AKL/V/2026
+[14/5/2026, 12.38.19] [SUCCESS] Berhasil simpan Penawaran: 005/PH-AKL/V/2026 (ID: 2d7f2b60-e48a-431c-86f6-b87006064620)
+[14/5/2026, 12.38.21] [INFO] Memulai simpan Penawaran: 005/PH-AKL/V/2026
+[14/5/2026, 12.38.22] [SUCCESS] Berhasil simpan Penawaran: 005/PH-AKL/V/2026 (ID: 2d7f2b60-e48a-431c-86f6-b87006064620)
+[14/5/2026, 12.38.22] [INFO] Memulai pembuatan PDF untuk ID: 2d7f2b60-e48a-431c-86f6-b87006064620
+[14/5/2026, 12.38.44] [SUCCESS] Berhasil membuat PDF untuk ID: 2d7f2b60-e48a-431c-86f6-b87006064620

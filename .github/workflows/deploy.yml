@@ -1,24 +1,20 @@
-name: Deploy to VPS
+name: Deploy Apindo App
 
 on:
   push:
     branches:
       - main
 
+env:
+  # Memaksa GitHub menggunakan Node 24 (Sesuai peringatan terbaru)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.3
@@ -28,14 +24,16 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            # Masuk ke folder proyek (Anda harus membuat folder ini dulu di VPS)
-            # Contoh: cd /var/www/akl-app
+            # Masuk ke folder proyek
             cd /var/www/akl-app
+            
+            # Anti-Error 128 (Git Dubious Ownership)
+            git config --global --add safe.directory /var/www/akl-app
             
             # Ambil kode terbaru
             git pull origin main
             
-            # Bangun ulang container (database tetap aman karena pakai volumes)
+            # Jalankan dengan Docker (Lebih stabil untuk VPS modern)
             docker-compose up -d --build
             
-            echo "Deployment Berhasil ke VPS!"
+            echo "✨ Deployment Selesai & Berhasil!"

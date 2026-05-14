@@ -4,7 +4,19 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import { QuotationData } from "@/lib/types";
 import { calculatePages } from "@/lib/paginator";
 import { formatCurrency } from "@/lib/utils";
-import { ZoomIn, ZoomOut, Maximize } from "lucide-react";
+
+// Inline SVG Icons for better portability
+const ZoomInIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+);
+
+const ZoomOutIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+);
+
+const MaximizeIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+);
 
 interface A4PreviewProps {
     data: QuotationData;
@@ -91,11 +103,11 @@ export default function A4Preview({
 
             {/* Zoom Controls */}
             <div className="absolute bottom-6 right-6 z-50 flex lg:flex-col gap-1 bg-white/90 backdrop-blur-md p-1.5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-200 no-print transition-all">
-                <button type="button" onClick={() => setZoomLevel(z => Math.min(z + 0.1, 2.5))} className="p-2 hover:bg-slate-100 rounded-xl text-slate-600" title="Perbesar"><ZoomIn className="w-5 h-5" /></button>
+                <button type="button" onClick={() => setZoomLevel(z => Math.min(z + 0.1, 2.5))} className="p-2 hover:bg-slate-100 rounded-xl text-slate-600" title="Perbesar"><ZoomInIcon /></button>
                 <div className="flex items-center justify-center p-1 text-[10px] font-black text-slate-500 w-10 select-none">{Math.round(zoomLevel * 100)}%</div>
-                <button type="button" onClick={() => setZoomLevel(z => Math.max(z - 0.1, 0.4))} className="p-2 hover:bg-slate-100 rounded-xl text-slate-600" title="Perkecil"><ZoomOut className="w-5 h-5" /></button>
+                <button type="button" onClick={() => setZoomLevel(z => Math.max(z - 0.1, 0.4))} className="p-2 hover:bg-slate-100 rounded-xl text-slate-600" title="Perkecil"><ZoomOutIcon /></button>
                 <div className="w-px h-full lg:w-full lg:h-px bg-slate-200 my-0 lg:my-1"></div>
-                <button type="button" onClick={() => setZoomLevel(1)} className="p-2 hover:bg-blue-50 rounded-xl text-blue-600" title="Normal 100%"><Maximize className="w-5 h-5" /></button>
+                <button type="button" onClick={() => setZoomLevel(1)} className="p-2 hover:bg-blue-50 rounded-xl text-blue-600" title="Normal 100%"><MaximizeIcon /></button>
             </div>
 
             <div
