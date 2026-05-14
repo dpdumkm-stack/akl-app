@@ -30,6 +30,8 @@ interface InvoiceSummary {
 
 interface DashboardStats {
   totalQuotations: number;
+  invoicedQuotations: number;
+  conversionRate: number;
   totalInvoices: number;
   pendingInvoices: number;
   paidInvoices: number;
@@ -61,6 +63,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats>({
     totalQuotations: 0,
+    invoicedQuotations: 0,
+    conversionRate: 0,
     totalInvoices: 0,
     pendingInvoices: 0,
     paidInvoices: 0,
@@ -87,8 +91,13 @@ export default function DashboardPage() {
       const totalRevenue = paid.reduce((a, i) => a + i.total, 0);
       const outstandingBalance = pending.reduce((a, i) => a + i.total, 0);
 
+      const invoicedQuotes = quotations.filter(q => q.isInvoiced).length;
+      const conversionRate = quotations.length > 0 ? Math.round((invoicedQuotes / quotations.length) * 100) : 0;
+
       setStats({
         totalQuotations: quotations.length,
+        invoicedQuotations: invoicedQuotes,
+        conversionRate,
         totalInvoices: invoices.length,
         pendingInvoices: pending.length,
         paidInvoices: paid.length,
@@ -190,11 +199,51 @@ export default function DashboardPage() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Welcome */}
-        <div>
-          <h1 className="text-3xl font-black text-white">
-            Selamat datang, <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">{session?.user?.name ?? "Admin"}</span> 👋
-          </h1>
-          <p className="text-slate-400 mt-1 text-sm">PT. Apindo Karya Lestari — Sistem Manajemen Penawaran &amp; Invoice</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-white">
+              Selamat datang, <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">{session?.user?.name ?? "Admin"}</span> 👋
+            </h1>
+            <p className="text-slate-400 mt-1 text-sm">PT. Apindo Karya Lestari — Sistem Manajemen Penawaran &amp; Invoice</p>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-slate-900/50 border border-slate-800 rounded-2xl">
+             <div className="flex flex-col items-end">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Conversion Rate</span>
+                <span className="text-sm font-black text-fuchsia-400">{stats.conversionRate}%</span>
+             </div>
+             <div className="w-10 h-10 bg-fuchsia-500/10 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-fuchsia-400" />
+             </div>
+          </div>
+        </div>
+
+        {/* Lifecycle Visualization */}
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+                <Layers className="w-48 h-48 text-white" />
+            </div>
+            
+            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-10 text-center md:text-left">Alur Kerja Dokumen (Lifecycle)</h3>
+            
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-12 md:gap-4 max-w-4xl mx-auto">
+                {/* Connector Line */}
+                <div className="hidden md:block absolute top-[32px] left-0 w-full h-[2px] bg-gradient-to-r from-violet-500/20 via-blue-500/20 to-emerald-500/20 z-0"></div>
+                
+                {[
+                    { label: "Penawaran", value: stats.totalQuotations, sub: "Diterbitkan", icon: FileText, color: "from-violet-500 to-violet-600", shadow: "shadow-violet-900/40" },
+                    { label: "Invoice", value: stats.invoicedQuotations, sub: "Terintegrasi", icon: Receipt, color: "from-blue-500 to-blue-600", shadow: "shadow-blue-900/40" },
+                    { label: "Pembayaran", value: stats.paidInvoices, sub: "Dana Masuk", icon: CheckCircle, color: "from-emerald-500 to-emerald-600", shadow: "shadow-emerald-900/40" },
+                ].map((step, idx) => (
+                    <div key={idx} className="relative z-10 flex flex-col items-center text-center group">
+                        <div className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center shadow-xl ${step.shadow} mb-4 group-hover:scale-110 transition-transform duration-500`}>
+                            <step.icon className="w-8 h-8 text-white" />
+                        </div>
+                        <p className="text-white font-black text-2xl tracking-tighter">{step.value}</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{step.label}</p>
+                        <p className="text-[9px] font-bold text-slate-600 uppercase mt-0.5">{step.sub}</p>
+                    </div>
+                ))}
+            </div>
         </div>
 
         {/* Stats Row */}
