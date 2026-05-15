@@ -12,6 +12,7 @@ import { getNextInvoiceNumber } from "@/lib/invoice-number-service";
 import InvoiceA4Preview from "@/components/InvoiceA4Preview";
 import DocumentPreviewStudio from "@/components/editor/DocumentPreviewStudio";
 import OtorisasiSection from "@/components/editor/OtorisasiSection";
+import { formatInvoiceNumber } from "@/lib/utils";
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
@@ -146,9 +147,21 @@ export default function CreateInvoicePage() {
           {/* Editor */}
           <div className={`space-y-6 h-[calc(100vh-140px)] overflow-y-auto pr-2 custom-scrollbar pb-10 ${viewMode === 'preview' ? 'hidden lg:block' : 'block'}`}>
             <div className="bg-slate-900 border border-white/5 rounded-[32px] p-8 space-y-6 shadow-2xl">
-               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Nomor Invoice</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">No. Urut</label>
+                  <input 
+                    type="number" 
+                    value={form.nomorUrut} 
+                    onChange={e => {
+                        const val = Number(e.target.value) || 1;
+                        setForm(f => ({ ...f, nomorUrut: val, invoiceNumber: formatInvoiceNumber(val, new Date(f.date)) }));
+                    }} 
+                    className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-3 text-emerald-500 font-bold text-sm outline-none focus:border-emerald-500/50" 
+                  />
+                </div>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-2">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Nomor Invoice (Editable)</label>
                   <input value={form.invoiceNumber} onChange={e => setForm(f => ({ ...f, invoiceNumber: e.target.value }))} className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-3 text-white font-bold text-sm outline-none focus:border-emerald-500/50" />
                 </div>
                 <div className="space-y-2">

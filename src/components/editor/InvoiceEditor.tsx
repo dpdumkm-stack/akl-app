@@ -4,6 +4,7 @@ import { InvoiceData, InvoiceItemData } from '@/lib/types';
 import { getNextInvoiceNumber } from '@/lib/invoice-number-service';
 import InvoiceItemRow from '@/components/editor/InvoiceItemRow';
 import { saveInvoice } from '@/app/actions';
+import { formatInvoiceNumber } from '@/lib/utils';
 import { Save } from 'lucide-react';
 
 export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
@@ -121,8 +122,21 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nomor Invoice</label>
-          <input type="text" readOnly value={invoiceNumber} className="w-full p-3 bg-slate-900/50 border-2 border-white/5 rounded-2xl text-sm font-black text-slate-400 outline-none" />
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">No. Urut</label>
+          <input 
+            type="number" 
+            value={nomorUrut} 
+            onChange={e => {
+                const val = Number(e.target.value) || 1;
+                setNomorUrut(val);
+                setInvoiceNumber(formatInvoiceNumber(val, date ? new Date(date) : new Date()));
+            }} 
+            className="w-full p-3 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-emerald-500 focus:border-emerald-500 outline-none transition-all" 
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Nomor Invoice (Editable)</label>
+          <input type="text" value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} className="w-full p-3 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-white focus:border-blue-500 outline-none transition-all" />
         </div>
         <div>
           <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Tanggal</label>

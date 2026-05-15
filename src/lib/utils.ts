@@ -48,6 +48,13 @@ export function formatQuotationNumber(urut: number, date: Date = new Date()): st
     return `${formattedUrut}/PH-AKL/${romanMonth}/${year}`;
 }
 
+export function formatInvoiceNumber(urut: number, date: Date = new Date()): string {
+    const year = date.getFullYear();
+    const romanMonth = getRomanMonth(date.getMonth());
+    const formattedUrut = String(urut).padStart(3, '0');
+    return `${formattedUrut}/INV-AKL/${romanMonth}/${year}`;
+}
+
 export const getUniqueId = (): string => {
   return Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
 };
