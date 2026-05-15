@@ -27,24 +27,46 @@ Import trace:
     ./src/app/api/pdf/route.ts
 
 
-✓ Compiled successfully in 48s
+✓ Compiled successfully in 39.7s
   Running TypeScript ...
-  Finished TypeScript in 19.2s ...
+  Finished TypeScript in 20.9s ...
   Collecting page data using 3 workers ...
-[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
   Generating static pages using 3 workers (0/31) ...
   Generating static pages using 3 workers (7/31) 
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
+[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
+⚠ Unsupported metadata themeColor is configured in metadata export in /_not-found. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+⚠ Unsupported metadata themeColor is configured in metadata export in /clients. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+⚠ Unsupported metadata themeColor is configured in metadata export in /invoice/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
   Generating static pages using 3 workers (15/31) 
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
   Generating static pages using 3 workers (23/31) 
+⚠ Unsupported metadata themeColor is configured in metadata export in /login. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+⚠ Unsupported metadata themeColor is configured in metadata export in /invoice. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+⚠ Unsupported metadata themeColor is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+⚠ Unsupported metadata themeColor is configured in metadata export in /quotations/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+⚠ Unsupported metadata themeColor is configured in metadata export in /quotations. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+⚠ Unsupported metadata themeColor is configured in metadata export in /settings. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+⚠ Unsupported metadata themeColor is configured in metadata export in /settings/users. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
@@ -52,7 +74,9 @@ Import trace:
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-✓ Generating static pages using 3 workers (31/31) in 4.6s
+⚠ Unsupported metadata themeColor is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+✓ Generating static pages using 3 workers (31/31) in 2.1s
   Finalizing page optimization ...
 
 Route (app)

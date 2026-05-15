@@ -5,8 +5,15 @@ import "./globals.css";
 import { ensureAdminAccounts } from "@/lib/init-admin";
 
 export const metadata = {
-  title: "Studio AKL - Quotation Management System",
+  title: "Studio AKL - Office Suite",
   description: "Aplikasi Penawaran Terintegrasi PT. Apindo Karya Lestari",
+  manifest: "/manifest.json",
+  themeColor: "#2563eb",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Studio AKL",
+  },
 };
 
 export default async function RootLayout({
