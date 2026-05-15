@@ -10,7 +10,7 @@ import A4Preview from "@/components/A4Preview";
 import PrintingProgress from "@/components/PrintingProgress";
 import DocumentPreviewStudio from "@/components/editor/DocumentPreviewStudio";
 import { AlertCircle, FileText, ArrowLeft, Save, LayoutDashboard, Eye, Edit3, RefreshCw, Copy, Check } from "lucide-react";
-import { getGlobalSettings } from "@/app/actions";
+import { getGlobalSettings, getNextQuotationNumber } from "@/app/actions";
 
 const emptyQuotation = (): QuotationData => ({
   nomorSurat: formatQuotationNumber(0),
@@ -53,12 +53,24 @@ export default function CreateQuotationPage() {
   const [globalTTD, setGlobalTTD] = useState<string | null>(null);
 
   useEffect(() => {
+    // Ambil Pengaturan Global (Logo & TTD)
     getGlobalSettings().then(res => {
       if (res.success && 'data' in res) {
         const logo = (res.data as any[]).find(s => s.id.toUpperCase() === 'LOGO')?.value;
         const ttd = (res.data as any[]).find(s => s.id.toUpperCase() === 'TTD')?.value;
         if (logo) setGlobalLogo(logo);
         if (ttd) setGlobalTTD(ttd);
+      }
+    });
+
+    // Ambil Nomor Urut Berikutnya
+    getNextQuotationNumber().then(res => {
+      if (res.success && res.nextUrut) {
+        setData(prev => ({
+          ...prev,
+          nomorUrut: res.nextUrut,
+          nomorSurat: formatQuotationNumber(res.nextUrut)
+        }));
       }
     });
   }, []);
