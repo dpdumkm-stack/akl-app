@@ -267,3 +267,4 @@ Unique constraint failed on the fields: (`nomorSurat`)
 [Fri 05/15/2026 20:27:19.93] [DEPLOY] fix: unify invoice numbering and add auto-sync sequence on startup 
 [Fri 05/15/2026 20:38:56.93] [DEPLOY] ui: improve mobile responsiveness and fix name truncation in OtorisasiSection 
 [Fri 05/15/2026 20:53:15.50] [DEPLOY] ui: optimize mobile responsiveness across shell, editor, and global styles 
+[Fri 05/15/2026 21:02:47.33] [DEPLOY] pwa: implement full pwa support with installable manifest and mobile refinements 
