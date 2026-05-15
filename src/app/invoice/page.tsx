@@ -363,9 +363,11 @@ export default function InvoiceArchivePage() {
                   <button onClick={() => router.push(`/invoice/edit/${inv.id}`)} className="p-2.5 bg-slate-950 hover:bg-indigo-600/10 text-slate-600 hover:text-indigo-400 rounded-xl border border-white/5 transition-all" title="Edit">
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button onClick={() => setDeleteId(inv.id)} className="p-2.5 bg-slate-950 hover:bg-red-600/10 text-slate-600 hover:text-red-500 rounded-xl border border-white/5 transition-all" title="Hapus">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {(session?.user as any)?.role === "OWNER" && (
+                    <button onClick={() => setDeleteId(inv.id)} className="p-2.5 bg-slate-950 hover:bg-red-600/10 text-slate-600 hover:text-red-500 rounded-xl border border-white/5 transition-all" title="Hapus">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

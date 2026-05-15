@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { QuotationData } from "@/lib/types";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { logActivity } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 import { syncClient } from "@/lib/client-service";
@@ -24,50 +25,83 @@ const sanitize = (str: string | null | undefined) => {
 };
 
 async function checkAuth() {
-    const session = await getServerSession();
-    if (!session) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
         throw new Error("Unauthorized: Anda harus login untuk melakukan tindakan ini.");
     }
-    return session;
+    // SCSA FIX: Gunakan email (username) dari session yang sudah valid
+    const username = session.user.email || "";
+    const user = await prisma.user.findUnique({
+        where: { username }
+    });
+    return { session, user };
+}
+
+async function checkOwner() {
+    const { user } = await checkAuth();
+    if (user?.role !== "OWNER") {
+        throw new Error("Hanya Owner yang diizinkan untuk menghapus data permanen.");
+    }
+    return { user };
 }
 
 
 
 export async function saveQuotation(data: QuotationData, totalHarga: number) {
   try {
-    await checkAuth();
+    const { user } = await checkAuth();
     logActivity(`Memulai simpan Penawaran: ${data.nomorSurat || 'DRAFT'}`, 'INFO');
     
     const payloadSize = JSON.stringify(data).length;
     console.log(`[saveQuotation] START - ID: ${data.id}, Nomor: ${data.nomorSurat}, Payload Size: ${(payloadSize / 1024).toFixed(2)} KB`);
 
-    // SCSA RELAXED: Izinkan simpan apapun, beri fallback jika benar-benar kosong
     const company = (data.companyName || data.namaKlien || "").trim();
     const client = (data.clientName || data.up || "").trim();
+
+    // SCSA VALIDATION: Minimal salah satu harus diisi (Company atau UP)
+    if (!company && !client) {
+        throw new Error("Validasi Gagal: Nama Perusahaan atau U.P. (Nama Klien) wajib diisi salah satu.");
+    }
+
+    // SCSA VALIDATION: Section item tidak boleh kosong
+    if (!data.items || data.items.length === 0 || (data.items.length === 1 && !data.items[0].deskripsi?.trim())) {
+        throw new Error("Validasi Gagal: Minimal harus ada 1 item pekerjaan yang dimasukkan.");
+    }
+
     const displayClientName = company || client || "KLIEN-TANPA-NAMA";
 
-    console.log(`[saveQuotation] PROSES SIMPAN - Company: "${company}", Client: "${client}"`);
+    // Validasi apakah ini Update atau Create
+    const isExisting = data.id ? await prisma.quotation.findUnique({ where: { id: data.id } }) : null;
 
-    const finalNomorSurat = (data.nomorSurat && data.nomorSurat.trim() !== "") 
+    let finalNomorUrut = Number(data.nomorUrut) || 0;
+    
+    // ATOMIC NUMBERING: Jika ini penawaran baru (Create), ambil nomor urut secara aman
+    if (!isExisting) {
+        const { getNextSequenceAtomic } = await import("@/lib/sequence-service");
+        const nextUrut = await getNextSequenceAtomic("QUOTATION");
+        finalNomorUrut = nextUrut;
+    }
+
+    const { formatQuotationNumber } = await import("@/lib/utils");
+    const finalNomorSurat = (data.nomorSurat && data.nomorSurat.trim() !== "" && isExisting) 
         ? sanitize(data.nomorSurat) 
-        : `DRAFT-${new Date().getTime()}`;
+        : formatQuotationNumber(finalNomorUrut);
 
-    // Safe Mode: Recalculate total on server to prevent mismatches
+    // Safe Mode: Recalculate total on server
     const calculatedSubtotal = (data.items || []).reduce((acc, i) => {
         const hBahan = Number(i.hargaBahan) || 0;
         const hJasa = Number(i.hargaJasa) || 0;
         const hSatuan = Number(i.harga) || 0;
         const vol = Number(i.volume) || 0;
-
         let price = data.isMaterialOnlyMode ? hBahan : (data.isJasaBahanMode ? (hBahan + hJasa) : hSatuan);
         return acc + (vol * price);
     }, 0);
     const calculatedDpp = calculatedSubtotal - (Number(data.diskon) || 0);
     const calculatedTotal = calculatedDpp + (data.kenakanPPN ? calculatedDpp * 0.11 : 0);
 
-    const payload = {
+    const payload: any = {
       nomorSurat:           finalNomorSurat,
-      nomorUrut:            Number(data.nomorUrut)      || 1,
+      nomorUrut:            finalNomorUrut,
       tanggal:              sanitize(data.tanggal),
       namaKlien:            sanitize(displayClientName),
       companyName:          sanitize(company),
@@ -90,13 +124,10 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
       termin:               JSON.stringify(data.termin        ?? []),
       lingkupKerja:         JSON.stringify(data.lingkupKerja  ?? []),
       syaratGaransi:        JSON.stringify(data.syaratGaransi ?? []),
+      createdById:          user?.id || null
     };
 
     let quotation;
-    
-    // Validasi apakah ini Update atau Create
-    const isExisting = data.id ? await prisma.quotation.findUnique({ where: { id: data.id } }) : null;
-
     if (isExisting) {
       quotation = await prisma.quotation.update({
         where: { id: data.id },
@@ -137,27 +168,17 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
       });
     }
 
-    // Sync Client Database
     await syncClient({
         companyName: company,
         clientName: client,
         address: data.lokasi,
-        phone: data.up // Fallback phone or we can add it later
     });
 
-    logActivity(`Berhasil simpan Penawaran: ${quotation.nomorSurat} (ID: ${quotation.id})`, 'SUCCESS');
+    logActivity(`Berhasil simpan Penawaran: ${quotation.nomorSurat}`, 'SUCCESS');
     return { success: true, id: quotation.id };
   } catch (error: any) {
     logActivity(`GAGAL simpan Penawaran: ${error.message}`, 'ERROR');
-    console.error("[saveQuotation] FATAL ERROR:", error);
-    const isProd = process.env.NODE_ENV === 'production';
-    let msg = isProd ? "Gagal menyimpan data ke server. Silakan coba lagi." : (error?.message || "Unknown Database Error");
-    
-    if (error.message?.toLowerCase().includes("prisma") || error.message?.toLowerCase().includes("database") || error.code) {
-        msg = `Database/Server Error: ${msg} (Code: ${error.code || 'N/A'})`;
-    }
-    
-    return { success: false, message: msg };
+    return { success: false, message: error.message };
   }
 }
 
@@ -176,7 +197,7 @@ export async function getQuotations() {
 
 export async function deleteQuotation(id: string) {
   try {
-    await checkAuth();
+    await checkOwner();
     await prisma.quotation.delete({ where: { id } });
     return { success: true };
   } catch (error: any) {
@@ -234,7 +255,7 @@ export async function saveMasterItem(data: any) {
 
 export async function deleteMasterItem(id: string) {
   try {
-    await checkAuth();
+    await checkOwner();
     await prisma.masterItem.delete({ where: { id } });
     return { success: true };
   } catch (error: any) {
@@ -302,7 +323,7 @@ export async function saveSignatory(data: any) {
 
 export async function deleteSignatory(id: string) {
     try {
-        await checkAuth();
+        await checkOwner();
         await prisma.signatory.delete({ where: { id } });
         revalidatePath('/');
         return { success: true };
@@ -335,18 +356,41 @@ export async function getNextQuotationNumber() {
 
 export async function saveInvoice(data: any) {
   try {
-    await checkAuth();
+    const { user } = await checkAuth();
     logActivity(`Memulai simpan Invoice: ${data.invoiceNumber || 'DRAFT'}`, 'INFO');
     
-    if (!data.invoiceNumber || !data.clientName) {
-      return { success: false, message: "Nomor Invoice dan Nama Klien wajib diisi." };
+    const isExisting = data.id ? await prisma.invoice.findUnique({ where: { id: data.id } }) : null;
+    
+    let finalNomorUrut = Number(data.nomorUrut) || 0;
+    
+    // ATOMIC NUMBERING: Jika ini invoice baru, ambil nomor urut secara aman
+    if (!isExisting) {
+        const { getNextSequenceAtomic } = await import("@/lib/sequence-service");
+        finalNomorUrut = await getNextSequenceAtomic("INVOICE");
     }
+
+    const { formatInvoiceNumber } = await import("@/lib/utils");
+    const finalInvoiceNumber = (data.invoiceNumber && data.invoiceNumber.trim() !== "" && isExisting) 
+        ? sanitize(data.invoiceNumber) 
+        : formatInvoiceNumber(finalNomorUrut);
 
     const subtotal = (data.items || []).reduce((acc: number, i: any) => {
       const qty = Number(i.quantity) || 0;
       const price = Number(i.unitPrice) || 0;
       return acc + qty * price;
     }, 0);
+
+    // SCSA VALIDATION: Minimal salah satu harus diisi (Company atau Nama Klien)
+    const company = (data.companyName || "").trim();
+    const client = (data.clientName || "").trim();
+    if (!company && !client) {
+        throw new Error("Validasi Gagal: Nama Perusahaan atau Nama Klien wajib diisi salah satu.");
+    }
+
+    // SCSA VALIDATION: Section item tidak boleh kosong
+    if (!data.items || data.items.length === 0 || (data.items.length === 1 && !data.items[0].description?.trim())) {
+        throw new Error("Validasi Gagal: Minimal harus ada 1 item invoice yang dimasukkan.");
+    }
     const discountAmount = Number(data.discountAmount) || 0;
     const dpp = subtotal - discountAmount;
     const taxAmount = data.taxApplied ? dpp * Number(data.taxRate || 0.11) : 0;
@@ -355,9 +399,9 @@ export async function saveInvoice(data: any) {
     const downPayment = Number(data.downPayment || 0);
     const total = invoiceType === "DP" ? downPayment : (grandTotal - downPayment);
 
-    const payload = {
-      invoiceNumber: sanitize(data.invoiceNumber),
-      nomorUrut: Number(data.nomorUrut) || 0,
+    const payload: any = {
+      invoiceNumber: finalInvoiceNumber,
+      nomorUrut: finalNomorUrut,
       date: data.date ? new Date(data.date) : new Date(),
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       clientName: sanitize(data.clientName),
@@ -376,10 +420,11 @@ export async function saveInvoice(data: any) {
       jabatanPenandatangan: sanitize(data.jabatanPenandatangan),
       phonePenandatangan: sanitize(data.phonePenandatangan),
       ttdStempelUrl: data.ttdStempelUrl,
+      createdById: user?.id || null
     };
 
     let invoice;
-    if (data.id) {
+    if (isExisting) {
       invoice = await prisma.invoice.update({
         where: { id: data.id },
         data: { 
@@ -390,6 +435,7 @@ export async function saveInvoice(data: any) {
                     description: sanitize(it.description),
                     quantity: Number(it.quantity) || 0,
                     unitPrice: Number(it.unitPrice) || 0,
+                    lineTotal: (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0)
                 })) 
             } 
         },
@@ -403,31 +449,31 @@ export async function saveInvoice(data: any) {
                     description: sanitize(it.description),
                     quantity: Number(it.quantity) || 0,
                     unitPrice: Number(it.unitPrice) || 0,
+                    lineTotal: (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0)
                 })) 
             } 
         },
       });
     }
-    // Sync Client Database
+
     await syncClient({
         companyName: data.companyName,
         clientName: data.clientName,
         address: data.clientAddress,
     });
 
-    logActivity(`Berhasil simpan Invoice: ${invoice.invoiceNumber} (ID: ${invoice.id})`, 'SUCCESS');
+    logActivity(`Berhasil simpan Invoice: ${invoice.invoiceNumber}`, 'SUCCESS');
     return { success: true, id: invoice.id };
   } catch (error: any) {
     logActivity(`GAGAL simpan Invoice: ${error.message}`, 'ERROR');
-    console.error("[saveInvoice] Error:", error);
-    return { success: false, message: "Terjadi kesalahan saat menyimpan Invoice." };
+    return { success: false, message: error.message };
   }
 }
 
 export async function convertToInvoice(quotationId: string) {
   console.log("[convertToInvoice] Starting conversion for ID:", quotationId);
   try {
-    // await checkAuth(); // Matikan sementara untuk testing jika session bermasalah
+    await checkAuth();
     
     const q = await prisma.quotation.findUnique({
       where: { id: quotationId },

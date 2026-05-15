@@ -35,6 +35,7 @@ export default function HistoryDrawer({ isOpen, onClose, onLoad, showToast, setC
 
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchQuotations();
     }
   }, [isOpen]);

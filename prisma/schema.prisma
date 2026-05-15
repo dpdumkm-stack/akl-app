@@ -11,31 +11,51 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(cuid())
-  username String @unique
-  password String
-  name     String?
+  id        String      @id @default(cuid())
+  username  String      @unique
+  password  String
+  name      String?
+  role      UserRole    @default(ADMIN)
+  isActive  Boolean     @default(true)
+  
+  quotations Quotation[]
+  invoices   Invoice[]
+  logs       ActivityLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+}
+
+model DocumentSequence {
+  type      String // "QUOTATION" atau "INVOICE"
+  year      Int
+  lastUrut  Int    @default(0)
+  
+  @@id([type, year])
 }
 
 model Quotation {
   id                    String   @id @default(uuid())
-  nomorSurat            String
+  nomorSurat            String   @unique
   nomorUrut             Int
   tanggal               String
-  namaKlien             String?  // Gabungan atau Fallback
-  companyName           String?  // Nama PT
-  clientName            String?  // Nama Pribadi
+  namaKlien             String?
+  companyName           String?
+  clientName            String?
   up                    String?
   lokasi                String?
   
-  // Penandatangan
   namaPenandatangan     String
   jabatanPenandatangan  String
   phonePenandatangan    String?
-  ttdStempelUrl         String? // Base64 atau URL
-  logoUrl               String? // Base64 atau URL
+  ttdStempelUrl         String?
+  logoUrl               String?
 
-  // Pengaturan Tampilan & Harga
   showLingkupKerja      Boolean  @default(true)
   showSyaratGaransi     Boolean  @default(true)
   isHargaSatuanMode     Boolean  @default(false)
@@ -46,13 +66,15 @@ model Quotation {
   totalHarga            Float    @default(0)
   isInvoiced            Boolean  @default(false)
 
-  // Disimpan sebagai String JSON (karena SQLite tidak natively support String[])
   termin                String   
   lingkupKerja          String   
   syaratGaransi         String   
 
-  // Relasi ke Item
   items                 QuotationItem[]
+  
+  // Tracking
+  createdById           String?
+  createdBy             User?    @relation(fields: [createdById], references: [id])
 
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -71,7 +93,7 @@ model QuotationItem {
   hargaBahan  Float     @default(0)
   hargaJasa   Float     @default(0)
   
-  orderIndex  Int       @default(0) // Untuk mengurutkan item
+  orderIndex  Int       @default(0)
 }
 
 model MasterItem {
@@ -88,8 +110,8 @@ model MasterItem {
 }
 
 model GlobalSetting {
-  id          String   @id // Contoh: "LOGO", "CONTACTS"
-  value       String   // Isi data string/base64
+  id          String   @id
+  value       String   
   updatedAt   DateTime @updatedAt
 }
 
@@ -98,7 +120,7 @@ model Signatory {
   nama        String   @unique
   jabatan     String
   phone       String?
-  ttdUrl      String?  // Base64
+  ttdUrl      String?  
   updatedAt   DateTime @updatedAt
 }
 
@@ -113,24 +135,27 @@ model Invoice {
   clientAddress     String?
   items             InvoiceItem[]
   subtotal          Decimal       @default(0)
-  quotationId       String?       // ID Penawaran asal (untuk integrasi)
-  taxRate           Decimal       @default(0.11) // 11% PPN
+  quotationId       String?       
+  taxRate           Decimal       @default(0.11)
   taxApplied        Boolean       @default(false)
   taxAmount         Decimal       @default(0)
-  discountAmount    Decimal       @default(0)   // total discount amount
-  downPayment       Decimal       @default(0)   // uang muka yang sudah dibayar
-  notes             String?       // catatan tambahan
+  discountAmount    Decimal       @default(0)   
+  downPayment       Decimal       @default(0)   
+  notes             String?       
   paymentMethod     String        @default("CASH")
   total             Decimal       @default(0)
-  invoiceType       String        @default("PELUNASAN") // "DP" or "PELUNASAN"
+  invoiceType       String        @default("PELUNASAN")
   status            InvoiceStatus @default(PENDING)
   
-  // Penandatangan
   namaPenandatangan     String?
   jabatanPenandatangan  String?
   phonePenandatangan    String?
-  ttdStempelUrl         String? // Base64
+  ttdStempelUrl         String? 
   
+  // Tracking
+  createdById           String?
+  createdBy             User?    @relation(fields: [createdById], references: [id])
+
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 }
@@ -141,7 +166,7 @@ model InvoiceItem {
   quantity     Int
   unitPrice    Decimal
   lineTotal    Decimal   @default(0)
-  invoice      Invoice  @relation(fields: [invoiceId], references: [id])
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   invoiceId    String
 }
 
@@ -153,8 +178,8 @@ enum InvoiceStatus {
 
 model Client {
   id           String   @id @default(uuid())
-  companyName  String?  // Nama PT (Optional)
-  clientName   String?  // Nama Pribadi (Optional)
+  companyName  String?  
+  clientName   String?  
   address      String?
   phone        String?
   email        String?
@@ -162,4 +187,14 @@ model Client {
   updatedAt    DateTime @updatedAt
 
   @@unique([companyName, clientName])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  target    String?
+  details   String?
+  createdAt DateTime @default(now())
 }

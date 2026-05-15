@@ -17,11 +17,6 @@ export default function ClientsPage() {
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (status === "unauthenticated") router.push("/login");
-    loadClients();
-  }, [status, router]);
-
   const loadClients = async () => {
     setLoading(true);
     try {
@@ -38,6 +33,12 @@ export default function ClientsPage() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/login");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadClients();
+  }, [status, router]);
 
   const handleDelete = async () => {
     if (!deleteId) return;

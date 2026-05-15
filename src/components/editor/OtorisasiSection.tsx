@@ -35,6 +35,7 @@ export default function OtorisasiSection({
     };
 
     React.useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadSignatories();
     }, []);
 

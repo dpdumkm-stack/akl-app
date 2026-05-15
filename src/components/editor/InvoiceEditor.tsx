@@ -66,11 +66,23 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
       return;
     }
 
-    if (!clientName && !companyName) {
+    // SCSA VALIDATION: Recipient
+    if (!clientName.trim() && !companyName.trim()) {
       if (typeof window !== 'undefined' && (window as any).showToast) {
-        (window as any).showToast('Minimal isi salah satu antara Nama Perusahaan atau Nama Penerima (U.P.)', 'error');
+        (window as any).showToast('Gagal Simpan: Nama Perusahaan atau Nama Penerima (U.P.) wajib diisi salah satu.', 'error');
       } else {
-        alert('Minimal isi salah satu antara Nama Perusahaan atau Nama Penerima (U.P.)');
+        alert('Gagal Simpan: Nama Perusahaan atau Nama Penerima (U.P.) wajib diisi salah satu.');
+      }
+      return;
+    }
+
+    // SCSA VALIDATION: Items
+    const hasItems = items.length > 0 && items.some(it => it.description?.trim());
+    if (!hasItems) {
+      if (typeof window !== 'undefined' && (window as any).showToast) {
+        (window as any).showToast('Gagal Simpan: Masukkan minimal 1 item invoice.', 'error');
+      } else {
+        alert('Gagal Simpan: Masukkan minimal 1 item invoice.');
       }
       return;
     }

@@ -2,13 +2,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 
 export async function DELETE(req: NextRequest) {
-  const session = await getServerSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await getServerSession(authOptions);
+  if (!session || (session.user as any).role !== "OWNER") {
+    return NextResponse.json({ error: 'Hanya Owner yang diizinkan untuk menghapus data permanen.' }, { status: 403 });
   }
 
   try {

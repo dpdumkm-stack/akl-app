@@ -81,6 +81,20 @@ export default function CreateQuotationPage() {
   };
 
   const handleSave = async () => {
+    // SCSA VALIDATION FRONTEND
+    const company = (data.companyName || data.namaKlien || "").trim();
+    const up = (data.up || data.clientName || "").trim();
+    if (!company && !up) {
+      showToast("Gagal Simpan: Nama Perusahaan atau U.P. wajib diisi salah satu.", "error");
+      return;
+    }
+
+    const hasItems = data.items && data.items.length > 0 && data.items.some(it => it.deskripsi?.trim());
+    if (!hasItems) {
+      showToast("Gagal Simpan: Masukkan minimal 1 item pekerjaan.", "error");
+      return;
+    }
+
     setIsSaving(true);
     try {
       const { saveQuotation } = await import("@/app/actions");

@@ -69,6 +69,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+
+          {/* SCSA FIX: Tambah menu Manajemen Staff khusus Owner */}
+          {(session?.user as any)?.role === "OWNER" && (
+            <Link 
+              href="/settings/users"
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all group ${
+                pathname === "/settings/users" 
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40 translate-x-1" 
+                  : "text-slate-400 hover:bg-white/5 hover:text-slate-100"
+              }`}
+            >
+              <Users className={`w-5 h-5 ${pathname === "/settings/users" ? "text-white" : "text-slate-500 group-hover:text-slate-300"}`} />
+              <span className="text-sm font-black uppercase tracking-widest">Manajemen Staff</span>
+            </Link>
+          )}
         </nav>
 
         <div className="p-6 border-t border-white/5">
@@ -153,6 +168,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           );
         })}
+        
+        {/* SCSA FIX: Tambah menu Manajemen Staff khusus Owner di Mobile */}
+        {(session?.user as any)?.role === "OWNER" && (
+           <Link 
+            href="/settings/users"
+            className={`flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all ${
+              pathname === "/settings/users" ? "text-blue-600" : "text-slate-400"
+            }`}
+          >
+            <div className={`p-1.5 rounded-lg transition-all ${pathname === "/settings/users" ? "bg-blue-600/10" : ""}`}>
+              <Users className="w-5 h-5" />
+            </div>
+            <span className="text-[8px] font-black uppercase tracking-widest">Staff</span>
+          </Link>
+        )}
       </nav>
     </div>
   );

@@ -12,6 +12,7 @@ export default function PrintingProgress({ isOpen, progress }: PrintingProgressP
     const [statusText, setStatusText] = useState("Menyiapkan Mesin Cetak...");
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (progress < 20) setStatusText("Mengoptimalkan Layout A4...");
         else if (progress < 40) setStatusText("Menyiapkan Data & Aset...");
         else if (progress < 70) setStatusText("Proses Rendering Puppeteer...");

@@ -1,0 +1,87 @@
+
+> akl-app@0.1.0 build
+> next build
+
+▲ Next.js 16.2.6 (Turbopack)
+- Environments: .env
+- Experiments (use with caution):
+  · serverActions
+
+  Creating an optimized production build ...
+Turbopack build encountered 1 warnings:
+./next.config.mjs
+Encountered unexpected file in NFT list
+A file was traced that indicates that the whole project was traced unintentionally. Somewhere in the import trace below, there are:
+- filesystem operations (like path.join, path.resolve or fs.readFile), or
+- very dynamic requires (like require('./' + foo)).
+To resolve this, you can
+- remove them if possible, or
+- only use them in development, or
+- make sure they are statically scoped to some subfolder: path.join(process.cwd(), 'data', bar), or
+- add ignore comments: path.join(/*turbopackIgnore: true*/ process.cwd(), bar)
+
+Import trace:
+  App Route:
+    ./next.config.mjs
+    ./src/lib/logger.ts
+    ./src/app/api/pdf/route.ts
+
+
+✓ Compiled successfully in 37.8s
+  Running TypeScript ...
+  Finished TypeScript in 22.4s ...
+  Collecting page data using 3 workers ...
+[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
+[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
+[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
+[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
+  Generating static pages using 3 workers (0/31) ...
+  Generating static pages using 3 workers (7/31) 
+  Generating static pages using 3 workers (15/31) 
+  Generating static pages using 3 workers (23/31) 
+✓ Generating static pages using 3 workers (31/31) in 3.0s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/clients/delete
+├ ƒ /api/clients/history
+├ ƒ /api/clients/list
+├ ƒ /api/clients/stats
+├ ƒ /api/combine-pdf
+├ ƒ /api/debug-db
+├ ƒ /api/export/invoices
+├ ƒ /api/hello
+├ ƒ /api/invoice
+├ ƒ /api/invoice/[id]
+├ ƒ /api/invoice/delete
+├ ƒ /api/invoice/list
+├ ƒ /api/invoice/payment
+├ ƒ /api/invoice/payment/revert
+├ ƒ /api/invoice/save
+├ ƒ /api/pdf
+├ ƒ /api/quotations/[id]
+├ ƒ /api/quotations/latest-by-client
+├ ƒ /api/quotations/list
+├ ƒ /api/test
+├ ○ /clients
+├ ○ /dashboard
+├ ○ /invoice
+├ ○ /invoice/create
+├ ƒ /invoice/edit/[id]
+├ ○ /login
+├ ƒ /print/[id]
+├ ○ /quotations
+├ ○ /quotations/create
+├ ƒ /quotations/edit/[id]
+├ ○ /settings
+└ ○ /settings/users
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -301,13 +301,15 @@ export default function QuotationArchivePage() {
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
 
-                    <button 
-                      onClick={() => handleDelete(q.id, q.nomorSurat)}
-                      className="p-2 bg-slate-950 hover:bg-red-600/10 text-slate-600 hover:text-red-400 rounded-lg transition-all border border-white/5"
-                      title="Hapus"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {(session?.user as any)?.role === "OWNER" && (
+                      <button 
+                        onClick={() => handleDelete(q.id, q.nomorSurat)}
+                        className="p-2 bg-slate-950 hover:bg-red-600/10 text-slate-600 hover:text-red-400 rounded-lg transition-all border border-white/5"
+                        title="Hapus"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
