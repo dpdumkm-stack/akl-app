@@ -50,7 +50,7 @@ async function checkOwner() {
 export async function saveQuotation(data: QuotationData, totalHarga: number) {
   try {
     const { user } = await checkAuth();
-    logActivity(`Memulai simpan Penawaran: ${data.nomorSurat || 'DRAFT'}`, 'INFO');
+    await logActivity(`Memulai simpan Penawaran: ${data.nomorSurat || 'DRAFT'}`, 'INFO', user?.id, 'QUOTATION');
     
     const payloadSize = JSON.stringify(data).length;
     console.log(`[saveQuotation] START - ID: ${data.id}, Nomor: ${data.nomorSurat}, Payload Size: ${(payloadSize / 1024).toFixed(2)} KB`);
@@ -174,10 +174,10 @@ export async function saveQuotation(data: QuotationData, totalHarga: number) {
         address: data.lokasi,
     });
 
-    logActivity(`Berhasil simpan Penawaran: ${quotation.nomorSurat}`, 'SUCCESS');
+    await logActivity(`Berhasil simpan Penawaran: ${quotation.nomorSurat}`, 'SUCCESS', user?.id, 'QUOTATION');
     return { success: true, id: quotation.id };
   } catch (error: any) {
-    logActivity(`GAGAL simpan Penawaran: ${error.message}`, 'ERROR');
+    await logActivity(`GAGAL simpan Penawaran: ${error.message}`, 'ERROR', undefined, 'QUOTATION');
     return { success: false, message: error.message };
   }
 }
@@ -197,11 +197,17 @@ export async function getQuotations() {
 
 export async function deleteQuotation(id: string) {
   try {
-    await checkOwner();
+    const { user } = await checkOwner();
+    const q = await prisma.quotation.findUnique({ where: { id } });
+    const target = q ? q.nomorSurat : id;
+
     await prisma.quotation.delete({ where: { id } });
+
+    await logActivity(`Hapus Penawaran: ${target}`, 'SUCCESS', user?.id, 'QUOTATION');
     return { success: true };
   } catch (error: any) {
     console.error("[deleteQuotation] Error:", error);
+    await logActivity(`GAGAL Hapus Penawaran: ${error.message}`, 'ERROR', undefined, 'QUOTATION');
     return { success: false, message: "Gagal menghapus data." };
   }
 }
@@ -373,7 +379,7 @@ export async function getInvoiceNumberAction() {
 export async function saveInvoice(data: any) {
   try {
     const { user } = await checkAuth();
-    logActivity(`Memulai simpan Invoice: ${data.invoiceNumber || 'DRAFT'}`, 'INFO');
+    await logActivity(`Memulai simpan Invoice: ${data.invoiceNumber || 'DRAFT'}`, 'INFO', user?.id, 'INVOICE');
     
     const isExisting = data.id ? await prisma.invoice.findUnique({ where: { id: data.id } }) : null;
     
@@ -478,10 +484,10 @@ export async function saveInvoice(data: any) {
         address: data.clientAddress,
     });
 
-    logActivity(`Berhasil simpan Invoice: ${invoice.invoiceNumber}`, 'SUCCESS');
+    await logActivity(`Berhasil simpan Invoice: ${invoice.invoiceNumber}`, 'SUCCESS', user?.id, 'INVOICE');
     return { success: true, id: invoice.id };
   } catch (error: any) {
-    logActivity(`GAGAL simpan Invoice: ${error.message}`, 'ERROR');
+    await logActivity(`GAGAL simpan Invoice: ${error.message}`, 'ERROR', undefined, 'INVOICE');
     return { success: false, message: error.message };
   }
 }
