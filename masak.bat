@@ -2,14 +2,17 @@
 setlocal enabledelayedexpansion
 
 :: ==========================================================
-:: SMART MASAK v2.0 - Studio AKL Deployment Suite
+:: SMART MASAK v2.1 - Studio AKL Deployment Suite
 :: ==========================================================
-:: Deskripsi: Script otomatisasi Prisma, Linting, dan Git Push.
-:: Fitur Baru: Argumen Pesan, Auto-Fix Lint, & Interactive Bypass.
+:: Fitur: Prisma, Lint (Auto-Fix + Log), Commit, & Push.
+:: Log Masalah: logs/lint_issues.log
 :: ==========================================================
 
 :: Ambil pesan dari argument pertama jika ada
 set msg_arg=%~1
+
+:: Pastikan folder logs ada
+if not exist logs mkdir logs
 
 echo.
 echo 🍳 [STEP 1/4] Menyiapkan bumbu (Prisma Generate)...
@@ -22,19 +25,32 @@ if %errorlevel% neq 0 (
 
 echo.
 echo 🧼 [STEP 2/4] Membersihkan dapur (Linting & Auto-Fix)...
-:: Mencoba memperbaiki otomatis jika memungkinkan (misal: spasi, titik koma)
-call npm run lint -- --fix
-if %errorlevel% neq 0 (
+:: Jalankan lint dan simpan output ke file sementara
+call npm run lint -- --fix > logs\lint_temp.txt 2>&1
+set lint_status=%errorlevel%
+
+if %lint_status% neq 0 (
     echo.
-    echo ⚠️  Dapur agak berantakan! Ada peringatan/error linting yang membandel.
-    set /p bypass="Tetap lanjut masak dan abaikan linting? (y/n): "
+    echo ⚠️  Ditemukan beberapa masalah pada kode:
+    echo ------------------------------------------
+    type logs\lint_temp.txt
+    echo ------------------------------------------
+    echo.
+    set /p bypass="Tetap lanjut masak dan simpan daftar error ke log? (y/n): "
     if /i "!bypass!" neq "y" (
         echo ❌ Masakan dibatalkan. Silakan perbaiki kode terlebih dahulu.
+        if exist logs\lint_temp.txt del logs\lint_temp.txt
         pause
-        exit /b %errorlevel%
+        exit /b %lint_status%
     )
-    echo ⏩ Melanjutkan masakan (Linting diabaikan atas permintaan Admin)...
+    
+    :: Arsipkan error ke log permanen agar tidak terlupakan
+    echo [%date% %time%] MASALAH TERTUNDA: >> logs\lint_issues.log
+    type logs\lint_temp.txt >> logs\lint_issues.log
+    echo ------------------------------------------ >> logs\lint_issues.log
+    echo ⏩ Melanjutkan masakan. Daftar PR tersimpan di logs/lint_issues.log
 )
+if exist logs\lint_temp.txt del logs\lint_temp.txt
 
 echo.
 echo 📝 [STEP 3/4] Mencatat resep (Commit)...
@@ -67,21 +83,20 @@ git push origin main
 if %errorlevel% neq 0 (
     echo.
     echo ❌ Gagal mengirim ke GitHub! 
-    echo ℹ️  Saran: Coba jalankan 'git pull' jika ada konflik dengan rekan tim.
+    echo ℹ️  Saran: Coba jalankan 'git pull' jika ada konflik.
     pause
     exit /b %errorlevel%
 )
 
-:: Mencatat ke Log Aktivitas
-if not exist logs mkdir logs
+:: Catat ke Log Aktivitas
 echo [%date% %time%] [DEPLOY] !msg! >> logs\admin_activity.log
 
 echo.
 echo ==========================================================
-echo ✨ MASAKAN MATANG SEMPURNA!
+echo ✨ MASAKAN MATANG! (Cek logs/lint_issues.log untuk PR)
 echo ==========================================================
-echo 🏗️  GitHub Actions sedang membangun image (Estimasi 5-10 menit).
-echo 🛡️  VPS Anda akan otomatis terupdate setelah proses build selesai.
+echo 🏗️  GitHub Actions sedang membangun image (5-10 menit).
+echo 🛡️  VPS Anda akan otomatis terupdate.
 echo ==========================================================
 echo.
 pause
