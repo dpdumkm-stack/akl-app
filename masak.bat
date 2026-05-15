@@ -2,10 +2,11 @@
 setlocal enabledelayedexpansion
 
 :: ==========================================================
-:: SMART MASAK v2.1 - Studio AKL Deployment Suite
+:: SMART MASAK v2.2 - Studio AKL Deployment Suite
 :: ==========================================================
 :: Fitur: Prisma, Lint (Auto-Fix + Log), Commit, & Push.
 :: Log Masalah: logs/lint_issues.log
+:: Logic Penanganan Error: Auto-Retry & Smart-Pull.
 :: ==========================================================
 
 :: Ambil pesan dari argument pertama jika ada
@@ -79,13 +80,42 @@ git commit -m "!msg!"
 
 echo.
 echo 🚀 [STEP 4/4] Mengirim masakan ke server (Pushing to GitHub)...
+
+set retry_count=0
+:push_loop
 git push origin main
 if %errorlevel% neq 0 (
+    set /a retry_count+=1
     echo.
-    echo ❌ Gagal mengirim ke GitHub! 
-    echo ℹ️  Saran: Coba jalankan 'git pull' jika ada konflik.
+    echo ⚠️  Gagal mengirim masakan (Percobaan ke-!retry_count!/3).
+    
+    if !retry_count! lss 3 (
+        echo ⏳ Menunggu 5 detik sebelum mencoba lagi...
+        timeout /t 5 > nul
+        goto push_loop
+    )
+
+    echo.
+    echo ❌ Masih gagal setelah 3 kali percobaan.
+    echo 💡 Kemungkinan penyebab:
+    echo    1. Masalah server GitHub (seperti 502 Bad Gateway tadi).
+    echo    2. Ada perubahan baru di GitHub yang belum Anda ambil (Conflict).
+    
+    set /p choice="Ingin mencoba sinkronisasi (git pull) lalu push ulang? (y/n): "
+    if /i "!choice!"=="y" (
+        echo 🔄 Mencoba menyamakan resep (Pulling with rebase)...
+        git pull origin main --rebase
+        if !errorlevel! eq 0 (
+            set retry_count=0
+            echo ✅ Sinkronisasi sukses! Mencoba push ulang...
+            goto push_loop
+        ) else (
+            echo ❌ Gagal sinkronisasi otomatis. Ada konflik manual yang harus diselesaikan.
+        )
+    )
+    
     pause
-    exit /b %errorlevel%
+    exit /b 1
 )
 
 :: Catat ke Log Aktivitas
@@ -93,7 +123,7 @@ echo [%date% %time%] [DEPLOY] !msg! >> logs\admin_activity.log
 
 echo.
 echo ==========================================================
-echo ✨ MASAKAN MATANG! (Cek logs/lint_issues.log untuk PR)
+echo ✨ MASAKAN MATANG SEMPURNA!
 echo ==========================================================
 echo 🏗️  GitHub Actions sedang membangun image (5-10 menit).
 echo 🛡️  VPS Anda akan otomatis terupdate.
