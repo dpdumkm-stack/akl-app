@@ -135,7 +135,7 @@ export default function OtorisasiSection({
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-[220px] overflow-y-auto no-scrollbar pr-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[380px] overflow-y-auto custom-scrollbar pr-2 py-1">
                         {isLoading ? (
                             <div className="col-span-full py-8 flex flex-col items-center gap-3">
                                 <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
@@ -145,22 +145,22 @@ export default function OtorisasiSection({
                                 <div key={s.id} className="relative group/card">
                                     <div 
                                         onClick={() => handlePickProfile(s)}
-                                        className={`p-4 rounded-[24px] border cursor-pointer transition-all duration-300 relative overflow-hidden h-full flex items-center gap-4 ${
+                                        className={`p-3.5 sm:p-4 rounded-[26px] border cursor-pointer transition-all duration-300 relative overflow-hidden flex items-center gap-3 sm:gap-4 ${
                                             data.namaPenandatangan === s.nama 
-                                            ? 'bg-blue-600/20 border-blue-500/40 shadow-lg shadow-blue-900/10' 
+                                            ? 'bg-blue-600/20 border-blue-500/40 shadow-lg shadow-blue-900/20' 
                                             : 'bg-white/5 border-white/5 hover:border-white/20 hover:bg-white/10'
                                         }`}
                                     >
-                                        <div className={`w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center font-black text-sm transition-all ${
+                                        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex-shrink-0 flex items-center justify-center font-black text-xs sm:text-sm transition-all ${
                                             data.namaPenandatangan === s.nama ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-800 text-slate-400'
                                         }`}>
                                             {s.nama.charAt(0)}
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h6 className={`text-[11px] font-black uppercase tracking-tight leading-tight mb-1 ${data.namaPenandatangan === s.nama ? 'text-white' : 'text-slate-200'}`}>
+                                        <div className="flex-1 min-w-0 py-0.5">
+                                            <h6 className={`text-[10px] sm:text-[11px] font-black uppercase tracking-tight leading-tight mb-0.5 break-words ${data.namaPenandatangan === s.nama ? 'text-white' : 'text-slate-200'}`}>
                                                 {s.nama}
                                             </h6>
-                                            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">{s.jabatan}</p>
+                                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed truncate">{s.jabatan}</p>
                                         </div>
                                         {data.namaPenandatangan === s.nama && (
                                             <div className="flex-shrink-0">
