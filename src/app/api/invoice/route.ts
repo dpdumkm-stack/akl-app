@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from 'next-auth/react';
 import { prisma } from '@/lib/prisma';
-import { getNextInvoiceNumber } from '@/lib/invoice-number-service';
 
 export async function POST(request: Request) {
   const session = await getSession({ req: { headers: request.headers } as any });
@@ -9,11 +8,17 @@ export async function POST(request: Request) {
     return new NextResponse('Forbidden', { status: 403 });
   }
   const data = await request.json();
-  const res = await getNextInvoiceNumber();
+  
+  const { getNextSequenceAtomic } = await import("@/lib/sequence-service");
+  const { formatInvoiceNumber } = await import("@/lib/utils");
+  
+  const nextUrut = await getNextSequenceAtomic("INVOICE");
+  const invoiceNumber = formatInvoiceNumber(nextUrut);
+
   const invoice = await prisma.invoice.create({
     data: {
-      invoiceNumber: res.invoiceNumber,
-      nomorUrut: res.nextUrut,
+      invoiceNumber: invoiceNumber,
+      nomorUrut: nextUrut,
       date: new Date(data.date),
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       clientName: data.clientName,

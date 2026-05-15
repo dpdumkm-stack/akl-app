@@ -354,6 +354,22 @@ export async function getNextQuotationNumber() {
     }
 }
 
+export async function getInvoiceNumberAction() {
+    try {
+        await checkAuth();
+        const { getNextSequenceAtomic } = await import("@/lib/sequence-service");
+        const { formatInvoiceNumber } = await import("@/lib/utils");
+        
+        const nextUrut = await getNextSequenceAtomic("INVOICE");
+        const invoiceNumber = formatInvoiceNumber(nextUrut);
+        
+        return { success: true, invoiceNumber, nextUrut };
+    } catch (error: any) {
+        console.error("[getInvoiceNumberAction] Error:", error);
+        return { success: false, message: "Gagal membuat nomor invoice otomatis." };
+    }
+}
+
 export async function saveInvoice(data: any) {
   try {
     const { user } = await checkAuth();
@@ -482,8 +498,11 @@ export async function convertToInvoice(quotationId: string) {
     
     if (!q) throw new Error("Penawaran tidak ditemukan di database.");
     
-    const { getNextInvoiceNumber } = await import("@/lib/invoice-number-service");
-    const nextInvoiceNumber = await getNextInvoiceNumber();
+    const { getNextSequenceAtomic } = await import("@/lib/sequence-service");
+    const { formatInvoiceNumber } = await import("@/lib/utils");
+    
+    const nextUrut = await getNextSequenceAtomic("INVOICE");
+    const invoiceNumber = formatInvoiceNumber(nextUrut);
     
     const invoiceItems = (q.items || []).map(it => {
         let unitPrice = 0;
@@ -512,8 +531,8 @@ export async function convertToInvoice(quotationId: string) {
     
     const newInvoice = await prisma.invoice.create({
       data: {
-        invoiceNumber: nextInvoiceNumber.invoiceNumber,
-        nomorUrut: nextInvoiceNumber.nextUrut,
+        invoiceNumber: invoiceNumber,
+        nomorUrut: nextUrut,
         clientName: q.clientName || q.up || q.namaKlien || "Klien Tanpa Nama",
         companyName: q.companyName || q.namaKlien || "Perusahaan Tanpa Nama",
         clientAddress: q.lokasi || "",

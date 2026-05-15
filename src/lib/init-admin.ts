@@ -47,7 +47,39 @@ export async function ensureAdminAccounts() {
       
       console.log("[INIT] Administrative accounts successfully synchronized.");
     }
+
+    // --- BARU: Sinkronisasi Nomor Urut (Quotation & Invoice) ---
+    const year = new Date().getFullYear();
+    
+    // Sinkronisasi INVOICE
+    const latestInv = await prisma.invoice.findFirst({
+      where: { date: { gte: new Date(year, 0, 1), lt: new Date(year + 1, 0, 1) } },
+      orderBy: { nomorUrut: 'desc' }
+    });
+    const currentInvUrut = latestInv?.nomorUrut || 0;
+    
+    await prisma.documentSequence.upsert({
+      where: { type_year: { type: 'INVOICE', year } },
+      update: { lastUrut: { set: Math.max(currentInvUrut, 0) } }, // Update jika sudah ada tapi lebih kecil
+      create: { type: 'INVOICE', year, lastUrut: currentInvUrut }
+    });
+
+    // Sinkronisasi QUOTATION
+    const latestQuot = await prisma.quotation.findFirst({
+      where: { createdAt: { gte: new Date(year, 0, 1), lt: new Date(year + 1, 0, 1) } },
+      orderBy: { nomorUrut: 'desc' }
+    });
+    const currentQuotUrut = latestQuot?.nomorUrut || 0;
+
+    await prisma.documentSequence.upsert({
+      where: { type_year: { type: 'QUOTATION', year } },
+      update: { lastUrut: { set: Math.max(currentQuotUrut, 0) } },
+      create: { type: 'QUOTATION', year, lastUrut: currentQuotUrut }
+    });
+
+    console.log(`[INIT] Document sequences synchronized (INV: ${currentInvUrut}, QUOT: ${currentQuotUrut})`);
+
   } catch (error) {
-    console.error("[INIT] Failed to ensure admin accounts:", error);
+    console.error("[INIT] Failed to ensure admin accounts or sync sequences:", error);
   }
 }

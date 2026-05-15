@@ -7,8 +7,7 @@ import {
   ArrowLeft, Save, Plus, X, Search, Database, 
   TrendingUp, RefreshCw, AlertCircle, Receipt, Eye, Edit3
 } from "lucide-react";
-import { saveInvoice } from "@/app/actions";
-import { getNextInvoiceNumber } from "@/lib/invoice-number-service";
+import { saveInvoice, getInvoiceNumberAction } from "@/app/actions";
 import InvoiceA4Preview from "@/components/InvoiceA4Preview";
 import DocumentPreviewStudio from "@/components/editor/DocumentPreviewStudio";
 import OtorisasiSection from "@/components/editor/OtorisasiSection";
@@ -55,8 +54,8 @@ export default function CreateInvoicePage() {
 
   useEffect(() => {
     const fetchNextNum = async () => {
-      const res = await getNextInvoiceNumber();
-      if (res) {
+      const res = await getInvoiceNumberAction();
+      if (res.success) {
         setForm(f => ({ ...f, invoiceNumber: res.invoiceNumber, nomorUrut: res.nextUrut }));
       }
     };

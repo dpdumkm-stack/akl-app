@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { InvoiceData, InvoiceItemData } from '@/lib/types';
-import { getNextInvoiceNumber } from '@/lib/invoice-number-service';
+import { saveInvoice, getInvoiceNumberAction } from '@/app/actions';
 import InvoiceItemRow from '@/components/editor/InvoiceItemRow';
-import { saveInvoice } from '@/app/actions';
 import { formatInvoiceNumber } from '@/lib/utils';
 import { Save } from 'lucide-react';
 
@@ -27,10 +26,10 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
   // Generate invoice number on mount
   useEffect(() => {
     (async () => {
-      const res = await getNextInvoiceNumber();
-      if (res) {
-        setInvoiceNumber(res.invoiceNumber);
-        setNomorUrut(res.nextUrut);
+      const res = await getInvoiceNumberAction();
+      if (res.success) {
+        setInvoiceNumber(res.invoiceNumber || '');
+        setNomorUrut(res.nextUrut || 0);
       }
     })();
   }, []);

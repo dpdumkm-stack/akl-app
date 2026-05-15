@@ -27,11 +27,10 @@ Import trace:
     ./src/app/api/pdf/route.ts
 
 
-✓ Compiled successfully in 53s
+✓ Compiled successfully in 33.0s
   Running TypeScript ...
-  Finished TypeScript in 35.0s ...
+  Finished TypeScript in 31.6s ...
   Collecting page data using 3 workers ...
-[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
@@ -39,9 +38,21 @@ Import trace:
   Generating static pages using 3 workers (0/31) ...
   Generating static pages using 3 workers (7/31) 
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
+[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
   Generating static pages using 3 workers (15/31) 
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
   Generating static pages using 3 workers (23/31) 
-✓ Generating static pages using 3 workers (31/31) in 3.3s
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+✓ Generating static pages using 3 workers (31/31) in 2.0s
   Finalizing page optimization ...
 
 Route (app)

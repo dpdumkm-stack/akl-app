@@ -235,3 +235,32 @@ An operation failed because it depends on one or more records that were required
 [Fri 05/15/2026 19:01:29.93] [DEPLOY] security: remove temporary admin init api and cleanup scratch scripts 
 [Fri 05/15/2026 19:11:06.16] [DEPLOY] feat: implement self-healing admin accounts on startup 
 [Fri 05/15/2026 19:23:32.32] [DEPLOY] feat: move auto-admin check to authorize function for 100% reliability 
+[Fri 05/15/2026 19:49:28.41] [DEPLOY] feat: add role selection to staff management 
+[15/5/2026, 19.58.53] [INFO] Memulai simpan Penawaran: 008/PH-AKL/V/2026
+[15/5/2026, 19.58.53] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__13qf53y._.js:394:168
+
+  391         }
+  392     });
+  393 } else {
+→ 394     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create(
+Unique constraint failed on the fields: (`nomorSurat`)
+[15/5/2026, 19.59.16] [INFO] Memulai simpan Penawaran: 008/PH-AKL/V/2026
+[15/5/2026, 19.59.16] [ERROR] GAGAL simpan Penawaran: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create()` invocation in
+C:\Users\p\.gemini\antigravity\scratch\akl-app\.next\dev\server\chunks\ssr\[root-of-the-server]__13qf53y._.js:394:168
+
+  391         }
+  392     });
+  393 } else {
+→ 394     quotation = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].quotation.create(
+Unique constraint failed on the fields: (`nomorSurat`)
+[15/5/2026, 19.59.18] [INFO] Memulai simpan Penawaran: 008/PH-AKL/V/2026
+[15/5/2026, 19.59.18] [SUCCESS] Berhasil simpan Penawaran: 003/PH-AKL/V/2026
+[15/5/2026, 20.00.39] [INFO] Memulai pembuatan PDF untuk ID: a842e229-bd7c-4acc-acf7-99c249c95f66 (Mode: inline)
+[15/5/2026, 20.01.01] [SUCCESS] Berhasil membuat PDF untuk ID: a842e229-bd7c-4acc-acf7-99c249c95f66
+[15/5/2026, 20.10.45] [INFO] Memulai pembuatan PDF untuk ID: a842e229-bd7c-4acc-acf7-99c249c95f66 (Mode: inline)
+[15/5/2026, 20.10.50] [SUCCESS] Berhasil membuat PDF untuk ID: a842e229-bd7c-4acc-acf7-99c249c95f66
+[15/5/2026, 20.11.17] [INFO] Memulai pembuatan PDF untuk ID: c6de0a54-fb79-435c-82af-c30da205f666 (Mode: inline)
+[15/5/2026, 20.11.25] [SUCCESS] Berhasil membuat PDF untuk ID: c6de0a54-fb79-435c-82af-c30da205f666
