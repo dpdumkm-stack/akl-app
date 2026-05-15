@@ -201,10 +201,10 @@ export default function FormEditor({
     return (
         <div className={`lg:col-span-5 xl:col-span-4 flex flex-col h-full relative ${viewMode === 'preview' ? 'hidden lg:flex' : 'flex'} print:hidden`}>
             {/* TAB NAVIGATION - STICKY TOP */}
-            <div className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-white/5 pb-2 mb-4">
-                <div className="flex gap-1 overflow-x-auto no-scrollbar py-2">
+            <div className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-white/5 pb-2 mb-2 sm:mb-4">
+                <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-2 px-2 sm:px-0">
                     {tabs.map(tab => (
-                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 translate-y-[-2px]' : 'bg-slate-900 text-slate-500 hover:bg-slate-800 border border-white/5'}`}>
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl text-[9px] sm:text-[10px] font-black transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 translate-y-[-2px]' : 'bg-slate-900 text-slate-500 hover:bg-slate-800 border border-white/5'}`}>
                             {tab.icon} {tab.label}
                         </button>
                     ))}
@@ -224,7 +224,7 @@ export default function FormEditor({
 
                 {activeTab === 'item' && (
                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-4">
-                        <div className="bg-slate-900 p-6 rounded-3xl border border-white/5 shadow-2xl">
+                        <div className="bg-slate-900 p-4 sm:p-6 rounded-3xl border border-white/5 shadow-2xl">
                             <div className="flex justify-between items-center mb-6">
                                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                     <Plus className="w-3 h-3 text-blue-500" />

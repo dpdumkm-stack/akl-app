@@ -25,14 +25,14 @@ export default function ItemRow({
     return (
         <div className="group p-6 bg-slate-800/40 rounded-[32px] relative border border-white/5 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 font-['Outfit',sans-serif]">
             {/* Action Toolbar */}
-            <div className="absolute -top-3 right-6 flex gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute -top-3 right-4 sm:right-6 flex gap-1.5 sm:gap-2 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
                     type="button" 
                     onClick={() => onOpenMaster(item.id)} 
-                    className="bg-blue-600 text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:bg-blue-500 transition-all scale-90 hover:scale-100 border border-white/10"
+                    className="bg-blue-600 text-white px-2.5 sm:px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:bg-blue-500 transition-all scale-90 sm:scale-90 hover:scale-100 border border-white/10"
                 >
                     <Search className="w-3 h-3" />
-                    <span className="text-[9px] font-black uppercase tracking-tighter">Database</span>
+                    <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-tighter">DB</span>
                 </button>
                 
                 {item.masterId ? (
@@ -40,29 +40,20 @@ export default function ItemRow({
                         <button 
                             type="button" 
                             onClick={() => onSaveMaster(item)} 
-                            className="bg-orange-600 text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:bg-orange-500 transition-all scale-90 hover:scale-100 border border-white/10"
+                            className="bg-orange-600 text-white p-1.5 sm:px-3 sm:py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:bg-orange-500 transition-all scale-90 hover:scale-100 border border-white/10"
                         >
                             <BookmarkPlus className="w-3 h-3" />
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Update Master</span>
-                        </button>
-                        <button 
-                            type="button" 
-                            onClick={() => onSaveMaster(item, true)} 
-                            className="bg-blue-500 text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:bg-blue-400 transition-all scale-90 hover:scale-100 border border-white/10"
-                            title="Simpan sebagai Item Baru di Database"
-                        >
-                            <Copy className="w-3 h-3" />
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Simpan Baru</span>
+                            <span className="hidden sm:inline text-[9px] font-black uppercase tracking-tighter">Update</span>
                         </button>
                     </>
                 ) : (
                     <button 
                         type="button" 
                         onClick={() => onSaveMaster(item)} 
-                        className="bg-emerald-600 text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:bg-emerald-500 transition-all scale-90 hover:scale-100 border border-white/10"
+                        className="bg-emerald-600 text-white p-1.5 sm:px-3 sm:py-1.5 rounded-full shadow-lg flex items-center gap-1.5 hover:bg-emerald-500 transition-all scale-90 hover:scale-100 border border-white/10"
                     >
                         <BookmarkPlus className="w-3 h-3" />
-                        <span className="text-[9px] font-black uppercase tracking-tighter">Simpan Master</span>
+                        <span className="hidden sm:inline text-[9px] font-black uppercase tracking-tighter">Master</span>
                     </button>
                 )}
 
@@ -75,8 +66,8 @@ export default function ItemRow({
                 </button>
             </div>
             
-            <div className="flex gap-4">
-                <div className="flex flex-col gap-1 pr-3 border-r border-white/5 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-row sm:flex-col gap-1 pr-0 sm:pr-3 border-b sm:border-b-0 sm:border-r border-white/5 pb-2 sm:pb-0 justify-center sm:justify-start">
                     <button type="button" onClick={() => onMove(item.id, 'up')} className="p-1.5 text-slate-600 hover:text-blue-400 hover:bg-white/5 rounded-lg transition-all"><ChevronUp className="w-4 h-4" /></button>
                     <button type="button" onClick={() => onMove(item.id, 'down')} className="p-1.5 text-slate-600 hover:text-blue-400 hover:bg-white/5 rounded-lg transition-all"><ChevronDown className="w-4 h-4" /></button>
                 </div>
@@ -86,7 +77,7 @@ export default function ItemRow({
                             rows={1} 
                             value={item.deskripsi || ''} 
                             onChange={(e) => onUpdate(item.id, 'deskripsi', capitalizeWords(e.target.value))} 
-                            className="w-full bg-transparent border-none font-black text-sm p-0 focus:ring-0 text-white resize-none outline-none placeholder:text-slate-600 tracking-tight" 
+                            className="w-full bg-transparent border-none font-black text-sm sm:text-base p-0 focus:ring-0 text-white resize-none outline-none placeholder:text-slate-600 tracking-tight" 
                             placeholder={data.isMaterialOnlyMode ? "NAMA MATERIAL..." : "NAMA PEKERJAAN..."} 
                         />
                         
@@ -94,12 +85,11 @@ export default function ItemRow({
                             <div className="flex items-center gap-1.5">
                                 <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-orange-900/20 text-orange-400 rounded-md border border-orange-900/30">
                                     <div className="w-1 h-1 bg-orange-500 rounded-full animate-pulse"></div>
-                                    <span className="text-[8px] font-black uppercase tracking-widest">Terhubung Database</span>
+                                    <span className="text-[8px] font-black uppercase tracking-widest">Database</span>
                                 </div>
                                 <button 
                                     onClick={() => onDetachMaster(item.id)}
                                     className="p-1 text-slate-600 hover:text-red-400 transition-all"
-                                    title="Lepas dari Master (Edit Tanpa Mengubah Database)"
                                 >
                                     <X className="w-3 h-3" />
                                 </button>
@@ -111,7 +101,7 @@ export default function ItemRow({
                             <input 
                                 value={item.bahan || ''} 
                                 onChange={(e) => onUpdate(item.id, 'bahan', capitalizeWords(e.target.value))} 
-                                className="w-full bg-transparent border-none text-[11px] italic p-0 focus:ring-0 text-slate-400 placeholder:text-slate-600 font-medium" 
+                                className="w-full bg-transparent border-none text-[10px] sm:text-[11px] italic p-0 focus:ring-0 text-slate-400 placeholder:text-slate-600 font-medium" 
                                 placeholder="Spesifikasi / Detail bahan..." 
                             />
                         </div>
@@ -119,8 +109,8 @@ export default function ItemRow({
 
                     <div className={`grid gap-3 pt-3 border-t border-white/5 ${
                         data.isJasaBahanMode 
-                            ? (data.isHargaSatuanMode ? 'grid-cols-[0.8fr_1.2fr_1.2fr]' : 'grid-cols-[0.7fr_0.7fr_1.3fr_1.3fr]') 
-                            : (data.isHargaSatuanMode ? 'grid-cols-[1fr_1.5fr]' : 'grid-cols-[0.8fr_0.8fr_1.4fr]')
+                            ? (data.isHargaSatuanMode ? 'grid-cols-1 sm:grid-cols-[0.8fr_1.2fr_1.2fr]' : 'grid-cols-2 sm:grid-cols-[0.7fr_0.7fr_1.3fr_1.3fr]') 
+                            : (data.isHargaSatuanMode ? 'grid-cols-1 sm:grid-cols-[1fr_1.5fr]' : 'grid-cols-2 sm:grid-cols-[0.8fr_0.8fr_1.4fr]')
                     }`}>
                         {!data.isHargaSatuanMode && (
                             <div className="space-y-1">

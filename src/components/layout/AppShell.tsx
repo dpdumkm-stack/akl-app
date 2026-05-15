@@ -157,14 +157,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Link 
               key={item.href} 
               href={item.href}
-              className={`flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all ${
+              className={`flex flex-col items-center gap-1 px-1.5 sm:px-3 py-1 rounded-xl transition-all ${
                 isActive ? "text-blue-600" : "text-slate-400"
               }`}
             >
               <div className={`p-1.5 rounded-lg transition-all ${isActive ? "bg-blue-600/10" : ""}`}>
-                <item.icon className="w-5 h-5" />
+                <item.icon className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
               </div>
-              <span className="text-[8px] font-black uppercase tracking-widest">{item.name}</span>
+              <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest">{item.name}</span>
             </Link>
           );
         })}
@@ -173,14 +173,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {(session?.user as any)?.role === "OWNER" && (
            <Link 
             href="/settings/users"
-            className={`flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all ${
+            className={`flex flex-col items-center gap-1 px-1.5 sm:px-3 py-1 rounded-xl transition-all ${
               pathname === "/settings/users" ? "text-blue-600" : "text-slate-400"
             }`}
           >
             <div className={`p-1.5 rounded-lg transition-all ${pathname === "/settings/users" ? "bg-blue-600/10" : ""}`}>
-              <Users className="w-5 h-5" />
+              <Users className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
             </div>
-            <span className="text-[8px] font-black uppercase tracking-widest">Staff</span>
+            <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest">Staff</span>
           </Link>
         )}
       </nav>

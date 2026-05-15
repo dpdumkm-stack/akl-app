@@ -265,3 +265,4 @@ Unique constraint failed on the fields: (`nomorSurat`)
 [15/5/2026, 20.11.17] [INFO] Memulai pembuatan PDF untuk ID: c6de0a54-fb79-435c-82af-c30da205f666 (Mode: inline)
 [15/5/2026, 20.11.25] [SUCCESS] Berhasil membuat PDF untuk ID: c6de0a54-fb79-435c-82af-c30da205f666
 [Fri 05/15/2026 20:27:19.93] [DEPLOY] fix: unify invoice numbering and add auto-sync sequence on startup 
+[Fri 05/15/2026 20:38:56.93] [DEPLOY] ui: improve mobile responsiveness and fix name truncation in OtorisasiSection 
