@@ -11,6 +11,7 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
   const isAdmin = !!(session?.user as any)?.role?.includes('admin');
 
   const [invoiceNumber, setInvoiceNumber] = useState<string>('');
+  const [nomorUrut, setNomorUrut] = useState<number>(0);
   const [date, setDate] = useState<string>('');
   const [dueDate, setDueDate] = useState<string>('');
   const [clientName, setClientName] = useState<string>('');
@@ -25,8 +26,11 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
   // Generate invoice number on mount
   useEffect(() => {
     (async () => {
-      const num = await getNextInvoiceNumber();
-      setInvoiceNumber(num);
+      const res = await getNextInvoiceNumber();
+      if (res) {
+        setInvoiceNumber(res.invoiceNumber);
+        setNomorUrut(res.nextUrut);
+      }
     })();
   }, []);
 
@@ -75,6 +79,7 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
     const payload: InvoiceData = {
       id: '', // server will generate
       invoiceNumber,
+      nomorUrut,
       date: date, // send as string
       dueDate: dueDate || null,
       clientName,

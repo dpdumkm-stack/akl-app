@@ -19,6 +19,7 @@ const fmt = (n: number) =>
 const emptyForm = () => ({
   id: "",
   invoiceNumber: "",
+  nomorUrut: 0,
   date: new Date().toISOString().slice(0, 10),
   dueDate: "",
   clientName: "",
@@ -54,7 +55,9 @@ export default function CreateInvoicePage() {
   useEffect(() => {
     const fetchNextNum = async () => {
       const res = await getNextInvoiceNumber();
-      setForm(f => ({ ...f, invoiceNumber: res }));
+      if (res) {
+        setForm(f => ({ ...f, invoiceNumber: res.invoiceNumber, nomorUrut: res.nextUrut }));
+      }
     };
     const fetchSettings = async () => {
         const { getGlobalSettings } = await import("@/app/actions");

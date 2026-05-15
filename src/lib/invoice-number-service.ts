@@ -11,7 +11,7 @@ export async function getNextInvoiceNumber() {
   const romanMonths = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
   const romanMonth = romanMonths[month - 1];
 
-  // Get latest invoice for current year
+  // Get latest invoice for current year based on nomorUrut
   const latestInvoice = await prisma.invoice.findFirst({
     where: {
       date: {
@@ -20,19 +20,15 @@ export async function getNextInvoiceNumber() {
       },
     },
     orderBy: {
-      invoiceNumber: 'desc',
+      nomorUrut: 'desc',
     },
   });
 
-  let nextNumber = 1;
-  if (latestInvoice && latestInvoice.invoiceNumber) {
-    const parts = latestInvoice.invoiceNumber.split('/');
-    const lastNum = parseInt(parts[0]);
-    if (!isNaN(lastNum)) {
-      nextNumber = lastNum + 1;
-    }
-  }
-
+  const nextNumber = (latestInvoice?.nomorUrut || 0) + 1;
   const paddedNumber = nextNumber.toString().padStart(3, '0');
-  return `${paddedNumber}/INV-AKL/${romanMonth}/${year}`;
+  
+  return {
+    invoiceNumber: `${paddedNumber}/INV-AKL/${romanMonth}/${year}`,
+    nextUrut: nextNumber
+  };
 }

@@ -357,6 +357,7 @@ export async function saveInvoice(data: any) {
 
     const payload = {
       invoiceNumber: sanitize(data.invoiceNumber),
+      nomorUrut: Number(data.nomorUrut) || 0,
       date: data.date ? new Date(data.date) : new Date(),
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       clientName: sanitize(data.clientName),
@@ -465,7 +466,8 @@ export async function convertToInvoice(quotationId: string) {
     
     const newInvoice = await prisma.invoice.create({
       data: {
-        invoiceNumber: nextInvoiceNumber,
+        invoiceNumber: nextInvoiceNumber.invoiceNumber,
+        nomorUrut: nextInvoiceNumber.nextUrut,
         clientName: q.clientName || q.up || q.namaKlien || "Klien Tanpa Nama",
         companyName: q.companyName || q.namaKlien || "Perusahaan Tanpa Nama",
         clientAddress: q.lokasi || "",

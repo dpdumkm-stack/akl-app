@@ -9,10 +9,11 @@ export async function POST(request: Request) {
     return new NextResponse('Forbidden', { status: 403 });
   }
   const data = await request.json();
-  const invoiceNumber = await getNextInvoiceNumber();
+  const res = await getNextInvoiceNumber();
   const invoice = await prisma.invoice.create({
     data: {
-      invoiceNumber,
+      invoiceNumber: res.invoiceNumber,
+      nomorUrut: res.nextUrut,
       date: new Date(data.date),
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       clientName: data.clientName,

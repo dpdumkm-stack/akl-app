@@ -50,6 +50,7 @@ export interface InvoiceItemData {
 export interface InvoiceData {
   id?: string;
   invoiceNumber: string;
+  nomorUrut?: number;
   date: string; // ISO
   dueDate?: string;
   clientName?: string;

@@ -224,3 +224,5 @@ An operation failed because it depends on one or more records that were required
 [15/5/2026, 03.12.22] [SUCCESS] Berhasil simpan Penawaran: 000/PH-AKL/V/2026 (ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99)
 [15/5/2026, 03.12.25] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: attachment)
 [15/5/2026, 03.12.59] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
+[15/5/2026, 05.33.47] [INFO] Memulai pembuatan PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99 (Mode: inline)
+[15/5/2026, 05.34.02] [SUCCESS] Berhasil membuat PDF untuk ID: 024557e9-1e99-4599-be3c-f80ee2ba7d99
