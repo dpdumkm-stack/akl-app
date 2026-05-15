@@ -27,9 +27,9 @@ Import trace:
     ./src/app/api/pdf/route.ts
 
 
-✓ Compiled successfully in 35.8s
+✓ Compiled successfully in 53s
   Running TypeScript ...
-  Finished TypeScript in 20.6s ...
+  Finished TypeScript in 35.0s ...
   Collecting page data using 3 workers ...
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
@@ -41,7 +41,7 @@ Import trace:
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
   Generating static pages using 3 workers (15/31) 
   Generating static pages using 3 workers (23/31) 
-✓ Generating static pages using 3 workers (31/31) in 2.7s
+✓ Generating static pages using 3 workers (31/31) in 3.3s
   Finalizing page optimization ...
 
 Route (app)

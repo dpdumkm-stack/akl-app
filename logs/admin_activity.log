@@ -234,3 +234,4 @@ An operation failed because it depends on one or more records that were required
 [Fri 05/15/2026 18:45:49.93] [DEPLOY] feat: add secure admin init api for live server 
 [Fri 05/15/2026 19:01:29.93] [DEPLOY] security: remove temporary admin init api and cleanup scratch scripts 
 [Fri 05/15/2026 19:11:06.16] [DEPLOY] feat: implement self-healing admin accounts on startup 
+[Fri 05/15/2026 19:23:32.32] [DEPLOY] feat: move auto-admin check to authorize function for 100% reliability 

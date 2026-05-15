@@ -148,6 +148,29 @@ export default function UserManagementPage() {
                      </button>
                    </div>
                 </div>
+
+                <div className="space-y-2">
+                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Hak Akses (Role)</label>
+                   <div className="grid grid-cols-2 gap-3">
+                      <button 
+                        type="button"
+                        onClick={() => setFormData({ ...formData, role: "ADMIN" })}
+                        className={`py-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${formData.role === 'ADMIN' ? 'border-blue-600 bg-blue-50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}
+                      >
+                         <span className={`text-[10px] font-black uppercase tracking-widest ${formData.role === 'ADMIN' ? 'text-blue-600' : 'text-slate-400'}`}>Staff Admin</span>
+                         <span className="text-[8px] text-slate-400 font-medium">Akses terbatas</span>
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setFormData({ ...formData, role: "OWNER" })}
+                        className={`py-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${formData.role === 'OWNER' ? 'border-indigo-600 bg-indigo-50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}
+                      >
+                         <span className={`text-[10px] font-black uppercase tracking-widest ${formData.role === 'OWNER' ? 'text-indigo-600' : 'text-slate-400'}`}>Owner / Direksi</span>
+                         <span className="text-[8px] text-slate-400 font-medium">Akses penuh</span>
+                      </button>
+                   </div>
+                </div>
+
                 <div className="flex gap-4 pt-4">
                    <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-6 py-4 border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">Batal</button>
                    <button type="submit" className="flex-1 px-6 py-4 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-900/20 font-black text-[10px] uppercase tracking-widest hover:bg-blue-500 transition-all">Simpan</button>
