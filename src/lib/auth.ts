@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { ensureAdminAccounts } from "./init-admin";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -18,6 +19,9 @@ export const authOptions: NextAuthOptions = {
         const password = (credentials.password as string).trim();
 
         try {
+          // Panggil pengecekan akun admin tepat sebelum login diproses
+          await ensureAdminAccounts();
+
           const user = await prisma.user.findUnique({ where: { username } });
           if (!user) return null;
           const isValid = await bcrypt.compare(password, user.password);
