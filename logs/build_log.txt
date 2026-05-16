@@ -27,10 +27,11 @@ Import trace:
     ./src/app/api/invoice/delete/route.ts
 
 
-✓ Compiled successfully in 48s
+✓ Compiled successfully in 38.4s
   Running TypeScript ...
-  Finished TypeScript in 32.4s ...
+  Finished TypeScript in 29.0s ...
   Collecting page data using 3 workers ...
+[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
@@ -40,18 +41,18 @@ Import trace:
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
   Generating static pages using 3 workers (16/32) 
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
   Generating static pages using 3 workers (24/32) 
-✓ Generating static pages using 3 workers (32/32) in 5.6s
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
+✓ Generating static pages using 3 workers (32/32) in 2.2s
   Finalizing page optimization ...
 
 Route (app)

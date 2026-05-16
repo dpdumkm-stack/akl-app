@@ -158,7 +158,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 p-3 sm:p-4 lg:p-8 max-w-[1800px] mx-auto w-full pb-24 lg:pb-8">
+        <main className="flex-1 p-0 sm:p-4 lg:p-8 max-w-[1800px] mx-auto w-full pb-24 lg:pb-8">
           {children}
         </main>
       </div>
