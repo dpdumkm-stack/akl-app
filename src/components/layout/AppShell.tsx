@@ -126,17 +126,31 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
              </div>
 
              <div className="flex items-center gap-2 lg:gap-4">
-                <button className="p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition-all relative">
+                <button className="hidden sm:block p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition-all relative">
                   <Bell className="w-5 h-5" />
                   <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
                 </button>
+                
+                {/* Tombol Logout (Mobile) - Agar mudah ditemukan di HP */}
+                <button 
+                  onClick={() => {
+                    if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                      signOut();
+                    }
+                  }}
+                  className="lg:hidden p-2 text-red-500 bg-red-50 hover:bg-red-100 hover:text-red-600 rounded-xl transition-all flex items-center gap-2 border border-red-100"
+                >
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider pr-1">Keluar</span>
+                </button>
+
                 <div className="h-8 w-px bg-slate-200 mx-1 hidden lg:block"></div>
                 <div className="flex items-center gap-3">
                   <div className="text-right hidden lg:block">
                     <p className="text-[10px] font-black text-slate-900 uppercase">{session?.user?.name || "Admin"}</p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Office Manager</p>
                   </div>
-                  <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-600/20 flex items-center justify-center text-blue-600 font-black text-xs">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600/10 border border-blue-600/20 flex items-center justify-center text-blue-600 font-black text-xs">
                     {session?.user?.name?.substring(0,2).toUpperCase() || "AD"}
                   </div>
                 </div>

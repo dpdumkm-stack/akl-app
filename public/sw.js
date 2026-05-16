@@ -1,4 +1,4 @@
-const CACHE_NAME = 'studio-akl-v1';
+const CACHE_NAME = 'studio-akl-v2';
 
 // Aset-aset inti yang di-cache saat instalasi
 const PRECACHE_ASSETS = [

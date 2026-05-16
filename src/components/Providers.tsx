@@ -2,7 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { ToastProvider } from "@/context/ToastContext";
-
+import InstallPrompt from "@/components/InstallPrompt";
 import { useEffect } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -17,7 +17,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <SessionProvider>
-      <ToastProvider>{children}</ToastProvider>
+      <ToastProvider>{children}<InstallPrompt /></ToastProvider>
     </SessionProvider>
   );
 }
