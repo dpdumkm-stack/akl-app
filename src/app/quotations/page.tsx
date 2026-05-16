@@ -128,9 +128,11 @@ export default function QuotationArchivePage() {
 
           <button 
             onClick={() => router.push("/quotations/create")}
-            className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-[9px] sm:text-[10px] uppercase tracking-wider sm:tracking-widest rounded-xl transition-all shadow-lg shadow-blue-900/20"
           >
-            <Plus className="w-4 h-4" /> Buat Penawaran Baru
+            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+            <span className="hidden sm:inline">Buat Penawaran Baru</span>
+            <span className="sm:hidden">Buat Baru</span>
           </button>
         </div>
       </nav>

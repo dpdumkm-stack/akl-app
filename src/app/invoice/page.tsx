@@ -176,9 +176,11 @@ export default function InvoiceArchivePage() {
           </div>
           <button 
             onClick={() => router.push("/invoice/create")} 
-            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-emerald-900/20"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2 sm:py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[9px] sm:text-[10px] uppercase tracking-wider sm:tracking-widest rounded-xl transition-all shadow-lg shadow-emerald-900/20"
           >
-            <Plus className="w-4 h-4" /> Buat Invoice Baru
+            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+            <span className="hidden sm:inline">Buat Invoice Baru</span>
+            <span className="sm:hidden">Buat Baru</span>
           </button>
         </div>
       </nav>
