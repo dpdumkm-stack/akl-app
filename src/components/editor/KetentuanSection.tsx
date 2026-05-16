@@ -56,7 +56,7 @@ export default function KetentuanSection({
                         )}
                     </div>
                     {data.showLingkupKerja && (
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                             {(data.lingkupKerja || []).map((text, idx) => (
                                 <div key={idx} className="flex gap-2 group items-start">
                                     <div className="flex-1">
@@ -68,7 +68,7 @@ export default function KetentuanSection({
                                             accentColor="blue"
                                         />
                                     </div>
-                                    <button type="button" onClick={() => removeRow('lingkupKerja', idx)} className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100 mt-1"><Trash2 className="w-4 h-4" /></button>
+                                    <button type="button" onClick={() => removeRow('lingkupKerja', idx)} className="w-11 h-11 flex-shrink-0 flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 active:scale-95 rounded-xl transition-all mt-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"><Trash2 className="w-5 h-5 sm:w-4 sm:h-4" /></button>
                                 </div>
                             ))}
                         </div>
@@ -94,7 +94,7 @@ export default function KetentuanSection({
                         )}
                     </div>
                     {data.showSyaratGaransi && (
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                             {(data.syaratGaransi || []).map((text, idx) => (
                                 <div key={idx} className="flex gap-2 group items-start">
                                     <div className="flex-1">
@@ -106,7 +106,7 @@ export default function KetentuanSection({
                                             accentColor="emerald"
                                         />
                                     </div>
-                                    <button type="button" onClick={() => removeRow('syaratGaransi', idx)} className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100 mt-1"><Trash2 className="w-4 h-4" /></button>
+                                    <button type="button" onClick={() => removeRow('syaratGaransi', idx)} className="w-11 h-11 flex-shrink-0 flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 active:scale-95 rounded-xl transition-all mt-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"><Trash2 className="w-5 h-5 sm:w-4 sm:h-4" /></button>
                                 </div>
                             ))}
                         </div>
@@ -119,11 +119,11 @@ export default function KetentuanSection({
                         <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Metode Pembayaran</h4>
                         <button type="button" onClick={() => addRow('termin')} className="text-[9px] font-black text-slate-600 uppercase tracking-widest hover:text-slate-400 transition-all">+ Tambah Termin</button>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         {(data.termin || []).map((text, idx) => (
-                            <div key={idx} className="flex gap-2 group">
-                                <input value={text} onChange={(e) => updateArray('termin', idx, e.target.value)} className="flex-1 bg-slate-900/80 border-2 border-white/10 rounded-xl p-3 text-xs font-black text-white shadow-lg focus:border-blue-500 focus:bg-slate-900 transition-all" placeholder="Contoh: DP 50% setelah PO..." />
-                                <button type="button" onClick={() => removeRow('termin', idx)} className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"><Trash2 className="w-4 h-4" /></button>
+                            <div key={idx} className="flex gap-2 group items-center">
+                                <input value={text} onChange={(e) => updateArray('termin', idx, e.target.value)} className="flex-1 bg-slate-900/80 border-2 border-white/10 rounded-xl p-4 text-sm font-medium text-white shadow-lg focus:border-blue-500 focus:bg-slate-900 transition-all outline-none" placeholder="Contoh: DP 50% setelah PO..." />
+                                <button type="button" onClick={() => removeRow('termin', idx)} className="w-11 h-11 flex-shrink-0 flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 active:scale-95 rounded-xl transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"><Trash2 className="w-5 h-5 sm:w-4 sm:h-4" /></button>
                             </div>
                         ))}
                     </div>

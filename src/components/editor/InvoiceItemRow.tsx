@@ -31,7 +31,7 @@ export default function InvoiceItemRow({ index, item, onChange, onRemove }: Invo
           type="number"
           value={item.quantity}
           onChange={e => onChange('quantity', Number(e.target.value))}
-          className="w-full bg-white border border-slate-200 rounded-lg p-2 text-sm outline-none focus:border-blue-500 transition-all text-center"
+          className="w-full bg-white border border-slate-200 rounded-lg p-3 sm:p-2 text-base sm:text-sm outline-none focus:border-blue-500 transition-all text-center"
         />
       </div>
       <div className="md:col-span-2">
@@ -40,17 +40,17 @@ export default function InvoiceItemRow({ index, item, onChange, onRemove }: Invo
           type="number"
           value={item.unitPrice}
           onChange={e => onChange('unitPrice', Number(e.target.value))}
-          className="w-full bg-white border border-slate-200 rounded-lg p-2 text-sm outline-none focus:border-blue-500 transition-all text-right"
+          className="w-full bg-white border border-slate-200 rounded-lg p-3 sm:p-2 text-base sm:text-sm outline-none focus:border-blue-500 transition-all text-right"
         />
       </div>
       <div className="md:col-span-1 flex items-end justify-center pb-1">
         <button
           type="button"
           onClick={onRemove}
-          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+          className="w-11 h-11 flex-shrink-0 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 active:scale-95 rounded-xl transition-all"
           title="Hapus Item"
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-5 h-5 sm:w-4 sm:h-4" />
         </button>
       </div>
     </div>

@@ -44,7 +44,7 @@ export default function TextEditorTrigger({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className={`group w-full text-left bg-slate-900/80 border-2 border-white/10 rounded-2xl p-4 transition-all hover:bg-slate-900 ${accentBorderMap[accentColor]} ${className}`}
+        className={`group w-full text-left bg-slate-900/80 border-2 border-white/10 rounded-2xl p-5 transition-all hover:bg-slate-900 active:scale-[0.98] ${accentBorderMap[accentColor]} ${className}`}
       >
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 mt-0.5">
@@ -60,7 +60,7 @@ export default function TextEditorTrigger({
                 {previewText}
               </p>
             ) : (
-              <p className="text-xs text-slate-600 italic">{placeholder}</p>
+              <p className="text-xs text-slate-500 italic">{placeholder}</p>
             )}
           </div>
           <div className="flex-shrink-0">

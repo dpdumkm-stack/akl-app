@@ -86,7 +86,7 @@ export default function TextEditorModal({
 
   return (
     <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="w-full sm:max-w-lg bg-slate-900 rounded-t-[32px] sm:rounded-[32px] border border-white/10 shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[80vh] animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
+      <div className="w-full sm:max-w-lg bg-slate-900 rounded-t-[32px] sm:rounded-[32px] border border-white/10 shadow-2xl ring-1 ring-white/5 flex flex-col h-[95dvh] sm:h-auto sm:max-h-[85vh] animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/5">
           <div className="flex items-center gap-3">
@@ -107,31 +107,31 @@ export default function TextEditorModal({
         </div>
 
         {/* Formatting Toolbar */}
-        <div className="flex items-center gap-2 px-6 py-3 border-b border-white/5">
-          <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest mr-1">Format</span>
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 overflow-x-auto">
+          <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest mr-1 ml-2">Format</span>
           <button
             type="button"
             onClick={() => insertFormat("**", "**")}
-            className={`p-2 rounded-lg transition-all ${accent.toolbar} border border-white/5`}
+            className={`w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-xl transition-all ${accent.toolbar} border border-white/5 active:scale-95`}
             title="Bold"
           >
-            <Bold className="w-3.5 h-3.5" />
+            <Bold className="w-4 h-4" />
           </button>
           <button
             type="button"
             onClick={() => insertFormat("_", "_")}
-            className={`p-2 rounded-lg transition-all ${accent.toolbar} border border-white/5`}
+            className={`w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-xl transition-all ${accent.toolbar} border border-white/5 active:scale-95`}
             title="Italic"
           >
-            <Italic className="w-3.5 h-3.5" />
+            <Italic className="w-4 h-4" />
           </button>
           <button
             type="button"
             onClick={insertBullet}
-            className={`p-2 rounded-lg transition-all ${accent.toolbar} border border-white/5`}
+            className={`w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-xl transition-all ${accent.toolbar} border border-white/5 active:scale-95`}
             title="Bullet Point"
           >
-            <List className="w-3.5 h-3.5" />
+            <List className="w-4 h-4" />
           </button>
           <div className="ml-auto text-[9px] text-slate-700 font-medium tabular-nums">
             {localText.length} karakter
@@ -139,29 +139,29 @@ export default function TextEditorModal({
         </div>
 
         {/* Textarea */}
-        <div className="flex-1 px-6 py-4 overflow-y-auto">
+        <div className="flex-1 px-4 sm:px-6 py-4 overflow-y-auto">
           <textarea
             ref={textareaRef}
             value={localText}
             onChange={(e) => setLocalText(e.target.value)}
             placeholder={placeholder}
-            className={`w-full h-full min-h-[200px] sm:min-h-[250px] bg-slate-950/50 border-2 border-white/5 rounded-2xl p-4 text-sm font-medium text-white placeholder:text-slate-700 outline-none resize-none transition-all focus:border-white/10 focus:ring-2 ${accent.ring} leading-relaxed`}
+            className={`w-full h-full min-h-[200px] sm:min-h-[250px] bg-slate-950/50 border-2 border-white/5 rounded-2xl p-4 text-base sm:text-sm font-medium text-white placeholder:text-slate-700 outline-none resize-none transition-all focus:border-white/10 focus:ring-2 ${accent.ring} leading-relaxed`}
           />
         </div>
 
         {/* Footer Actions */}
-        <div className="flex gap-3 px-6 pb-6 pt-2">
+        <div className="flex gap-3 px-4 sm:px-6 pb-6 pt-3">
           <button
             onClick={onClose}
-            className="flex-1 py-3.5 rounded-2xl bg-slate-800 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:bg-slate-700 hover:text-white transition-all border border-white/5"
+            className="flex-1 py-4 rounded-2xl bg-slate-800 text-slate-400 font-black text-xs uppercase tracking-widest hover:bg-slate-700 hover:text-white transition-all border border-white/5 active:scale-[0.98]"
           >
             Batal
           </button>
           <button
             onClick={handleSave}
-            className={`flex-1 py-3.5 rounded-2xl ${accent.btn} text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2`}
+            className={`flex-1 py-4 rounded-2xl ${accent.btn} text-white font-black text-xs uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 active:scale-[0.98]`}
           >
-            <Check className="w-4 h-4" />
+            <Check className="w-5 h-5" />
             Simpan
           </button>
         </div>
