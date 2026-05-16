@@ -287,3 +287,4 @@ Unique constraint failed on the fields: (`nomorSurat`)
 [Sat 05/16/2026 22:44:05.87] [DEPLOY] feat: Auto-resize textarea and dynamic modal height in TextEditorModal 
 [Sat 05/16/2026 23:13:56.87] [DEPLOY] feat: Full screen layouts across AppShell, Quotations, and Invoice pages 
 [Sat 05/16/2026 23:41:35.80] [DEPLOY] fix: Remove white border on mobile for edge-to-edge dark mode pages 
+[Sat 05/16/2026 23:57:49.58] [DEPLOY] feat: Full system Dark Mode overhaul for all pages 

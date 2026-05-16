@@ -3,10 +3,10 @@
 # deploy-zero-downtime.sh
 # Script Blue-Green Deployment untuk AKL App
 # Menjamin ZERO DOWNTIME saat pergantian kontainer.
+# v2: Tambah auto-rollback jika kontainer baru gagal healthy
 # =============================================================
 set -e
 
-COMPOSE_FILE="/var/www/akl-app/docker-compose.yml"
 NGINX_CONF="/etc/nginx/conf.d/akl-upstream.conf"
 PROJECT_DIR="/var/www/akl-app"
 
@@ -42,7 +42,6 @@ detect_active_slot() {
     ACTIVE_PORT=3001
     INACTIVE_PORT=3000
   elif [ "$BLUE_RUNNING" = "true" ] && [ "$GREEN_RUNNING" = "true" ]; then
-    # Keduanya running — anggap Blue yang aktif, matikan Green
     warn "Kedua slot berjalan. Mematikan Green untuk digunakan sebagai target..."
     docker stop akl-green 2>/dev/null || true
     ACTIVE_SLOT="blue"
@@ -50,7 +49,6 @@ detect_active_slot() {
     ACTIVE_PORT=3000
     INACTIVE_PORT=3001
   else
-    # Tidak ada yang berjalan — fresh deploy
     warn "Tidak ada kontainer aktif. Melakukan fresh deploy ke slot Blue..."
     ACTIVE_SLOT="none"
     INACTIVE_SLOT="blue"
@@ -66,6 +64,40 @@ detect_active_slot() {
 }
 
 # =============================================================
+# AUTO-ROLLBACK: Hidupkan kembali slot lama jika deploy gagal
+# =============================================================
+rollback() {
+  echo ""
+  warn "🔄 AUTO-ROLLBACK: Menghidupkan kembali slot lama..."
+
+  if [ "$ACTIVE_SLOT" = "none" ]; then
+    error "Tidak ada slot lama untuk di-rollback. Situs mati total!"
+  fi
+
+  cd "$PROJECT_DIR"
+  docker compose up -d "akl-${ACTIVE_SLOT}" || true
+
+  # Pastikan Nginx kembali ke slot lama
+  if [ -f "$NGINX_CONF" ]; then
+    cat > "$NGINX_CONF" <<EOF
+# Auto-generated oleh deploy-zero-downtime.sh (ROLLBACK)
+# Slot aktif: ${ACTIVE_SLOT^^} — $(date '+%Y-%m-%d %H:%M:%S')
+upstream akl_backend {
+    server 127.0.0.1:${ACTIVE_PORT};
+}
+EOF
+    nginx -t 2>/dev/null && nginx -s reload || true
+  fi
+
+  # Bersihkan slot yang gagal
+  docker stop "akl-${INACTIVE_SLOT}" 2>/dev/null || true
+  docker rm "akl-${INACTIVE_SLOT}" 2>/dev/null || true
+
+  warn "Rollback ke ${ACTIVE_SLOT^^} selesai. Situs kembali online dengan versi lama."
+  error "Deploy GAGAL — Rollback berhasil. Pipeline dihentikan."
+}
+
+# =============================================================
 # LANGKAH 2: Nyalakan slot baru dengan image terbaru
 # =============================================================
 start_new_slot() {
@@ -73,11 +105,9 @@ start_new_slot() {
 
   cd "$PROJECT_DIR"
 
-  # Pastikan kontainer lama dari slot target sudah berhenti
   docker stop "akl-${INACTIVE_SLOT}" 2>/dev/null || true
   docker rm "akl-${INACTIVE_SLOT}" 2>/dev/null || true
 
-  # Nyalakan hanya service yang dibutuhkan
   docker compose up -d "akl-${INACTIVE_SLOT}"
 
   success "Slot ${INACTIVE_SLOT^^} dimulai. Menunggu healthcheck..."
@@ -89,12 +119,23 @@ start_new_slot() {
 wait_for_healthy() {
   log "🏥 Menunggu slot ${INACTIVE_SLOT^^} menjadi HEALTHY..."
 
-  MAX_WAIT=120  # Maksimal 120 detik (2 menit)
+  MAX_WAIT=180
   ELAPSED=0
-  INTERVAL=3
+  INTERVAL=5
 
   while [ $ELAPSED -lt $MAX_WAIT ]; do
     HEALTH=$(docker inspect -f '{{.State.Health.Status}}' "akl-${INACTIVE_SLOT}" 2>/dev/null || echo "unknown")
+    RUNNING=$(docker inspect -f '{{.State.Running}}' "akl-${INACTIVE_SLOT}" 2>/dev/null || echo "false")
+
+    # Jika kontainer crash, langsung rollback
+    if [ "$RUNNING" = "false" ]; then
+      echo ""
+      warn "Kontainer ${INACTIVE_SLOT^^} crash!"
+      echo "--- Log terakhir kontainer ---"
+      docker logs --tail 30 "akl-${INACTIVE_SLOT}" 2>/dev/null || true
+      echo "------------------------------"
+      rollback
+    fi
 
     if [ "$HEALTH" = "healthy" ]; then
       success "Slot ${INACTIVE_SLOT^^} HEALTHY setelah ${ELAPSED} detik! 🎉"
@@ -107,7 +148,8 @@ wait_for_healthy() {
   done
 
   echo ""
-  error "Slot ${INACTIVE_SLOT^^} GAGAL healthy dalam ${MAX_WAIT} detik. Deployment dibatalkan!"
+  warn "Slot ${INACTIVE_SLOT^^} GAGAL healthy dalam ${MAX_WAIT} detik. Melakukan rollback..."
+  rollback
 }
 
 # =============================================================
@@ -116,7 +158,6 @@ wait_for_healthy() {
 switch_nginx() {
   log "🔄 Mengalihkan Nginx ke slot ${INACTIVE_SLOT^^} (port ${INACTIVE_PORT})..."
 
-  # Tulis ulang konfigurasi upstream
   cat > "$NGINX_CONF" <<EOF
 # Auto-generated oleh deploy-zero-downtime.sh
 # Slot aktif: ${INACTIVE_SLOT^^} — $(date '+%Y-%m-%d %H:%M:%S')
@@ -125,12 +166,12 @@ upstream akl_backend {
 }
 EOF
 
-  # Test konfigurasi Nginx sebelum reload
   if nginx -t 2>/dev/null; then
     nginx -s reload
     success "Nginx berhasil di-reload → upstream ke port ${INACTIVE_PORT}"
   else
-    error "Konfigurasi Nginx GAGAL! Tidak jadi reload. Periksa konfigurasi manual."
+    warn "Konfigurasi Nginx GAGAL! Rollback..."
+    rollback
   fi
 }
 
@@ -144,13 +185,9 @@ stop_old_slot() {
   fi
 
   log "🛑 Mematikan slot lama ${ACTIVE_SLOT^^}..."
-
-  # Beri sedikit waktu untuk request yang sedang in-flight
-  sleep 2
-
+  sleep 3
   docker stop "akl-${ACTIVE_SLOT}" 2>/dev/null || true
   docker rm "akl-${ACTIVE_SLOT}" 2>/dev/null || true
-
   success "Slot lama ${ACTIVE_SLOT^^} dimatikan."
 }
 
@@ -164,11 +201,11 @@ cleanup() {
 }
 
 # =============================================================
-# MAIN: Jalankan semua langkah
+# MAIN
 # =============================================================
 echo ""
 echo "=========================================================="
-echo "   🚀 AKL App — Zero-Downtime Blue-Green Deployment"
+echo "   🚀 AKL App — Zero-Downtime Blue-Green Deployment v2"
 echo "=========================================================="
 echo ""
 
@@ -187,6 +224,5 @@ echo "   Slot aktif sekarang: ${INACTIVE_SLOT^^} (port ${INACTIVE_PORT})"
 echo "=========================================================="
 echo ""
 
-# Tampilkan status akhir
 docker ps --filter "name=akl-" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 echo ""
