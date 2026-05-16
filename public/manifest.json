@@ -34,5 +34,21 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/screenshot-mobile.png",
+      "type": "image/png",
+      "sizes": "540x960",
+      "form_factor": "narrow",
+      "label": "Dashboard Studio AKL di Mobile"
+    },
+    {
+      "src": "/screenshots/screenshot-desktop.png",
+      "type": "image/png",
+      "sizes": "1280x800",
+      "form_factor": "wide",
+      "label": "Dashboard Studio AKL di Desktop"
+    }
   ]
 }
