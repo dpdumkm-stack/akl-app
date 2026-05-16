@@ -168,7 +168,7 @@ export default function QuotationArchivePage() {
             <div className="col-span-2 text-right">Aksi</div>
           </div>
 
-          <div className="divide-y divide-white/[0.03]">
+          <div className="flex flex-col gap-5 p-4 md:p-0 md:block md:divide-y md:divide-white/[0.03]">
             {loading ? (
               <div className="py-20 flex flex-col items-center gap-4">
                 <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -182,15 +182,15 @@ export default function QuotationArchivePage() {
                  <p className="text-slate-600 font-medium italic">Tidak ada data penawaran yang ditemukan.</p>
               </div>
             ) : displayData.map(q => (
-              <div key={q.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center px-8 py-6 hover:bg-white/[0.02] transition-all group">
+              <div key={q.id} className="grid grid-cols-2 md:grid-cols-12 gap-y-6 gap-x-4 md:gap-4 md:items-center p-6 md:px-8 md:py-6 bg-slate-900/60 md:bg-transparent rounded-[32px] md:rounded-none border border-white/5 md:border-none hover:bg-white/[0.02] transition-all group shadow-2xl md:shadow-none">
                 {/* Client Info */}
-                <div className="col-span-4 flex items-center gap-5">
-                   <div className="w-12 h-12 rounded-2xl bg-slate-950 border border-white/5 flex items-center justify-center text-xs font-black text-slate-500 group-hover:border-blue-500/30 group-hover:text-blue-400 transition-all uppercase">
+                <div className="col-span-2 md:col-span-4 flex items-start sm:items-center gap-4">
+                   <div className="w-12 h-12 flex-shrink-0 rounded-2xl bg-slate-950 border border-white/5 flex items-center justify-center text-xs font-black text-slate-500 group-hover:border-blue-500/30 group-hover:text-blue-400 transition-all uppercase">
                       {q.namaKlien?.substring(0, 2)}
                    </div>
-                   <div className="min-w-0">
-                      <h4 className="text-sm font-bold text-slate-200 truncate group-hover:text-white transition-colors">{q.namaKlien}</h4>
-                      <div className="flex items-center gap-3 mt-1">
+                   <div className="min-w-0 flex-1">
+                      <h4 className="text-sm font-bold text-slate-200 truncate group-hover:text-white transition-colors leading-relaxed">{q.namaKlien}</h4>
+                      <div className="flex flex-wrap items-center gap-2 mt-1.5">
                         {q.isInvoiced && (
                           <span className="flex items-center gap-1 text-[8px] font-black text-emerald-500 uppercase tracking-widest px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20">
                             Terbit Invoice
@@ -202,33 +202,37 @@ export default function QuotationArchivePage() {
                 </div>
 
                 {/* ID */}
-                <div className="col-span-2 text-center">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Surat</p>
-                  <p className="text-[10px] font-medium text-slate-600 truncate">{q.nomorSurat}</p>
+                <div className="col-span-1 md:col-span-2 text-left md:text-center">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Nomor Surat</p>
+                  <p className="text-[11px] md:text-[10px] font-medium text-slate-300 md:text-slate-600 truncate">{q.nomorSurat}</p>
                 </div>
 
                 {/* Date */}
-                <div className="col-span-2 text-center flex flex-col items-center">
-                   <Calendar className="w-3.5 h-3.5 text-slate-700 mb-1" />
-                   <p className="text-[10px] font-bold text-slate-400 uppercase">{new Date(q.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                <div className="col-span-1 md:col-span-2 text-right md:text-center flex flex-col md:items-center">
+                   <Calendar className="w-3.5 h-3.5 text-slate-700 hidden md:block mb-1" />
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5 md:hidden">Tanggal</p>
+                   <p className="text-[11px] md:text-[10px] font-bold text-slate-300 md:text-slate-400 uppercase">{new Date(q.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                 </div>
 
                 {/* Amount */}
-                <div className="col-span-2 text-right">
-                   <p className="text-xs font-black text-blue-500">{fmt(q.totalHarga)}</p>
-                   <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Net Total</p>
+                <div className="col-span-2 md:col-span-2 bg-slate-950 md:bg-transparent p-4 md:p-0 rounded-2xl md:rounded-none border border-white/5 md:border-none flex items-center justify-between md:block md:text-right">
+                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest md:hidden">Total Harga</p>
+                   <div className="text-right">
+                     <p className="text-sm md:text-xs font-black text-blue-500">{fmt(q.totalHarga)}</p>
+                     <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest hidden md:block mt-0.5">Net Total</p>
+                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="col-span-2 flex justify-end gap-1">
-                  <div className="flex items-center gap-1.5">
+                <div className="col-span-2 md:col-span-2 flex flex-col justify-center pt-2 md:pt-0 border-t border-white/5 md:border-none">
+                  <div className="flex flex-wrap items-center gap-2 w-full md:justify-end">
                     {/* PRINT VIEW (INLINE PDF) */}
                     <button 
                       onClick={() => window.open(`/api/pdf?id=${q.id}&mode=inline`, '_blank')}
-                      className="p-2 bg-slate-950 hover:bg-blue-600/10 text-slate-600 hover:text-blue-400 rounded-lg transition-all border border-white/5" 
+                      className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-blue-600/10 text-slate-600 hover:text-blue-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95" 
                       title="Cetak"
                     >
-                      <Printer className="w-3.5 h-3.5" />
+                      <Printer className="w-4 h-4 md:w-3.5 md:h-3.5" />
                     </button>
 
                     {/* DOWNLOAD PDF */}
@@ -279,37 +283,37 @@ export default function QuotationArchivePage() {
                             showToast("Gagal mengunduh PDF", "error");
                           });
                       }}
-                      className="p-2 bg-slate-950 hover:bg-indigo-600/10 text-slate-600 hover:text-indigo-400 rounded-lg transition-all border border-white/5" 
+                      className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-indigo-600/10 text-slate-600 hover:text-indigo-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95" 
                       title="Download PDF"
                     >
-                      <Download className="w-3.5 h-3.5" />
+                      <Download className="w-4 h-4 md:w-3.5 md:h-3.5" />
                     </button>
 
                     {!q.isInvoiced && (
                       <button 
                         onClick={() => handleConvertToInvoice(q.id, q.namaKlien)}
-                        className="p-2 bg-slate-950 hover:bg-emerald-600/10 text-slate-600 hover:text-emerald-400 rounded-lg transition-all border border-white/5"
+                        className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-emerald-600/10 text-slate-600 hover:text-emerald-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95"
                         title="Terbitkan Invoice"
                       >
-                        <Receipt className="w-3.5 h-3.5" />
+                        <Receipt className="w-4 h-4 md:w-3.5 md:h-3.5" />
                       </button>
                     )}
 
                     <button 
                       onClick={() => router.push(`/quotations/edit/${q.id}`)}
-                      className="p-2 bg-slate-950 hover:bg-amber-600/10 text-slate-600 hover:text-amber-400 rounded-lg transition-all border border-white/5"
+                      className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-amber-600/10 text-slate-600 hover:text-amber-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95"
                       title="Edit"
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
+                      <Edit2 className="w-4 h-4 md:w-3.5 md:h-3.5" />
                     </button>
 
                     {(session?.user as any)?.role === "OWNER" && (
                       <button 
                         onClick={() => handleDelete(q.id, q.nomorSurat)}
-                        className="p-2 bg-slate-950 hover:bg-red-600/10 text-slate-600 hover:text-red-400 rounded-lg transition-all border border-white/5"
+                        className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-red-600/10 text-slate-600 hover:text-red-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95"
                         title="Hapus"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4 md:w-3.5 md:h-3.5" />
                       </button>
                     )}
                   </div>
