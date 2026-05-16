@@ -29,29 +29,27 @@
     }
 }
 
-/* SCSA Styling - Scrollbar Modern */
+/* SCSA Styling - Stealth Scrollbar Modern (Dark Mode) */
 ::-webkit-scrollbar,
 .custom-scrollbar::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track,
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f8fafc;
-    border-radius: 10px;
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb,
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #334155;
     border-radius: 10px;
-    border: 3px solid #f8fafc;
 }
 
 ::-webkit-scrollbar-thumb:hover,
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #475569;
 }
 
 /* SCSA FIX: Arsitektur A4 Presisi Mutlak B2B (794px x 1123px) */

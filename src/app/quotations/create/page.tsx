@@ -45,7 +45,6 @@ export default function CreateQuotationPage() {
   const [data, setData] = useState<QuotationData>(emptyQuotation());
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit');
   const [printProgress, setPrintProgress] = useState(0);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<any>(null);
@@ -165,18 +164,20 @@ export default function CreateQuotationPage() {
               <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none">Studio Drafting v3.0</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
              <button 
                 onClick={() => router.push("/dashboard")}
-                className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 border border-white/5"
+                className="px-3 sm:px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 border border-white/5"
+                title="Dashboard"
               >
-                <LayoutDashboard className="w-4 h-4" /> Dashboard
+                <LayoutDashboard className="w-4 h-4" /> <span className="hidden sm:inline">Dashboard</span>
               </button>
              <button 
                 onClick={handleSave} disabled={isSaving}
-                className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-blue-900/20"
+                className="px-4 sm:px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20"
+                title="Simpan Penawaran"
               >
-                {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Simpan Penawaran
+                {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} <span className="hidden sm:inline">Simpan Penawaran</span>
               </button>
           </div>
         </div>
@@ -185,7 +186,7 @@ export default function CreateQuotationPage() {
       <main className="max-w-[1800px] mx-auto px-4 lg:px-6 py-4 lg:py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
            {/* Editor */}
-           <div className={`space-y-6 h-[calc(100vh-140px)] overflow-y-auto pr-2 custom-scrollbar pb-10 ${viewMode === 'preview' ? 'hidden lg:block' : 'block'}`}>
+           <div className="space-y-6 h-[calc(100dvh-100px)] lg:h-[calc(100vh-140px)] overflow-y-auto pr-2 custom-scrollbar pb-10 block">
                 <FormEditor 
                   data={data} 
                   setData={setData} 
@@ -197,11 +198,21 @@ export default function CreateQuotationPage() {
                   globalTTDUrl={globalTTD}
                   isSaving={isSaving}
                   isGeneratingPDF={isGeneratingPDF}
+                  previewComponent={
+                    <DocumentPreviewStudio title="Quotation Preview" initialZoom={0.75}>
+                        <A4Preview 
+                          data={data} 
+                          isGeneratingPDF={false} 
+                          globalLogoUrl={globalLogo}
+                          globalTTDUrl={globalTTD}
+                        />
+                    </DocumentPreviewStudio>
+                  }
                />
             </div>
            
            {/* Studio Preview */}
-           <div className={`h-[calc(100vh-140px)] ${viewMode === 'edit' ? 'hidden lg:block' : 'block'}`}>
+           <div className="hidden lg:block h-[calc(100vh-140px)]">
               <DocumentPreviewStudio title="Quotation Preview" initialZoom={0.75}>
                   <A4Preview 
                     data={data} 
@@ -213,14 +224,6 @@ export default function CreateQuotationPage() {
            </div>
         </div>
       </main>
-
-      {/* Mobile Toggle */}
-      <button 
-        onClick={() => setViewMode(viewMode === 'edit' ? 'preview' : 'edit')}
-        className="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center z-[60] active:scale-90 transition-transform"
-      >
-        {viewMode === 'edit' ? <Eye className="w-6 h-6" /> : <Edit3 className="w-6 h-6" />}
-      </button>
 
       {toast && (
         <div className={`fixed bottom-8 right-8 pl-8 pr-6 py-5 rounded-[24px] shadow-2xl z-[100] flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500 ${toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'} text-white border border-white/20 backdrop-blur-md`}>

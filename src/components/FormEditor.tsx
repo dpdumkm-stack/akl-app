@@ -5,7 +5,7 @@ import { QuotationData } from "@/lib/types";
 import { formatCurrency, formatInputNumber, parseInputNumber, getUniqueId } from "@/lib/utils";
 import {
     Settings2, ToggleRight, ToggleLeft, History, Plus, Search, Loader2,
-    Trash2, Upload, Settings, BookmarkPlus, ChevronUp, Edit3, Phone, Save, Download, X, Clock
+    Trash2, Upload, Settings, BookmarkPlus, ChevronUp, Edit3, Phone, Save, Download, X, Clock, Eye
 } from "lucide-react";
 import { SIGNATORIES_BASE } from "@/lib/constants";
 import { saveMasterItem, getMasterItems, deleteMasterItem, saveGlobalSetting } from "@/app/actions";
@@ -28,11 +28,12 @@ interface FormEditorProps {
     setConfirmModal: (modal: any) => void;
     globalLogoUrl?: string | null;
     globalTTDUrl?: string | null;
+    previewComponent?: React.ReactNode;
 }
 
 export default function FormEditor({
     data, setData, isSaving, isGeneratingPDF, onSave, onDownloadPDF, viewMode = 'edit', showToast, setConfirmModal,
-    globalLogoUrl, globalTTDUrl
+    globalLogoUrl, globalTTDUrl, previewComponent
 }: FormEditorProps) {
 
 
@@ -47,6 +48,7 @@ export default function FormEditor({
         { id: 'biaya', label: 'Biaya', icon: <Settings2 className="w-4 h-4" /> },
         { id: 'syarat', label: 'Ketentuan', icon: <Clock className="w-4 h-4" /> },
         { id: 'ttd', label: 'Pengesahan', icon: <Phone className="w-4 h-4" /> },
+        { id: 'preview', label: 'Preview PDF', icon: <Eye className="w-4 h-4" />, mobileOnly: true },
     ];
 
     React.useEffect(() => {
@@ -199,12 +201,12 @@ export default function FormEditor({
     };
 
     return (
-        <div className={`lg:col-span-5 xl:col-span-4 flex flex-col h-full relative ${viewMode === 'preview' ? 'hidden lg:flex' : 'flex'} print:hidden`}>
+        <div className="lg:col-span-5 xl:col-span-4 flex flex-col h-full relative print:hidden">
             {/* TAB NAVIGATION - STICKY TOP */}
             <div className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-white/5 pb-2 mb-2 sm:mb-4">
-                <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-2 px-2 sm:px-0">
+                <div className="flex gap-2 overflow-x-auto custom-scrollbar py-3 px-3 sm:px-0">
                     {tabs.map(tab => (
-                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl text-[9px] sm:text-[10px] font-black transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 translate-y-[-2px]' : 'bg-slate-900 text-slate-500 hover:bg-slate-800 border border-white/5'}`}>
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 sm:px-5 py-3.5 rounded-xl text-[10px] sm:text-[11px] font-black transition-all whitespace-nowrap ${tab.mobileOnly ? 'lg:hidden' : ''} ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 translate-y-[-2px]' : 'bg-slate-900 text-slate-500 hover:bg-slate-800 border border-white/5'}`}>
                             {tab.icon} {tab.label}
                         </button>
                     ))}
@@ -278,16 +280,22 @@ export default function FormEditor({
                         globalTTDUrl={globalTTDUrl}
                     />
                 )}
+
+                {activeTab === 'preview' && (
+                    <div className="lg:hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        {previewComponent}
+                    </div>
+                )}
             </div>
 
             {/* ACTION FOOTER - FIXED POSITION AT BOTTOM (NOT OVERLAYING) */}
             <div className="pt-6 pb-2 border-t border-white/5 bg-slate-950">
-                <div className="flex gap-3">
+                <div className="flex flex-col-reverse md:flex-row gap-3">
                     <button 
                         type="button" 
                         onClick={onSave} 
                         disabled={isSaving} 
-                        className={`flex-1 bg-emerald-600/10 hover:bg-emerald-600 border border-emerald-500/20 hover:border-emerald-500 text-emerald-500 hover:text-white font-black py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
+                        className={`w-full md:w-auto md:flex-1 bg-emerald-600/10 hover:bg-emerald-600 border border-emerald-500/20 hover:border-emerald-500 text-emerald-500 hover:text-white font-black py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
                     >
                         {isSaving ? <Loader2 className="animate-spin w-5 h-5" /> : <Save className="w-5 h-5" />} 
                         <span className="uppercase tracking-[0.2em] text-[10px]">SIMPAN DRAF</span>
@@ -297,7 +305,7 @@ export default function FormEditor({
                         type="button" 
                         onClick={onDownloadPDF} 
                         disabled={isGeneratingPDF} 
-                        className={`flex-[1.5] bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isGeneratingPDF ? 'opacity-50 cursor-wait' : 'hover:shadow-blue-900/40 hover:translate-y-[-2px]'}`}
+                        className={`w-full md:w-auto md:flex-[1.5] bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 ${isGeneratingPDF ? 'opacity-50 cursor-wait' : 'hover:shadow-blue-900/40 hover:translate-y-[-2px]'}`}
                     >
                         {isGeneratingPDF ? <Loader2 className="animate-spin w-5 h-5" /> : <Download className="w-5 h-5" />} 
                         <span className="uppercase tracking-[0.2em] text-[10px]">SIMPAN & UNDUH PDF</span>
