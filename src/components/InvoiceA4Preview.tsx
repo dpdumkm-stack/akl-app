@@ -7,7 +7,6 @@ interface InvoiceA4PreviewProps {
     data: any;
     isGeneratingPDF: boolean;
     globalLogoUrl?: string | null;
-    globalTTDUrl?: string | null;
 }
 
 // ─── Terbilang (Indonesian Number-to-Words) ──────────────────────────────────
@@ -52,23 +51,23 @@ function terbilang(n: number): string {
   return result.trim() + ' Rupiah';
 }
 
-// ─── Currency formatter ───────────────────────────────────────────────────────
+// ─── Formatter ───────────────────────────────────────────────────────────
 const rp = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })
     .format(n).replace('IDR', 'Rp').replace('Rp', 'Rp ').replace(/\s+/, ' ');
 
-// ─── Date formatter ───────────────────────────────────────────────────────────
 const fmtDate = (d: string) =>
-  new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
-const fmtDateLong = (d: string) =>
-  new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }: InvoiceA4PreviewProps) => {
+const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl }: InvoiceA4PreviewProps) => {
   const pages = useMemo(() => calculatePages(data), [data]);
 
   // Financial calculations
-  const subtotal = (data.items || []).reduce((a: number, i: any) => a + (i.quantity * i.unitPrice), 0);
+  const subtotal = (data.items || []).reduce((acc: number, i: any) => {
+      const vol = Number(i.volume);
+      const price = Number(i.unitPrice) || 0;
+      return acc + (vol > 0 ? vol * price : price);
+  }, 0);
   const discountAmount = Number(data.discountAmount || 0);
   const dpp = subtotal - discountAmount;
   const taxAmount = data.taxApplied ? dpp * 0.11 : 0;
@@ -76,10 +75,6 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
   const dp = Number(data.downPayment || 0);
   const isDPMode = data.invoiceType === 'DP';
   const total = isDPMode ? dp : (grandTotal - dp);
-
-  const paymentDesc = data.notes
-    ? data.notes
-    : (data.items || []).map((i: any) => i.description).filter(Boolean).join('; ');
 
   return (
     <div id="print-area" style={{ width: '794px' }} className="flex flex-col items-center bg-transparent select-none">
@@ -105,195 +100,190 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
             }}
             className={`a4-page flex flex-col ${pageIndex > 0 ? 'pdf-page-break' : ''}`}
           >
-            <div style={{ height: '8px', backgroundColor: '#1e3a8a', width: '100%' }} />
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: pageIndex === 0 ? '14px 30px 10px 30px' : '10px 30px' }}>
+            {/* Kop Surat Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: pageIndex === 0 ? '25px 40px 15px 40px' : '20px 40px', borderBottom: '2px solid #1e3a8a' }}>
               <div style={{ flexShrink: 0 }}>
                 {(() => {
-                  const logoToDisplay = (data.logoUrl && data.logoUrl !== "" && data.logoUrl !== "null" && data.logoUrl !== "undefined") 
-                      ? data.logoUrl 
-                      : globalLogoUrl;
-                  
+                  const logoToDisplay = globalLogoUrl;
                   if (logoToDisplay && logoToDisplay !== "" && logoToDisplay !== "null" && logoToDisplay !== "undefined") {
                       return (
                           <img 
                             src={logoToDisplay} 
-                            style={{ maxHeight: pageIndex === 0 ? '80px' : '40px', maxWidth: '130px', objectFit: 'contain' }} 
+                            style={{ maxHeight: pageIndex === 0 ? '70px' : '40px', maxWidth: '140px', objectFit: 'contain' }} 
                             alt="Logo" 
                           />
                       );
                   }
-                  
                   return (
-                      <div style={{ width: pageIndex === 0 ? '90px' : '45px', height: pageIndex === 0 ? '80px' : '40px', backgroundColor: '#1e3a8a', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>AKL</div>
+                      <div style={{ width: pageIndex === 0 ? '90px' : '45px', height: pageIndex === 0 ? '70px' : '40px', backgroundColor: '#1e3a8a', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold' }}>AKL</div>
                   );
                 })()}
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <p style={{ margin: '0 0 2px 0', fontSize: pageIndex === 0 ? '22px' : '14px', fontWeight: '900', color: '#1e3a8a', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                <p style={{ margin: '0 0 4px 0', fontSize: pageIndex === 0 ? '24px' : '16px', fontWeight: '900', color: '#1e3a8a', letterSpacing: '1px', textTransform: 'uppercase' }}>
                   PT. Apindo Karya Lestari
                 </p>
                 {pageIndex === 0 ? (
                   <>
-                    <p style={{ margin: '0 0 6px 0', fontSize: '10px', fontWeight: 'bold', color: '#1e3a8a', letterSpacing: '3px', textTransform: 'uppercase' }}>
+                    <p style={{ margin: '0 0 6px 0', fontSize: '11px', fontWeight: 'bold', color: '#dc2626', letterSpacing: '3px', textTransform: 'uppercase' }}>
                       Spesialis Epoxy Lantai Sejak 1987
                     </p>
-                    <p style={{ margin: '0', fontSize: '10px', color: '#333' }}>
+                    <p style={{ margin: '0 0 2px 0', fontSize: '11px', color: '#333' }}>
                       Jl. Raya Serpong KM.15 Ruko 17A, Tangerang Selatan
                     </p>
-                    <p style={{ margin: '0', fontSize: '10px', color: '#333' }}>
-                      Telp: (021) 5316 2972 | Email: apindokl@gmail.com | Web: www.apindokl.co.id
+                    <p style={{ margin: '0', fontSize: '11px', color: '#333' }}>
+                      Telp: (021) 5316 2972 | Email: apindokl@gmail.com
                     </p>
                   </>
                 ) : (
-                  <p style={{ margin: '0', fontSize: '9px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase' }}>
+                  <p style={{ margin: '0', fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase' }}>
                     Invoice: {data.invoiceNumber} — Hal {pageIndex + 1}
                   </p>
                 )}
               </div>
             </div>
 
-            <div style={{ height: '4px', backgroundColor: '#1e3a8a', width: '100%' }} />
-            <div style={{ height: '2px', backgroundColor: '#dc2626', width: '100%', marginBottom: '0' }} />
-
+            {/* Dokumen Info (Hanya di Halaman Pertama) */}
             {page.isFirstPage && (
-              <>
-                <div style={{ display: 'flex', padding: '20px 30px 15px 30px', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <p style={{ margin: 0, fontSize: '18px', fontWeight: '900', letterSpacing: '4px', textDecoration: 'underline', color: '#1e3a8a' }}>
-                      KWITANSI
-                    </p>
-                    <p style={{ margin: '4px 0 0 0', fontSize: '11px', fontStyle: 'italic', color: '#555', letterSpacing: '2px', backgroundColor: '#f1f5f9', padding: '2px 10px', borderRadius: '4px' }}>
-                      RECEIPT
-                    </p>
+              <div style={{ padding: '30px 40px 15px 40px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '25px' }}>
+                  <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '900', letterSpacing: '4px', textDecoration: 'underline', color: '#0f172a' }}>
+                    INVOICE / FAKTUR TAGIHAN
+                  </h1>
+                  {data.invoiceType === 'DP' && (
+                     <p style={{ margin: '5px 0 0 0', fontSize: '12px', fontWeight: 'bold', color: '#dc2626', letterSpacing: '1px' }}>
+                       (TAGIHAN UANG MUKA)
+                     </p>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  {/* Kiri: Kepada Yth */}
+                  <div style={{ width: '55%', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '12px', backgroundColor: '#f8fafc' }}>
+                    <p style={{ margin: '0 0 5px 0', fontSize: '11px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>Ditagihkan Kepada:</p>
+                    <p style={{ margin: '0 0 2px 0', fontSize: '14px', fontWeight: '900', color: '#0f172a', textTransform: 'uppercase' }}>{data.companyName || '---'}</p>
+                    {data.clientName && (
+                        <p style={{ margin: '0 0 6px 0', fontSize: '12px', fontWeight: 'bold', color: '#334155' }}>U.P: {data.clientName}</p>
+                    )}
+                    <p style={{ margin: 0, fontSize: '11px', color: '#475569', lineHeight: '1.4' }}>{data.clientAddress || '-'}</p>
                   </div>
-                  <div style={{ width: '260px', fontSize: '11px' }}>
-                    <table style={{ borderCollapse: 'collapse', width: '100%', border: '1px solid #cbd5e1' }}>
+
+                  {/* Kanan: Info Invoice */}
+                  <div style={{ width: '40%' }}>
+                    <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '11px' }}>
                       <tbody>
                         <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                          <td style={{ padding: '4px 8px', fontWeight: 'bold', whiteSpace: 'nowrap', backgroundColor: '#f8fafc', width: '80px' }}>No</td>
-                          <td style={{ padding: '4px 8px' }}>: <span style={{ fontWeight: 'bold', color: '#dc2626' }}>{data.invoiceNumber}</span></td>
+                          <td style={{ padding: '6px', fontWeight: 'bold', width: '90px' }}>No. Invoice</td>
+                          <td style={{ padding: '6px', fontWeight: '900', color: '#0f172a' }}>: {data.invoiceNumber}</td>
                         </tr>
                         <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                          <td style={{ padding: '4px 8px', fontWeight: 'bold', whiteSpace: 'nowrap', backgroundColor: '#f8fafc' }}>Tgl <span style={{ fontStyle: 'italic', color: '#94a3b8', fontSize: '9px', fontWeight: 'normal' }}>(Date)</span></td>
-                          <td style={{ padding: '4px 8px' }}>: {fmtDate(data.date)}</td>
+                          <td style={{ padding: '6px', fontWeight: 'bold' }}>Tgl Terbit</td>
+                          <td style={{ padding: '6px' }}>: {fmtDate(data.date)}</td>
                         </tr>
                         <tr>
-                          <td style={{ padding: '4px 8px', fontWeight: 'bold', whiteSpace: 'nowrap', backgroundColor: '#f8fafc' }}>Jatuh Tempo</td>
-                          <td style={{ padding: '4px 8px' }}>: {data.dueDate ? fmtDate(data.dueDate) : fmtDate(data.date)}</td>
+                          <td style={{ padding: '6px', fontWeight: 'bold' }}>Jatuh Tempo</td>
+                          <td style={{ padding: '6px', fontWeight: 'bold', color: '#dc2626' }}>: {data.dueDate ? fmtDate(data.dueDate) : fmtDate(data.date)}</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
                 </div>
-
-                <div style={{ margin: '0 20px', borderTop: '1px solid #333' }} />
-
-                <div style={{ padding: '15px 30px', fontSize: '13px' }}>
-                  <table style={{ width: '100%', marginBottom: '12px', borderCollapse: 'collapse' }}>
-                    <tbody>
-                      <tr style={{ verticalAlign: 'top' }}>
-                        <td style={{ width: '170px', paddingTop: '6px' }}>
-                          <span style={{ fontWeight: 'bold' }}>Sudah Terima Dari</span><br />
-                          <span style={{ fontStyle: 'italic', fontSize: '10px', color: '#64748b' }}>Received From</span>
-                        </td>
-                        <td style={{ width: '20px', fontWeight: 'bold', paddingTop: '6px' }}>:</td>
-                        <td style={{ borderBottom: '1px dotted #94a3b8', padding: '6px 10px', backgroundColor: '#f8fafc' }}>
-                          <span style={{ fontWeight: '900', fontSize: '13px', textTransform: 'uppercase' }}>{data.clientName || '---'}</span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <table style={{ width: '100%', marginBottom: '12px', borderCollapse: 'collapse' }}>
-                    <tbody>
-                      <tr style={{ verticalAlign: 'top' }}>
-                        <td style={{ width: '170px', paddingTop: '6px' }}>
-                          <span style={{ fontWeight: 'bold' }}>Banyaknya Uang</span><br />
-                          <span style={{ fontStyle: 'italic', fontSize: '10px', color: '#64748b' }}>The Amount Of</span>
-                        </td>
-                        <td style={{ width: '20px', fontWeight: 'bold', paddingTop: '6px' }}>:</td>
-                        <td style={{ borderBottom: '1px dotted #94a3b8', padding: '6px 10px', fontWeight: 'bold', fontStyle: 'italic', fontSize: '12px', backgroundColor: '#f8fafc', lineHeight: '1.6' }}>
-                          ## {terbilang(total)} ##
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <table style={{ width: '100%', marginBottom: '5px', borderCollapse: 'collapse' }}>
-                    <tbody>
-                      <tr style={{ verticalAlign: 'top' }}>
-                        <td style={{ width: '170px', paddingTop: '6px' }}>
-                          <span style={{ fontWeight: 'bold' }}>Untuk Pembayaran</span><br />
-                          <span style={{ fontStyle: 'italic', fontSize: '10px', color: '#64748b' }}>For Payment Of</span>
-                        </td>
-                        <td style={{ width: '20px', fontWeight: 'bold', paddingTop: '6px' }}>:</td>
-                        <td style={{ borderBottom: '1px dotted #94a3b8', padding: '6px 10px', fontWeight: '600', fontSize: '12px', backgroundColor: '#f8fafc', lineHeight: '1.6' }}>
-                          {paymentDesc || '-'}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div style={{ margin: '0 20px', borderTop: '1px solid #333' }} />
-              </>
+              </div>
             )}
 
-            <div style={{ padding: page.isFirstPage ? '5px 30px 15px 30px' : '20px 30px 15px 30px', flexGrow: 1 }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', border: '1px solid #e2e8f0' }}>
-                <thead style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1' }}>
+            {/* Tabel Item */}
+            <div style={{ padding: page.isFirstPage ? '10px 40px 15px 40px' : '25px 40px 15px 40px', flexGrow: 1 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', border: '1px solid #0f172a' }}>
+                <thead style={{ backgroundColor: '#1e3a8a', color: 'white' }}>
                   <tr>
-                    <td style={{ padding: '6px 12px', fontWeight: 'bold' }}>Deskripsi</td>
-                    <td colSpan={2} style={{ padding: '6px 12px', fontWeight: 'bold', textAlign: 'right' }}>Jumlah</td>
+                    <th style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', width: '40px', textAlign: 'center' }}>NO</th>
+                    <th style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', textAlign: 'left' }}>URAIAN PEKERJAAN & BAHAN</th>
+                    <th style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', width: '50px', textAlign: 'center' }}>VOL</th>
+                    <th style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', width: '60px', textAlign: 'center' }}>SATUAN</th>
+                    <th style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', width: '90px', textAlign: 'right' }}>HARGA/SAT</th>
+                    <th style={{ padding: '8px 10px', width: '100px', textAlign: 'right' }}>TOTAL</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(page.items || []).map((item: any, idx: number) => (
-                    <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '5px 12px', textAlign: 'left', width: '60%' }}>
-                        {item.description}
-                      </td>
-                      <td style={{ padding: '5px 12px', textAlign: 'right', width: '10%' }}>Rp</td>
-                      <td style={{ padding: '5px 12px', textAlign: 'right', width: '20%', minWidth: '100px' }}>
-                        {rp(item.quantity * item.unitPrice).replace('Rp ', '')}
-                      </td>
-                    </tr>
-                  ))}
+                  {(page.items || []).map((item: any, idx: number) => {
+                      const vol = Number(item.volume);
+                      const price = Number(item.unitPrice) || 0;
+                      const lineTotal = vol > 0 ? vol * price : price;
 
+                      return (
+                        <tr key={idx} style={{ borderBottom: '1px solid #cbd5e1' }}>
+                          <td style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', textAlign: 'center', verticalAlign: 'top' }}>
+                            {startIdx + idx + 1}
+                          </td>
+                          <td style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', textAlign: 'left', verticalAlign: 'top', whiteSpace: 'pre-wrap' }}>
+                            {item.description}
+                          </td>
+                          <td style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', textAlign: 'center', verticalAlign: 'top' }}>
+                            {item.volume ? Number(item.volume).toLocaleString('id-ID') : '-'}
+                          </td>
+                          <td style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', textAlign: 'center', verticalAlign: 'top' }}>
+                            {item.satuan || '-'}
+                          </td>
+                          <td style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', textAlign: 'right', verticalAlign: 'top' }}>
+                            {rp(price).replace('Rp', '')}
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', verticalAlign: 'top', fontWeight: 'bold' }}>
+                            {rp(lineTotal).replace('Rp', '')}
+                          </td>
+                        </tr>
+                      )
+                  })}
+
+                  {/* Summary Section at the bottom of the last page */}
                   {page.hasSummary && (
                     <>
-                      <tr style={{ borderTop: '1px solid #cbd5e1' }}>
-                        <td style={{ padding: '5px 12px', textAlign: 'right', fontWeight: 'bold' }}>Subtotal =</td>
-                        <td style={{ padding: '5px 12px', textAlign: 'right' }}>Rp</td>
-                        <td style={{ padding: '5px 12px', textAlign: 'right', fontWeight: 'bold' }}>{rp(subtotal).replace('Rp ', '')}</td>
+                      <tr style={{ borderTop: '2px solid #0f172a' }}>
+                        <td colSpan={4} rowSpan={isDPMode || dp > 0 || discountAmount > 0 || data.taxApplied ? 5 : 2} style={{ padding: '12px 15px', borderRight: '1px solid #0f172a', verticalAlign: 'top', backgroundColor: '#f8fafc' }}>
+                           <div style={{ border: '1px solid #94a3b8', padding: '10px', backgroundColor: 'white', borderRadius: '4px' }}>
+                               <p style={{ margin: '0 0 4px 0', fontSize: '9px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase' }}>Terbilang Rupiah:</p>
+                               <p style={{ margin: 0, fontSize: '11px', fontWeight: '900', fontStyle: 'italic', lineHeight: '1.4' }}>
+                                 ## {terbilang(total).toUpperCase()} ##
+                               </p>
+                           </div>
+                        </td>
+                        <td style={{ padding: '6px 10px', borderRight: '1px solid #0f172a', textAlign: 'right', fontWeight: 'bold', backgroundColor: '#f1f5f9' }}>Subtotal</td>
+                        <td style={{ padding: '6px 10px', textAlign: 'right', fontWeight: 'bold', backgroundColor: '#f1f5f9' }}>{rp(subtotal).replace('Rp', '')}</td>
                       </tr>
+                      
                       {discountAmount > 0 && (
                         <tr>
-                          <td style={{ padding: '5px 12px', textAlign: 'right', color: '#dc2626' }}>Diskon =</td>
-                          <td style={{ padding: '5px 12px', textAlign: 'right', color: '#dc2626' }}>- Rp</td>
-                          <td style={{ padding: '5px 12px', textAlign: 'right', color: '#dc2626' }}>{rp(discountAmount).replace('Rp ', '')}</td>
+                          <td style={{ padding: '6px 10px', borderRight: '1px solid #0f172a', textAlign: 'right', fontWeight: 'bold', color: '#dc2626' }}>Diskon</td>
+                          <td style={{ padding: '6px 10px', textAlign: 'right', fontWeight: 'bold', color: '#dc2626' }}>- {rp(discountAmount).replace('Rp', '')}</td>
                         </tr>
                       )}
+                      
                       {data.taxApplied && (
                         <>
                           <tr>
-                            <td style={{ padding: '5px 12px', textAlign: 'right' }}>DPP =</td>
-                            <td style={{ padding: '5px 12px', textAlign: 'right' }}>Rp</td>
-                            <td style={{ padding: '5px 12px', textAlign: 'right' }}>{rp(dpp).replace('Rp ', '')}</td>
+                            <td style={{ padding: '6px 10px', borderRight: '1px solid #0f172a', textAlign: 'right', fontWeight: 'bold' }}>DPP</td>
+                            <td style={{ padding: '6px 10px', textAlign: 'right', fontWeight: 'bold' }}>{rp(dpp).replace('Rp', '')}</td>
                           </tr>
                           <tr>
-                            <td style={{ padding: '5px 12px', textAlign: 'right' }}>PPN 11% =</td>
-                            <td style={{ padding: '5px 12px', textAlign: 'right' }}>Rp</td>
-                            <td style={{ padding: '5px 12px', textAlign: 'right' }}>{rp(taxAmount).replace('Rp ', '')}</td>
+                            <td style={{ padding: '6px 10px', borderRight: '1px solid #0f172a', textAlign: 'right', fontWeight: 'bold' }}>PPN 11%</td>
+                            <td style={{ padding: '6px 10px', textAlign: 'right', fontWeight: 'bold' }}>{rp(taxAmount).replace('Rp', '')}</td>
                           </tr>
                         </>
                       )}
+
+                      {dp > 0 && !isDPMode && (
+                        <tr>
+                          <td style={{ padding: '6px 10px', borderRight: '1px solid #0f172a', textAlign: 'right', fontWeight: 'bold', color: '#d97706' }}>DP Dibayar</td>
+                          <td style={{ padding: '6px 10px', textAlign: 'right', fontWeight: 'bold', color: '#d97706' }}>- {rp(dp).replace('Rp', '')}</td>
+                        </tr>
+                      )}
+
                       <tr>
-                        <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: '900', fontSize: '12px', backgroundColor: '#f8fafc', borderTop: '1px solid #cbd5e1' }}>
-                          {isDPMode ? 'Tagihan Uang Muka (DP) =' : (dp > 0 ? 'Sisa Tagihan =' : 'Total Tagihan =')}
+                        <td style={{ padding: '8px 10px', borderRight: '1px solid #0f172a', textAlign: 'right', fontWeight: '900', backgroundColor: '#1e3a8a', color: 'white', fontSize: '12px' }}>
+                          {isDPMode ? 'TOTAL DP' : (dp > 0 ? 'SISA TAGIHAN' : 'GRAND TOTAL')}
                         </td>
-                        <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: '900', backgroundColor: '#f8fafc', borderTop: '1px solid #cbd5e1' }}>Rp</td>
-                        <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: '900', fontSize: '12px', backgroundColor: '#f8fafc', borderTop: '1px solid #cbd5e1' }}>
-                          {rp(total).replace('Rp ', '')}
+                        <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: '900', backgroundColor: '#1e3a8a', color: 'white', fontSize: '12px' }}>
+                          {rp(total)}
                         </td>
                       </tr>
                     </>
@@ -302,40 +292,42 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl, globalTTDUrl }
               </table>
             </div>
 
+            {/* Footer: Rekening & Tanda Tangan */}
             {page.showFooter && (
-              <>
-                <div style={{ margin: '0 30px', borderTop: '2px solid #e2e8f0' }} />
-                <div style={{ padding: '18px 30px 24px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ marginBottom: '14px' }}>
-                      <p style={{ margin: '0 0 2px 0', fontSize: '9px', fontWeight: '700', color: '#64748b', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Jumlah Tagihan</p>
-                      <p style={{ margin: 0, fontSize: '26px', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.5px', lineHeight: 1 }}>{rp(total)}</p>
-                    </div>
-                    <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
-                      <p style={{ margin: '0 0 8px 0', fontSize: '9px', fontWeight: '800', color: '#94a3b8', letterSpacing: '2px', textTransform: 'uppercase' }}>Rekening Pembayaran</p>
-                      <div style={{ display: 'flex', alignItems: 'stretch', gap: '0' }}>
-                        <div style={{ width: '4px', backgroundColor: '#1e3a8a', borderRadius: '4px 0 0 4px', flexShrink: 0 }} />
-                        <div style={{ padding: '10px 14px', backgroundColor: '#f8fafc', borderRadius: '0 6px 6px 0', border: '1px solid #e2e8f0', borderLeft: 'none' }}>
-                          <p style={{ fontSize: '11px', fontWeight: '800', color: '#0f172a', margin: 0 }}>Bank Danamon — BSD | <span style={{ color: '#1e3a8a', fontWeight: '900' }}>35-75-125-798</span></p>
-                          <p style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', margin: 0 }}>A.N PT. Apindo Karya Lestari</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ width: '200px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '4px' }}>
-                    <p style={{ margin: '0 0 4px 0', fontSize: '10px', color: '#475569', textAlign: 'center', fontStyle: 'italic' }}>Tangerang, {fmtDateLong(data.date)}</p>
-                    <p style={{ margin: '0 0 4px 0', fontSize: '9px', fontWeight: '700', color: '#94a3b8', letterSpacing: '1.5px', textTransform: 'uppercase', textAlign: 'center' }}>Hormat Kami,</p>
-                    <div style={{ width: '170px', height: '75px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      {(data.ttdStempelUrl || globalTTDUrl) && <img src={data.ttdStempelUrl || globalTTDUrl || ""} style={{ maxWidth: '160px', maxHeight: '75px', objectFit: 'contain' }} alt="Tanda Tangan" />}
-                    </div>
-                    <div style={{ borderTop: '1.5px solid #334155', width: '160px', textAlign: 'center', paddingTop: '6px' }}>
-                      <p style={{ margin: 0, fontSize: '11px', fontWeight: '900', color: '#0f172a', letterSpacing: '0.3px' }}>{data.namaPenandatangan || "MUDINI NURAFIN"}</p>
+              <div style={{ padding: '10px 40px 30px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ width: '60%' }}>
+                  <p style={{ margin: '0 0 6px 0', fontSize: '10px', fontWeight: 'bold', textDecoration: 'underline' }}>PEMBAYARAN DITRANSFER KE REKENING:</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ border: '2px solid #0f172a', padding: '10px 15px', borderRadius: '8px', backgroundColor: '#f8fafc' }}>
+                      <p style={{ margin: '0 0 4px 0', fontSize: '13px', fontWeight: '900' }}>PT. APINDO KARYA LESTARI</p>
+                      <p style={{ margin: '0 0 4px 0', fontSize: '12px', fontWeight: 'bold' }}>Bank Danamon BSD</p>
+                      <p style={{ margin: 0, fontSize: '14px', fontWeight: '900', letterSpacing: '1px' }}>A/C: 35-75-125-798</p>
                     </div>
                   </div>
                 </div>
-              </>
+
+                <div style={{ width: '30%', textAlign: 'center' }}>
+                  <p style={{ margin: '0 0 10px 0', fontSize: '11px', color: '#0f172a' }}>
+                    Tangerang Selatan, {fmtDate(data.date)}
+                  </p>
+                  
+                  {/* Area Kosong untuk Materai dan TTD Basah */}
+                  <div style={{ height: '120px', width: '100%', position: 'relative' }}>
+                    {/* Placeholder Panduan Materai (Bisa dihapus jika tidak mau terlihat saat print, 
+                        tapi karena ini preview, biarkan transparan) */}
+                    <div style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', width: '60px', height: '40px', border: '1px dashed #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
+                        <span style={{ fontSize: '8px', color: '#94a3b8' }}>Materai</span>
+                    </div>
+                  </div>
+
+                  <p style={{ margin: 0, fontSize: '13px', fontWeight: '900', textDecoration: 'underline', color: '#0f172a', textTransform: 'uppercase' }}>
+                    MUDINI NURAFIN
+                  </p>
+                </div>
+              </div>
             )}
 
+            {/* Bottom accent */}
             <div style={{ position: 'absolute', bottom: '0', left: '0', width: '100%', height: '8px', backgroundColor: '#1e3a8a' }} />
           </div>
         );

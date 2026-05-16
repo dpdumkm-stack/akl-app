@@ -44,6 +44,8 @@ export interface InvoiceItemData {
   id: string;
   description: string;
   quantity: number;
+  volume?: number | string | null;
+  satuan?: string | null;
   unitPrice: number;
 }
 

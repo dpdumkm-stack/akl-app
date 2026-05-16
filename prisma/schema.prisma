@@ -164,6 +164,8 @@ model InvoiceItem {
   id           String   @id @default(uuid())
   description  String
   quantity     Int
+  volume       Decimal?
+  satuan       String?
   unitPrice    Decimal
   lineTotal    Decimal   @default(0)
   invoice      Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)

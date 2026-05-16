@@ -397,9 +397,10 @@ export async function saveInvoice(data: any) {
         : formatInvoiceNumber(finalNomorUrut);
 
     const subtotal = (data.items || []).reduce((acc: number, i: any) => {
-      const qty = Number(i.quantity) || 0;
+      const vol = Number(i.volume);
       const price = Number(i.unitPrice) || 0;
-      return acc + qty * price;
+      const lineTotal = vol > 0 ? vol * price : price;
+      return acc + lineTotal;
     }, 0);
 
     // SCSA VALIDATION: Minimal salah satu harus diisi (Company atau Nama Klien)
@@ -453,12 +454,19 @@ export async function saveInvoice(data: any) {
             ...payload, 
             items: { 
                 deleteMany: {}, 
-                create: (data.items || []).map((it: any) => ({
-                    description: sanitize(it.description),
-                    quantity: Number(it.quantity) || 0,
-                    unitPrice: Number(it.unitPrice) || 0,
-                    lineTotal: (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0)
-                })) 
+                create: (data.items || []).map((it: any) => {
+                    const vol = Number(it.volume);
+                    const price = Number(it.unitPrice) || 0;
+                    const lTotal = vol > 0 ? vol * price : price;
+                    return {
+                        description: sanitize(it.description),
+                        quantity: 1,
+                        volume: vol > 0 ? vol : null,
+                        satuan: it.satuan ? sanitize(it.satuan) : null,
+                        unitPrice: price,
+                        lineTotal: lTotal
+                    };
+                }) 
             } 
         },
       });
@@ -467,12 +475,19 @@ export async function saveInvoice(data: any) {
         data: { 
             ...payload, 
             items: { 
-                create: (data.items || []).map((it: any) => ({
-                    description: sanitize(it.description),
-                    quantity: Number(it.quantity) || 0,
-                    unitPrice: Number(it.unitPrice) || 0,
-                    lineTotal: (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0)
-                })) 
+                create: (data.items || []).map((it: any) => {
+                    const vol = Number(it.volume);
+                    const price = Number(it.unitPrice) || 0;
+                    const lTotal = vol > 0 ? vol * price : price;
+                    return {
+                        description: sanitize(it.description),
+                        quantity: 1,
+                        volume: vol > 0 ? vol : null,
+                        satuan: it.satuan ? sanitize(it.satuan) : null,
+                        unitPrice: price,
+                        lineTotal: lTotal
+                    };
+                }) 
             } 
         },
       });

@@ -1,57 +1,90 @@
-"use client";
-
-import React from 'react';
-import { Trash2 } from 'lucide-react';
-import { InvoiceItemData } from '@/lib/types';
-import TextEditorTrigger from '@/components/TextEditorTrigger';
+import React from "react";
+import { InvoiceData, InvoiceItemData } from "@/lib/types";
+import { Trash2, GripVertical, Search } from "lucide-react";
 
 interface InvoiceItemRowProps {
-  index: number;
   item: InvoiceItemData;
-  onChange: (field: keyof InvoiceItemData, value: any) => void;
-  onRemove: () => void;
+  data: InvoiceData;
+  onUpdate: (id: string, field: string, value: any) => void;
+  onMove: (id: string, direction: 'up' | 'down') => void;
+  onDelete: (id: string) => void;
+  onOpenMaster: (id: string) => void;
 }
 
-export default function InvoiceItemRow({ index, item, onChange, onRemove }: InvoiceItemRowProps) {
+export default function InvoiceItemRow({ item, data, onUpdate, onMove, onDelete, onOpenMaster }: InvoiceItemRowProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 mb-3 group relative">
-      <div className="md:col-span-7">
-        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Deskripsi Pekerjaan</label>
-        <TextEditorTrigger
-          value={item.description}
-          onChange={(val) => onChange('description', val)}
-          title="Deskripsi Pekerjaan"
-          placeholder="Contoh: Epoxy Flooring 1000 Micron..."
-          accentColor="blue"
-        />
-      </div>
-      <div className="md:col-span-2">
-        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qty</label>
-        <input
-          type="number"
-          value={item.quantity}
-          onChange={e => onChange('quantity', Number(e.target.value))}
-          className="w-full bg-white border border-slate-200 rounded-lg p-3 sm:p-2 text-base sm:text-sm outline-none focus:border-blue-500 transition-all text-center"
-        />
-      </div>
-      <div className="md:col-span-2">
-        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Harga Satuan</label>
-        <input
-          type="number"
-          value={item.unitPrice}
-          onChange={e => onChange('unitPrice', Number(e.target.value))}
-          className="w-full bg-white border border-slate-200 rounded-lg p-3 sm:p-2 text-base sm:text-sm outline-none focus:border-blue-500 transition-all text-right"
-        />
-      </div>
-      <div className="md:col-span-1 flex items-end justify-center pb-1">
-        <button
-          type="button"
-          onClick={onRemove}
-          className="w-11 h-11 flex-shrink-0 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 active:scale-95 rounded-xl transition-all"
-          title="Hapus Item"
-        >
-          <Trash2 className="w-5 h-5 sm:w-4 sm:h-4" />
+    <div className="group relative bg-slate-950/50 hover:bg-slate-900 border border-white/5 hover:border-blue-500/30 rounded-3xl p-4 sm:p-5 transition-all shadow-sm">
+      
+      {/* Control Actions (Top Right) */}
+      <div className="absolute -top-3 right-4 flex items-center bg-slate-900 border border-white/10 rounded-full px-2 py-1 shadow-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10">
+        <button type="button" onClick={() => onMove(item.id, 'up')} className="p-1.5 text-slate-400 hover:text-white transition-colors" title="Geser ke Atas">
+          <GripVertical className="w-3.5 h-3.5" />
         </button>
+        <div className="w-px h-3 bg-white/10 mx-1"></div>
+        <button type="button" onClick={() => onDelete(item.id)} className="p-1.5 text-red-400 hover:text-red-300 transition-colors" title="Hapus Baris">
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-12 gap-4 items-start">
+        {/* Uraian Pekerjaan (Full width on mobile, 5 cols on desktop) */}
+        <div className="col-span-12 md:col-span-5 space-y-2">
+          <div className="flex justify-between items-center mb-1">
+            <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest block">Uraian Pekerjaan & Bahan</label>
+            <button 
+                type="button" 
+                onClick={() => onOpenMaster(item.id)}
+                className="text-[9px] font-black text-blue-500 uppercase tracking-widest hover:text-blue-400 flex items-center gap-1 transition-colors"
+            >
+                <Search className="w-3 h-3" /> Master
+            </button>
+          </div>
+          <textarea 
+            rows={2}
+            value={item.description} 
+            onChange={e => onUpdate(item.id, 'description', e.target.value)} 
+            placeholder="Ketik uraian..." 
+            className="w-full bg-slate-900 border border-white/5 rounded-xl px-4 py-2.5 text-white font-bold text-xs outline-none focus:border-blue-500/50 transition-all custom-scrollbar resize-none" 
+          />
+        </div>
+
+        {/* Volume (Half on mobile, 2 cols on desktop) */}
+        <div className="col-span-6 md:col-span-2 space-y-2">
+          <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest sm:text-center block mb-1">Vol (Ops)</label>
+          <input 
+            type="number" 
+            min="0"
+            step="any"
+            value={item.volume !== null && item.volume !== undefined ? item.volume : ''} 
+            onChange={e => onUpdate(item.id, 'volume', e.target.value)} 
+            placeholder="Kosong=1"
+            className="w-full bg-slate-900 border border-white/5 rounded-xl px-4 py-2.5 text-white font-bold text-xs sm:text-center outline-none focus:border-blue-500/50 transition-all" 
+          />
+        </div>
+
+        {/* Satuan (Half on mobile, 2 cols on desktop) */}
+        <div className="col-span-6 md:col-span-2 space-y-2">
+          <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest sm:text-center block mb-1">Satuan</label>
+          <input 
+            type="text" 
+            value={item.satuan || ''} 
+            onChange={e => onUpdate(item.id, 'satuan', e.target.value)} 
+            placeholder="m2, ls" 
+            className="w-full bg-slate-900 border border-white/5 rounded-xl px-4 py-2.5 text-white font-bold text-xs sm:text-center outline-none focus:border-blue-500/50 transition-all" 
+          />
+        </div>
+
+        {/* Harga Satuan (Full on mobile, 3 cols on desktop) */}
+        <div className="col-span-12 md:col-span-3 space-y-2">
+          <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest sm:text-right block mb-1">Harga/Sat (Rp)</label>
+          <input 
+            type="number" 
+            min="0" 
+            value={item.unitPrice || ''} 
+            onChange={e => onUpdate(item.id, 'unitPrice', Number(e.target.value))} 
+            className="w-full bg-slate-900 border border-white/5 rounded-xl px-4 py-2.5 text-white font-bold text-xs sm:text-right outline-none focus:border-blue-500/50 transition-all" 
+          />
+        </div>
       </div>
     </div>
   );

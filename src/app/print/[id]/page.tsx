@@ -78,7 +78,6 @@ export default async function PrintPage({ params }: { params: Promise<{ id: stri
             data={invoice as InvoiceData}
             isGeneratingPDF={true}
             globalLogoUrl={globalLogo}
-            globalTTDUrl={globalTTD}
           />
         ) : (
           <A4Preview
