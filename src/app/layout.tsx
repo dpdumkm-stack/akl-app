@@ -1,5 +1,7 @@
 import { Providers } from "@/components/Providers";
 import AppShell from "@/components/layout/AppShell";
+import PWARegistration from "@/components/PWARegistration";
+import InstallPrompt from "@/components/InstallPrompt";
 import "./globals.css";
 
 import { ensureAdminAccounts } from "@/lib/init-admin";
@@ -36,6 +38,8 @@ export default async function RootLayout({
     <html lang="id">
       <body className="bg-slate-100 font-sans text-slate-800">
         <Providers>
+          <PWARegistration />
+          <InstallPrompt />
           <AppShell>
             {children}
           </AppShell>
