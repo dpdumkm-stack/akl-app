@@ -53,6 +53,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <nav className="flex-1 px-4 py-4 space-y-1">
           {MENU_ITEMS.map((item) => {
+            // SCSA FIX: Sembunyikan Invoice dari admin1 dan admin2 (sementara)
+            if (item.name === "Invoice" && (session?.user as any)?.role !== "OWNER") {
+              return null;
+            }
+
             const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
             return (
               <Link 

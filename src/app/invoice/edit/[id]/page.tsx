@@ -56,7 +56,16 @@ export default function EditInvoicePage({ params }: { params: Promise<{ id: stri
   }, [id, router, showToast]);
 
   useEffect(() => {
-    if (status === "authenticated") loadInvoice();
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (status === "authenticated") {
+      const role = (session?.user as any)?.role;
+      if (role !== "OWNER") {
+        router.push("/dashboard");
+      } else {
+        loadInvoice();
+      }
+    }
     getGlobalSettings().then(res => {
       if (res.success && 'data' in res) {
         const logo = (res.data as any[]).find(s => s.id.toUpperCase() === 'LOGO')?.value;

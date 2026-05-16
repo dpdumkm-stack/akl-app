@@ -41,6 +41,17 @@ export default function InvoiceArchivePage() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [printProgress, setPrintProgress] = useState(0);
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (status === "authenticated") {
+      const role = (session?.user as any)?.role;
+      if (role !== "OWNER") {
+        router.push("/dashboard");
+      }
+    }
+  }, [status, session, router]);
+
   const loadInvoices = useCallback(async () => {
     setLoading(true);
     try {

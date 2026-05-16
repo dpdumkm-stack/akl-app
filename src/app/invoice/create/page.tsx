@@ -50,6 +50,17 @@ export default function CreateInvoicePage() {
   const [globalLogo, setGlobalLogo] = useState<string | null>(null);
 
   useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (status === "authenticated") {
+      const role = (session?.user as any)?.role;
+      if (role !== "OWNER") {
+        router.push("/dashboard");
+      }
+    }
+  }, [status, session, router]);
+
+  useEffect(() => {
     // Ambil Pengaturan Global (Logo)
     getGlobalSettings().then(res => {
       if (res.success && 'data' in res) {

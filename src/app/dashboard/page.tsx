@@ -192,12 +192,14 @@ export default function DashboardPage() {
                  onClick={() => router.push("/quotations/create")} 
                  color="blue"
                />
-               <ActionButton 
-                 icon={<Receipt className="w-4 h-4" />} 
-                 label="Tulis Invoice" 
-                 onClick={() => router.push("/invoice/create")} 
-                 color="emerald"
-               />
+               {(session?.user as any)?.role === "OWNER" && (
+                 <ActionButton 
+                   icon={<Receipt className="w-4 h-4" />} 
+                   label="Tulis Invoice" 
+                   onClick={() => router.push("/invoice/create")} 
+                   color="emerald"
+                 />
+               )}
                <ActionButton 
                  icon={<Users className="w-4 h-4" />} 
                  label="Data Klien" 
@@ -221,19 +223,21 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className={`grid grid-cols-1 ${(session?.user as any)?.role === "OWNER" ? "lg:grid-cols-2" : ""} gap-8`}>
         <RecentTable 
           title="Penawaran Terbaru" 
           items={recentQuotations} 
           type="PH" 
-          onClick={(id) => router.push(`/quotations/edit/${id}`)} 
+          onClick={(id: string) => router.push(`/quotations/edit/${id}`)} 
         />
-        <RecentTable 
-          title="Invoice Terkini" 
-          items={recentInvoices} 
-          type="INV" 
-          onClick={(id) => router.push(`/invoice/edit/${id}`)} 
-        />
+        {(session?.user as any)?.role === "OWNER" && (
+          <RecentTable 
+            title="Invoice Terkini" 
+            items={recentInvoices} 
+            type="INV" 
+            onClick={(id: string) => router.push(`/invoice/edit/${id}`)} 
+          />
+        )}
       </div>
     </div>
   );
