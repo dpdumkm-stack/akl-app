@@ -192,14 +192,19 @@ export default function DashboardPage() {
                  onClick={() => router.push("/quotations/create")} 
                  color="blue"
                />
-               {(session?.user as any)?.role === "OWNER" && (
-                 <ActionButton 
-                   icon={<Receipt className="w-4 h-4" />} 
-                   label="Tulis Invoice" 
-                   onClick={() => router.push("/invoice/create")} 
-                   color="emerald"
-                 />
-               )}
+               <ActionButton 
+                 icon={<Receipt className="w-4 h-4" />} 
+                 label="Tulis Invoice" 
+                 onClick={() => {
+                   if ((session?.user as any)?.role !== "OWNER") {
+                     alert("Mohon maaf, fitur Invoice sedang dalam tahap penyempurnaan oleh tim IT. Silakan gunakan fitur Penawaran untuk saat ini.");
+                   } else {
+                     router.push("/invoice/create");
+                   }
+                 }} 
+                 color="emerald"
+                 isDev={(session?.user as any)?.role !== "OWNER"}
+               />
                <ActionButton 
                  icon={<Users className="w-4 h-4" />} 
                  label="Data Klien" 
@@ -223,21 +228,26 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className={`grid grid-cols-1 ${(session?.user as any)?.role === "OWNER" ? "lg:grid-cols-2" : ""} gap-8`}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <RecentTable 
           title="Penawaran Terbaru" 
           items={recentQuotations} 
           type="PH" 
           onClick={(id: string) => router.push(`/quotations/edit/${id}`)} 
         />
-        {(session?.user as any)?.role === "OWNER" && (
-          <RecentTable 
-            title="Invoice Terkini" 
-            items={recentInvoices} 
-            type="INV" 
-            onClick={(id: string) => router.push(`/invoice/edit/${id}`)} 
-          />
-        )}
+        <RecentTable 
+          title="Invoice Terkini" 
+          items={recentInvoices} 
+          type="INV" 
+          onClick={(id: string) => {
+            if ((session?.user as any)?.role !== "OWNER") {
+              alert("Mohon maaf, fitur Invoice sedang dalam tahap penyempurnaan oleh tim IT. Silakan gunakan fitur Penawaran untuk saat ini.");
+            } else {
+              router.push(`/invoice/edit/${id}`);
+            }
+          }} 
+          isDev={(session?.user as any)?.role !== "OWNER"}
+        />
       </div>
     </div>
   );
@@ -262,7 +272,7 @@ function StatCard({ title, value, subValue, icon, color }: any) {
   );
 }
 
-function ActionButton({ icon, label, onClick, color }: any) {
+function ActionButton({ icon, label, onClick, color, isDev }: any) {
   const colors: any = {
     blue: "bg-blue-600 hover:bg-blue-500 shadow-blue-900/40",
     emerald: "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/40",
@@ -271,18 +281,22 @@ function ActionButton({ icon, label, onClick, color }: any) {
   return (
     <button 
       onClick={onClick}
-      className={`w-full flex items-center gap-4 p-4 rounded-2xl text-white transition-all shadow-lg font-black text-[10px] uppercase tracking-widest active:scale-95 ${colors[color]}`}
+      className={`w-full flex items-center gap-4 p-4 rounded-2xl text-white transition-all shadow-lg font-black text-[10px] uppercase tracking-widest active:scale-95 ${colors[color]} ${isDev ? 'opacity-70 grayscale' : ''}`}
     >
       {icon} {label}
+      {isDev && <span className="ml-auto text-[8px] bg-black/40 text-white/70 px-2 py-0.5 rounded">DEV</span>}
     </button>
   );
 }
 
-function RecentTable({ title, items, type, onClick }: any) {
+function RecentTable({ title, items, type, onClick, isDev }: any) {
   return (
-    <div className="bg-slate-900 border border-white/5 rounded-[32px] p-8 shadow-sm">
+    <div className={`bg-slate-900 border border-white/5 rounded-[32px] p-8 shadow-sm ${isDev ? 'opacity-80' : ''}`}>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-sm font-black text-white uppercase italic">{title}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-black text-white uppercase italic">{title}</h3>
+          {isDev && <span className="text-[8px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-black tracking-widest uppercase">DEV</span>}
+        </div>
         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{items.length} Data</span>
       </div>
       <div className="space-y-1">

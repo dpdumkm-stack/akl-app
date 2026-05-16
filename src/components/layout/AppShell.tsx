@@ -53,9 +53,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <nav className="flex-1 px-4 py-4 space-y-1">
           {MENU_ITEMS.map((item) => {
-            // SCSA FIX: Sembunyikan Invoice dari admin1 dan admin2 (sementara)
-            if (item.name === "Invoice" && (session?.user as any)?.role !== "OWNER") {
-              return null;
+            // SCSA FIX: Invoice Dev Mode untuk non-owner
+            const isInvoice = item.name === "Invoice";
+            const isNonOwner = (session?.user as any)?.role !== "OWNER";
+            
+            if (isInvoice && isNonOwner) {
+              return (
+                <button 
+                  key={item.name}
+                  onClick={() => alert("Mohon maaf, fitur Invoice sedang dalam tahap penyempurnaan oleh tim IT. Silakan gunakan fitur Penawaran untuk saat ini.")}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all group text-slate-500 hover:bg-white/5 opacity-70"
+                >
+                  <item.icon className="w-5 h-5 text-slate-600" />
+                  <span className="text-sm font-black uppercase tracking-widest">{item.name}</span>
+                  <span className="ml-auto text-[8px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase font-black tracking-widest">Dev</span>
+                </button>
+              );
             }
 
             const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
