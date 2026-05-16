@@ -284,3 +284,4 @@ Unique constraint failed on the fields: (`nomorSurat`)
 [Sat 05/16/2026 21:52:41.10] [DEPLOY] style: UI tweaks on quotation archive cards for dark mode 
 [Sat 05/16/2026 22:03:48.97] [DEPLOY] feat: Convert mobile actions to More Options dropdown 
 [Sat 05/16/2026 22:29:33.20] [DEPLOY] feat: Mobile-First UI/UX Refactoring for Form Editor and Page Create 
+[Sat 05/16/2026 22:44:05.87] [DEPLOY] feat: Auto-resize textarea and dynamic modal height in TextEditorModal 

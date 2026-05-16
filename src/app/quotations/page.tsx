@@ -107,8 +107,8 @@ export default function QuotationArchivePage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
       {/* Top Nav */}
-      <nav className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5 px-3 sm:px-6 py-4">
+        <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => router.push("/dashboard")}
@@ -138,7 +138,7 @@ export default function QuotationArchivePage() {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+      <main className="max-w-[1800px] mx-auto px-3 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8">
         {/* Search & Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative flex-1 max-w-lg group">

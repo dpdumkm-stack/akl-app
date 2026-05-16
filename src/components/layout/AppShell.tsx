@@ -108,8 +108,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* HEADER - TOP BAR */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 px-4 lg:px-8 py-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 px-3 sm:px-4 lg:px-8 py-4">
+          <div className="max-w-[1800px] mx-auto flex items-center justify-between">
              <div className="flex items-center gap-4">
                 {/* Logo for mobile */}
                 <div className="lg:hidden flex items-center gap-2">
@@ -158,7 +158,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 p-4 lg:p-8 max-w-7xl mx-auto w-full pb-24 lg:pb-8">
+        <main className="flex-1 p-3 sm:p-4 lg:p-8 max-w-[1800px] mx-auto w-full pb-24 lg:pb-8">
           {children}
         </main>
       </div>

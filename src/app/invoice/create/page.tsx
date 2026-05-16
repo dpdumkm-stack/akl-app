@@ -119,8 +119,8 @@ export default function CreateInvoicePage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
-      <nav className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5 px-3 sm:px-6 py-4">
+        <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => router.push("/invoice")} className="p-2 hover:bg-white/5 rounded-xl transition-colors">
               <ArrowLeft className="w-5 h-5 text-slate-400" />
@@ -141,7 +141,7 @@ export default function CreateInvoicePage() {
         </div>
       </nav>
 
-      <main className="max-w-[1800px] mx-auto px-4 lg:px-6 py-4 lg:py-6">
+      <main className="max-w-[1800px] mx-auto px-2 sm:px-4 lg:px-6 py-4 lg:py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Editor */}
           <div className={`space-y-6 h-[calc(100vh-140px)] overflow-y-auto pr-2 custom-scrollbar pb-10 ${viewMode === 'preview' ? 'hidden lg:block' : 'block'}`}>

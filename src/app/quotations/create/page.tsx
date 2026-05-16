@@ -149,7 +149,7 @@ export default function CreateQuotationPage() {
   return (
     <div className="min-h-screen bg-slate-950 font-sans text-slate-100">
       {/* Header */}
-      <nav className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-white/5 px-6 py-4">
+      <nav className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-white/5 px-3 sm:px-6 py-4">
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => router.push("/quotations")} className="p-2 hover:bg-white/5 rounded-full transition-colors">
@@ -183,7 +183,7 @@ export default function CreateQuotationPage() {
         </div>
       </nav>
 
-      <main className="max-w-[1800px] mx-auto px-4 lg:px-6 py-4 lg:py-6">
+      <main className="max-w-[1800px] mx-auto px-2 sm:px-4 lg:px-6 py-4 lg:py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
            {/* Editor */}
            <div className="space-y-6 h-[calc(100dvh-100px)] lg:h-[calc(100vh-140px)] overflow-y-auto pr-2 custom-scrollbar pb-10 block">
