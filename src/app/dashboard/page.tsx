@@ -96,16 +96,16 @@ export default function DashboardPage() {
       {/* Header & Export */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
-          <h2 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">
-            Dashboard <span className="text-blue-600">Finansial</span>
+          <h2 className="text-3xl font-black tracking-tight text-white uppercase italic">
+            Dashboard <span className="text-blue-500">Finansial</span>
           </h2>
           <p className="text-slate-500 font-bold text-[10px] uppercase tracking-[0.3em]">Ringkasan Bisnis Studio AKL</p>
         </div>
         <button 
           onClick={handleExport}
-          className="flex items-center gap-3 px-6 py-3 bg-white border border-slate-200 text-slate-900 rounded-2xl shadow-sm hover:shadow-md hover:bg-slate-50 transition-all font-black text-[10px] uppercase tracking-widest"
+          className="flex items-center gap-3 px-6 py-3 bg-slate-900 border border-white/5 text-slate-300 rounded-2xl shadow-sm hover:shadow-md hover:bg-slate-800 transition-all font-black text-[10px] uppercase tracking-widest"
         >
-          <Download className="w-4 h-4 text-blue-600" /> Export Laporan Excel
+          <Download className="w-4 h-4 text-blue-400" /> Export Laporan Excel
         </button>
       </div>
 
@@ -143,14 +143,14 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-[32px] p-8 shadow-sm flex flex-col">
+        <div className="lg:col-span-2 bg-slate-900 border border-white/5 rounded-[32px] p-8 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-sm font-black text-slate-900 uppercase">Tren Pendapatan</h3>
+                <h3 className="text-sm font-black text-white uppercase">Tren Pendapatan</h3>
                 <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">6 Bulan Terakhir</p>
               </div>
             </div>
@@ -241,18 +241,18 @@ export default function DashboardPage() {
 
 function StatCard({ title, value, subValue, icon, color }: any) {
   const colors: any = {
-    blue: "text-blue-600 bg-blue-50 border-blue-100",
-    emerald: "text-emerald-600 bg-emerald-50 border-emerald-100",
-    amber: "text-amber-600 bg-amber-50 border-amber-100",
-    indigo: "text-indigo-600 bg-indigo-50 border-indigo-100",
+    blue: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+    emerald: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+    amber: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+    indigo: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
   };
   return (
-    <div className={`p-6 rounded-[32px] bg-white border border-slate-200 shadow-sm transition-all hover:shadow-md group`}>
+    <div className={`p-6 rounded-[32px] bg-slate-900 border border-white/5 shadow-sm transition-all hover:shadow-md group`}>
       <div className="flex items-center justify-between mb-4">
         <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{title}</div>
         <div className={`p-2 rounded-xl transition-all group-hover:scale-110 ${colors[color]}`}>{icon}</div>
       </div>
-      <div className="text-2xl font-black text-slate-900 tracking-tighter">{value}</div>
+      <div className="text-2xl font-black text-white tracking-tighter">{value}</div>
       <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">{subValue}</div>
     </div>
   );
@@ -276,9 +276,9 @@ function ActionButton({ icon, label, onClick, color }: any) {
 
 function RecentTable({ title, items, type, onClick }: any) {
   return (
-    <div className="bg-white border border-slate-200 rounded-[32px] p-8 shadow-sm">
+    <div className="bg-slate-900 border border-white/5 rounded-[32px] p-8 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-sm font-black text-slate-900 uppercase italic">{title}</h3>
+        <h3 className="text-sm font-black text-white uppercase italic">{title}</h3>
         <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{items.length} Data</span>
       </div>
       <div className="space-y-1">
@@ -286,14 +286,14 @@ function RecentTable({ title, items, type, onClick }: any) {
           <div 
             key={item.id} 
             onClick={() => onClick(item.id)}
-            className="flex items-center justify-between p-4 hover:bg-slate-50 rounded-2xl transition-all cursor-pointer group"
+            className="flex items-center justify-between p-4 hover:bg-white/5 rounded-2xl transition-all cursor-pointer group"
           >
             <div className="min-w-0">
-              <p className="text-[11px] font-black text-slate-900 uppercase truncate">{item.clientName || item.namaKlien}</p>
+              <p className="text-[11px] font-black text-slate-200 uppercase truncate">{item.clientName || item.namaKlien}</p>
               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{item.invoiceNumber || item.nomorSurat}</p>
             </div>
             <div className="text-right">
-              <p className="text-[11px] font-black text-blue-600">{fmtCompact(item.total || item.totalHarga)}</p>
+              <p className="text-[11px] font-black text-blue-400">{fmtCompact(item.total || item.totalHarga)}</p>
               <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">
                 {new Date(item.date || item.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })}
               </p>

@@ -41,7 +41,7 @@ export default function UserManagementPage() {
     <div className="space-y-8 p-8 max-w-5xl mx-auto animate-in fade-in duration-700">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 uppercase italic">Manajemen <span className="text-blue-600">Staff</span></h1>
+          <h1 className="text-2xl font-black text-white uppercase italic">Manajemen <span className="text-blue-500">Staff</span></h1>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Kelola akses admin kantor</p>
         </div>
         <button 
@@ -52,9 +52,9 @@ export default function UserManagementPage() {
         </button>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-[32px] overflow-hidden shadow-sm">
+      <div className="bg-slate-900 border border-white/5 rounded-[32px] overflow-hidden shadow-sm">
         <table className="w-full text-left">
-          <thead className="bg-slate-50 border-b border-slate-200">
+          <thead className="bg-slate-950/50 border-b border-white/5">
             <tr>
               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nama / Username</th>
               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Role</th>
@@ -62,15 +62,15 @@ export default function UserManagementPage() {
               <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-white/5">
             {users.map((u) => (
-              <tr key={u.id} className="hover:bg-slate-50 transition-colors">
+              <tr key={u.id} className="hover:bg-white/5 transition-colors">
                 <td className="px-6 py-4">
-                  <p className="text-sm font-black text-slate-900">{u.name || "N/A"}</p>
+                  <p className="text-sm font-black text-white">{u.name || "N/A"}</p>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{u.username}</p>
                 </td>
                 <td className="px-6 py-4 text-center">
-                  <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${u.role === 'OWNER' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-600'}`}>
+                  <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${u.role === 'OWNER' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-300'}`}>
                     {u.role}
                   </span>
                 </td>
@@ -80,13 +80,13 @@ export default function UserManagementPage() {
                 <td className="px-6 py-4 text-right flex justify-end gap-2">
                   <button 
                     onClick={() => { setEditingUser(u); setFormData({ ...u, password: "" }); setModalOpen(true); }}
-                    className="p-2 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-xl transition-all"
+                    className="p-2 hover:bg-blue-500/10 text-slate-500 hover:text-blue-400 rounded-xl transition-all"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={async () => { if(confirm("Hapus user ini?")) { await deleteUser(u.id); loadUsers(); } }}
-                    className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-xl transition-all"
+                    className="p-2 hover:bg-red-500/10 text-slate-500 hover:text-red-400 rounded-xl transition-all"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -98,26 +98,26 @@ export default function UserManagementPage() {
       </div>
 
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-md rounded-[40px] shadow-2xl p-10 space-y-6 animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-white/5 w-full max-w-md rounded-[40px] shadow-2xl p-10 space-y-6 animate-in zoom-in-95 duration-300">
              <div className="flex items-center gap-4 mb-2">
-                <div className="w-12 h-12 bg-blue-600/10 rounded-2xl flex items-center justify-center">
-                   <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center">
+                   <Users className="w-6 h-6 text-blue-400" />
                 </div>
-                <h2 className="text-xl font-black text-slate-900 uppercase italic">
+                <h2 className="text-xl font-black text-white uppercase italic">
                   {editingUser ? "Edit Admin" : "Tambah Admin"}
                 </h2>
              </div>
 
              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-1">
+                 <div className="space-y-1">
                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Username</label>
                    <input 
                      required
                      type="text" 
                      value={formData.username}
                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                     className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all font-bold text-sm"
+                     className="w-full px-5 py-4 bg-slate-950 border border-white/5 rounded-2xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-bold text-sm text-white"
                    />
                 </div>
                 <div className="space-y-1">
@@ -127,7 +127,7 @@ export default function UserManagementPage() {
                      type="text" 
                      value={formData.name}
                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                     className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all font-bold text-sm"
+                     className="w-full px-5 py-4 bg-slate-950 border border-white/5 rounded-2xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-bold text-sm text-white"
                    />
                 </div>
                 <div className="space-y-1">
@@ -137,7 +137,7 @@ export default function UserManagementPage() {
                        type={showPassword ? "text" : "password"} 
                        value={formData.password}
                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                       className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all font-bold text-sm pr-14"
+                       className="w-full px-5 py-4 bg-slate-950 border border-white/5 rounded-2xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all font-bold text-sm pr-14 text-white"
                      />
                      <button 
                        type="button"
@@ -155,24 +155,24 @@ export default function UserManagementPage() {
                       <button 
                         type="button"
                         onClick={() => setFormData({ ...formData, role: "ADMIN" })}
-                        className={`py-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${formData.role === 'ADMIN' ? 'border-blue-600 bg-blue-50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}
+                        className={`py-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${formData.role === 'ADMIN' ? 'border-blue-500/50 bg-blue-500/10' : 'border-white/5 bg-slate-950 hover:border-white/10'}`}
                       >
-                         <span className={`text-[10px] font-black uppercase tracking-widest ${formData.role === 'ADMIN' ? 'text-blue-600' : 'text-slate-400'}`}>Staff Admin</span>
+                         <span className={`text-[10px] font-black uppercase tracking-widest ${formData.role === 'ADMIN' ? 'text-blue-400' : 'text-slate-400'}`}>Staff Admin</span>
                          <span className="text-[8px] text-slate-400 font-medium">Akses terbatas</span>
                       </button>
                       <button 
                         type="button"
                         onClick={() => setFormData({ ...formData, role: "OWNER" })}
-                        className={`py-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${formData.role === 'OWNER' ? 'border-indigo-600 bg-indigo-50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}
+                        className={`py-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${formData.role === 'OWNER' ? 'border-indigo-500/50 bg-indigo-500/10' : 'border-white/5 bg-slate-950 hover:border-white/10'}`}
                       >
-                         <span className={`text-[10px] font-black uppercase tracking-widest ${formData.role === 'OWNER' ? 'text-indigo-600' : 'text-slate-400'}`}>Owner / Direksi</span>
+                         <span className={`text-[10px] font-black uppercase tracking-widest ${formData.role === 'OWNER' ? 'text-indigo-400' : 'text-slate-400'}`}>Owner / Direksi</span>
                          <span className="text-[8px] text-slate-400 font-medium">Akses penuh</span>
                       </button>
                    </div>
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                   <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-6 py-4 border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">Batal</button>
+                   <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-6 py-4 border border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-800 transition-all">Batal</button>
                    <button type="submit" className="flex-1 px-6 py-4 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-900/20 font-black text-[10px] uppercase tracking-widest hover:bg-blue-500 transition-all">Simpan</button>
                 </div>
              </form>
