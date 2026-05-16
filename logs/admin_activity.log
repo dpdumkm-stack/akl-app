@@ -276,3 +276,4 @@ Unique constraint failed on the fields: (`nomorSurat`)
 [Sat 05/16/2026 19:07:26.84] [DEPLOY] feat: add mobile logout button and fix PWA SSR window error\n 
 [Sat 05/16/2026 19:17:30.51] [DEPLOY] ui: make create new document buttons visible on mobile screens\n 
 [Sat 05/16/2026 19:30:38.18] [DEPLOY] feat: implement PWA update banner and changelog modal\n 
+[Sat 05/16/2026 19:50:02.43] [DEPLOY] feat: implement reusable popup text editor modal for all long-text form fields\n 

@@ -44,42 +44,36 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
+      - name: Zero-Downtime Deploy via SSH
         uses: appleboy/ssh-action@v1.2.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
+          command_timeout: 5m
           script: |
             # Masuk ke folder proyek
             cd /var/www/akl-app
-            
+
             # Anti-Error 128 (Git Dubious Ownership)
             git config --global --add safe.directory /var/www/akl-app
-            
-            # Ambil kode terbaru (untuk docker-compose.yml)
+
+            # Ambil kode terbaru (untuk docker-compose.yml & deploy script)
             git pull origin main
-            
+
             # Login ke GHCR
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            # 1. Pull image baru di latar belakang (Pre-fetch)
+
+            # Pre-pull image baru (agar start kontainer lebih cepat)
             echo "🚀 Menarik image terbaru..."
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            
-            # 2. Restart container (Switching)
-            echo "🔄 Mengganti container ke versi terbaru..."
-            docker compose up -d --force-recreate
-            
-            # 3. Cleanup: Hapus image lama & cache yang tidak terpakai
-            echo "🧹 Membersihkan sisa-sisa build lama..."
-            docker image prune -f
-            
-            echo "🔍 Mengecek status container..."
-            docker ps
-            
-            echo "📋 20 Baris Log Terakhir Aplikasi:"
-            docker compose logs --tail=20 akl-app
-            
-            echo "✨ Deployment Berhasil!"
+
+            # Pastikan script executable
+            chmod +x deploy-zero-downtime.sh
+
+            # Jalankan Blue-Green Zero-Downtime Deployment
+            echo "🔄 Memulai Zero-Downtime Deployment..."
+            ./deploy-zero-downtime.sh
+
+            echo "✨ Pipeline Deployment Selesai!"

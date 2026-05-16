@@ -1,8 +1,8 @@
 services:
-  akl-app:
+  akl-blue:
     image: ghcr.io/dpdumkm-stack/akl-app:latest
-    container_name: akl-quotation-system
-    restart: always
+    container_name: akl-blue
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
@@ -12,3 +12,29 @@ services:
       - DB_PATH=/app/data/database.db
     volumes:
       - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  akl-green:
+    image: ghcr.io/dpdumkm-stack/akl-app:latest
+    container_name: akl-green
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-file:/app/data/database.db}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - DB_PATH=/app/data/database.db
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
