@@ -63,7 +63,14 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl }: InvoiceA4Pre
   const grand = dpp+taxAmt;
   const dp    = Number(data.downPayment||0);
   const isDPMode = data.invoiceType==='DP';
-  const total = isDPMode?dp:(grand-dp);
+  const isRetensiMode = data.invoiceType==='RETENSI';
+  const retentionPercent = Number(data.retentionPercent||0);
+  const retentionAmount = retentionPercent > 0 ? grand * (retentionPercent / 100) : 0;
+  
+  let total = 0;
+  if(isDPMode) total = dp;
+  else if(isRetensiMode) total = retentionAmount > 0 ? retentionAmount : Number(data.retentionAmount||0);
+  else total = grand - dp - retentionAmount;
 
   return (
     <div id="print-area" style={{width:'794px'}} className="flex flex-col items-center bg-transparent select-none">
@@ -133,6 +140,11 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl }: InvoiceA4Pre
                       (TAGIHAN UANG MUKA / DOWN PAYMENT)
                     </p>
                   )}
+                  {data.invoiceType==='RETENSI'&&(
+                    <p style={{margin:'4px 0 0 0',fontSize:'11px',fontWeight:'bold',color:RED,letterSpacing:'1px'}}>
+                      (TAGIHAN RETENSI)
+                    </p>
+                  )}
                 </div>
 
                 {/* Panel Klien + Info Dokumen */}
@@ -160,10 +172,16 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl }: InvoiceA4Pre
                           <td style={{padding:'7px 10px',fontWeight:'bold',color:'#64748b',fontSize:'10px'}}>Tgl Terbit</td>
                           <td style={{padding:'7px 10px',fontSize:'10px'}}>: {fmtDate(data.date)}</td>
                         </tr>
-                        <tr>
+                        <tr style={{borderBottom:data.poNumber?'1px solid #e2e8f0':'none'}}>
                           <td style={{padding:'7px 10px',fontWeight:'bold',color:RED,fontSize:'10px'}}>Jatuh Tempo</td>
                           <td style={{padding:'7px 10px',fontWeight:'bold',color:RED,fontSize:'10px'}}>: {data.dueDate?fmtDate(data.dueDate):fmtDate(data.date)}</td>
                         </tr>
+                        {data.poNumber&&(
+                          <tr style={{backgroundColor:LIGHT}}>
+                            <td style={{padding:'7px 10px',fontWeight:'bold',color:'#64748b',fontSize:'10px'}}>No. PO / Ref</td>
+                            <td style={{padding:'7px 10px',fontWeight:'900',color:'#0f172a',fontSize:'10px'}}>: {data.poNumber}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -208,7 +226,7 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl }: InvoiceA4Pre
 
                       {/* Subtotal */}
                       <tr style={{backgroundColor:LIGHT}}>
-                        <td colSpan={4} rowSpan={1 + (disc>0?1:0) + (data.taxApplied?2:0) + (dp>0&&!isDPMode?1:0)}
+                        <td colSpan={4} rowSpan={1 + (disc>0?1:0) + (data.taxApplied?2:0) + (dp>0&&!isDPMode?1:0) + (retentionAmount>0&&!isRetensiMode?1:0)}
                           style={{padding:'12px',border:'1px solid #cbd5e1',verticalAlign:'top'}}>
                           <div style={{border:'1px solid #94a3b8',padding:'10px 12px',backgroundColor:'white',borderRadius:'4px',borderLeft:'4px solid '+BLUE}}>
                             <p style={{margin:'0 0 5px 0',fontSize:'9px',fontWeight:'bold',color:'#64748b',textTransform:'uppercase',letterSpacing:'1px'}}>Terbilang:</p>
@@ -248,10 +266,17 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl }: InvoiceA4Pre
                         </tr>
                       )}
 
+                      {retentionAmount>0&&!isRetensiMode&&(
+                        <tr style={{backgroundColor:LIGHT}}>
+                          <td style={{padding:'6px 10px',border:'1px solid #cbd5e1',textAlign:'right',fontWeight:'bold',color:'#10b981',fontSize:'10px',textTransform:'uppercase'}}>Potongan Retensi ({retentionPercent}%)</td>
+                          <td style={{padding:'6px 10px',border:'1px solid #cbd5e1',textAlign:'right',fontWeight:'bold',color:'#10b981'}}>- {rp(retentionAmount).replace('Rp ','')}</td>
+                        </tr>
+                      )}
+
                       {/* Grand Total */}
                       <tr style={{backgroundColor:BLUE,color:'white'}}>
                         <td colSpan={5} style={{padding:'10px 12px',border:'1px solid '+BLUE,textAlign:'right',fontWeight:'900',textTransform:'uppercase',fontSize:'11px',letterSpacing:'1px'}}>
-                          {isDPMode?'Total Tagihan DP':(dp>0?'Sisa Tagihan':'Grand Total')}
+                          {isDPMode?'Total Tagihan DP':isRetensiMode?'Total Tagihan Retensi':(dp>0||retentionAmount>0?'Sisa Tagihan':'Grand Total')}
                         </td>
                         <td style={{padding:'10px 12px',border:'1px solid '+BLUE,textAlign:'right',fontWeight:'900',fontSize:'13px',borderLeft:'1px solid rgba(255,255,255,0.2)'}}>
                           {rp(total)}

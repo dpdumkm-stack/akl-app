@@ -9,6 +9,8 @@ import MasterItemModal from "./editor/MasterItemModal";
 import InvoiceUmumSection from "./editor/InvoiceUmumSection";
 import InvoiceItemRow from "./editor/InvoiceItemRow";
 import InvoiceBiayaSection from "./editor/InvoiceBiayaSection";
+import InvoiceImportModal from "./editor/InvoiceImportModal";
+import { FileDown } from "lucide-react";
 
 interface InvoiceFormEditorProps {
     data: InvoiceData;
@@ -29,6 +31,7 @@ export default function InvoiceFormEditor({
 
     const [masterItems, setMasterItems] = useState<any[]>([]);
     const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [activeRowId, setActiveRowId] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('umum'); // 'umum', 'item', 'biaya', 'preview'
 
@@ -101,6 +104,39 @@ export default function InvoiceFormEditor({
         });
     };
 
+    const handleImport = (q: any) => {
+        setIsImportModalOpen(false);
+        showToast(`Mengimpor data dari Penawaran: ${q.nomorSurat}`);
+        
+        setData(prev => ({
+            ...prev,
+            clientName: q.up || q.namaKlien || prev.clientName,
+            companyName: q.companyName || q.namaKlien || prev.companyName,
+            clientAddress: q.lokasi || prev.clientAddress,
+            quotationId: q.id,
+            discountAmount: q.diskon || 0,
+            taxApplied: q.kenakanPPN || false,
+            items: (q.items || []).map((it: any) => {
+                let unitPrice = 0;
+                const hBahan = Number(it.hargaBahan) || 0;
+                const hJasa = Number(it.hargaJasa) || 0;
+                const hSatuan = Number(it.harga) || 0;
+                if (q.isMaterialOnlyMode) unitPrice = hBahan;
+                else if (q.isJasaBahanMode) unitPrice = hBahan + hJasa;
+                else unitPrice = hSatuan;
+
+                return {
+                    id: getUniqueId(),
+                    description: (it.deskripsi || "Tanpa Deskripsi") + (it.bahan ? ` (${it.bahan})` : ''),
+                    quantity: 1,
+                    volume: Number(it.volume) || 0,
+                    satuan: it.satuan || '',
+                    unitPrice: unitPrice
+                };
+            })
+        }));
+    };
+
     // Calculate Totals
     const subTotal = (data.items || []).reduce((acc, i) => {
         const vol = Number(i.volume);
@@ -111,20 +147,41 @@ export default function InvoiceFormEditor({
     const dpp = subTotal - Number(data.discountAmount || 0);
     const tax = data.taxApplied ? dpp * 0.11 : 0;
     const grandTotal = dpp + tax;
+    
+    const retentionPercent = Number(data.retentionPercent || 0);
+    const retentionAmount = retentionPercent > 0 ? grandTotal * (retentionPercent / 100) : 0;
+    
     const dp = Number(data.downPayment || 0);
     const isDPMode = data.invoiceType === 'DP';
-    const total = isDPMode ? dp : (grandTotal - dp);
+    const isRetensiMode = data.invoiceType === 'RETENSI';
+    
+    let total = 0;
+    if (isDPMode) {
+        total = dp;
+    } else if (isRetensiMode) {
+        total = retentionAmount > 0 ? retentionAmount : Number(data.retentionAmount || 0);
+    } else {
+        total = grandTotal - dp - retentionAmount;
+    }
 
     return (
         <div className="lg:col-span-5 xl:col-span-4 flex flex-col h-full relative print:hidden">
             {/* TAB NAVIGATION - STICKY TOP */}
             <div className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-white/5 pb-2 mb-2 sm:mb-4">
-                <div className="flex gap-2 overflow-x-auto custom-scrollbar py-3 px-3 sm:px-0">
-                    {tabs.map(tab => (
-                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 sm:px-5 py-3.5 rounded-xl text-[10px] sm:text-[11px] font-black transition-all whitespace-nowrap ${tab.mobileOnly ? 'lg:hidden' : ''} ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 translate-y-[-2px]' : 'bg-slate-900 text-slate-500 hover:bg-slate-800 border border-white/5'}`}>
-                            {tab.icon} {tab.label}
-                        </button>
-                    ))}
+                <div className="flex flex-col sm:flex-row justify-between gap-2 sm:items-center px-3 sm:px-0 pt-2">
+                    <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
+                        {tabs.map(tab => (
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 sm:px-5 py-3.5 rounded-xl text-[10px] sm:text-[11px] font-black transition-all whitespace-nowrap ${tab.mobileOnly ? 'lg:hidden' : ''} ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 translate-y-[-2px]' : 'bg-slate-900 text-slate-500 hover:bg-slate-800 border border-white/5'}`}>
+                                {tab.icon} {tab.label}
+                            </button>
+                        ))}
+                    </div>
+                    <button
+                        onClick={() => setIsImportModalOpen(true)}
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] sm:text-[11px] font-black transition-all shadow-lg shadow-emerald-900/20 whitespace-nowrap"
+                    >
+                        <FileDown className="w-4 h-4" /> IMPOR DARI PENAWARAN
+                    </button>
                 </div>
             </div>
 
@@ -222,6 +279,12 @@ export default function InvoiceFormEditor({
                 masterItems={masterItems}
                 onPick={handlePickMaster}
                 onDelete={handleDeleteMaster}
+            />
+
+            <InvoiceImportModal 
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
+                onImport={handleImport}
             />
         </div>
     );

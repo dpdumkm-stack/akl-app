@@ -64,11 +64,14 @@ export interface InvoiceData {
   taxApplied?: boolean;
   taxAmount?: number;
   discountAmount?: number; // total discount
+  retentionPercent?: number; // persentase retensi
+  retentionAmount?: number; // nilai retensi
   downPayment?: number; // uang muka yang sudah dibayar
+  poNumber?: string; // nomor PO referensi
   notes?: string; // catatan tambahan
   paymentMethod: 'CASH' | 'CHEQUE' | 'BILYET GIRO' | 'TRANSFER';
   total: number;
-  invoiceType: 'DP' | 'PELUNASAN';
+  invoiceType: 'DP' | 'PELUNASAN' | 'RETENSI';
   quotationId?: string;
   status: 'PENDING' | 'PAID' | 'CANCELLED';
   namaPenandatangan?: string;

@@ -19,7 +19,8 @@ interface Invoice {
   companyName?: string | null;
   total: number;
   status: "PENDING" | "PAID" | "CANCELLED";
-  invoiceType: "DP" | "PELUNASAN";
+  invoiceType: "DP" | "PELUNASAN" | "RETENSI";
+  poNumber?: string | null;
 }
 
 const fmt = (n: number) =>
@@ -73,7 +74,8 @@ export default function InvoiceArchivePage() {
       const query = searchQuery.toLowerCase();
       const matchesSearch = inv.clientName.toLowerCase().includes(query) || 
                             (inv.companyName || "").toLowerCase().includes(query) ||
-                            inv.invoiceNumber.toLowerCase().includes(query);
+                            inv.invoiceNumber.toLowerCase().includes(query) ||
+                            (inv.poNumber || "").toLowerCase().includes(query);
       return matchesStatus && matchesSearch;
     })
     .slice(0, searchQuery ? undefined : 5);
@@ -273,6 +275,7 @@ export default function InvoiceArchivePage() {
                 <div className="col-span-2 text-center">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 text-slate-600">Doc No.</p>
                   <p className="text-[10px] font-medium text-slate-500 truncate">{inv.invoiceNumber}</p>
+                  {inv.poNumber && <p className="text-[9px] font-bold text-slate-600 mt-1 uppercase truncate">PO: {inv.poNumber}</p>}
                 </div>
 
                 <div className="col-span-2 text-center">

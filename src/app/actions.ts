@@ -418,9 +418,21 @@ export async function saveInvoice(data: any) {
     const dpp = subtotal - discountAmount;
     const taxAmount = data.taxApplied ? dpp * Number(data.taxRate || 0.11) : 0;
     const grandTotal = dpp + taxAmount;
-    const invoiceType = data.invoiceType || "PELUNASAN";
+    
+    // RETENTION & DP CALCULATION
+    const retentionPercent = Number(data.retentionPercent || 0);
+    const retentionAmount = retentionPercent > 0 ? grandTotal * (retentionPercent / 100) : 0;
     const downPayment = Number(data.downPayment || 0);
-    const total = invoiceType === "DP" ? downPayment : (grandTotal - downPayment);
+    const invoiceType = data.invoiceType || "PELUNASAN";
+    
+    let total = 0;
+    if (invoiceType === "DP") {
+        total = downPayment;
+    } else if (invoiceType === "RETENSI") {
+        total = retentionAmount > 0 ? retentionAmount : (data.retentionAmount || 0);
+    } else {
+        total = grandTotal - downPayment - retentionAmount;
+    }
 
     const payload: any = {
       invoiceNumber: finalInvoiceNumber,
@@ -435,6 +447,9 @@ export async function saveInvoice(data: any) {
       discountAmount: discountAmount,
       downPayment: downPayment,
       notes: sanitize(data.notes),
+      poNumber: data.poNumber ? sanitize(data.poNumber) : null,
+      retentionPercent: retentionPercent,
+      retentionAmount: retentionAmount,
       subtotal,
       taxAmount,
       total,
@@ -599,5 +614,26 @@ export async function convertToInvoice(quotationId: string) {
         message: errorDetail,
         debug: error.stack 
     };
+  }
+}
+export async function searchQuotations(query: string = "") {
+  try {
+    const q = query.trim().toLowerCase();
+    const quotations = await prisma.quotation.findMany({
+      where: {
+        OR: [
+          { nomorSurat: { contains: q } },
+          { companyName: { contains: q } },
+          { namaKlien: { contains: q } },
+          { up: { contains: q } }
+        ]
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      include: { items: true }
+    });
+    return { success: true, data: quotations };
+  } catch (error: any) {
+    return { success: false, message: error.message };
   }
 }

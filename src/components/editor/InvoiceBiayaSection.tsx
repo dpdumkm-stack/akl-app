@@ -58,6 +58,24 @@ export default function InvoiceBiayaSection({ data, setData, subTotal, total }: 
 
             <div>
               <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 block">
+                Retensi (%) - Opsional
+              </label>
+              <div className="relative">
+                <input 
+                  type="number" 
+                  min="0"
+                  max="100"
+                  value={data.retentionPercent || ''} 
+                  onChange={(e) => setData(prev => ({ ...prev, retentionPercent: Number(e.target.value) }))} 
+                  placeholder="0"
+                  className="w-full bg-slate-950 border border-white/10 rounded-xl pr-10 pl-4 py-3 text-emerald-400 font-bold text-sm outline-none focus:border-emerald-500/50 transition-all" 
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">%</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 block">
                 Uang Muka / DP Sudah Dibayar (Rp)
               </label>
               <div className="relative">
@@ -107,10 +125,17 @@ export default function InvoiceBiayaSection({ data, setData, subTotal, total }: 
               </div>
             )}
 
+            {Number(data.retentionPercent || 0) > 0 && data.invoiceType !== 'RETENSI' && (
+              <div className="flex justify-between items-center text-emerald-400 pt-1">
+                <span className="text-xs font-bold uppercase tracking-widest">Potongan Retensi ({data.retentionPercent}%)</span>
+                <span className="font-bold">-{formatCurrency((dpp + tax) * (Number(data.retentionPercent) / 100))}</span>
+              </div>
+            )}
+
             <div className="pt-4 border-t border-white/10 mt-2">
               <div className="flex justify-between items-end">
                 <span className="text-xs font-black text-white uppercase tracking-widest">
-                  {isDPMode ? 'TOTAL TAGIHAN DP' : (Number(data.downPayment || 0) > 0 ? 'SISA TAGIHAN' : 'GRAND TOTAL')}
+                  {isDPMode ? 'TOTAL TAGIHAN DP' : data.invoiceType === 'RETENSI' ? 'TOTAL TAGIHAN RETENSI' : (Number(data.downPayment || 0) > 0 || Number(data.retentionPercent || 0) > 0 ? 'SISA TAGIHAN' : 'GRAND TOTAL')}
                 </span>
                 <span className="text-2xl sm:text-3xl font-black text-white">{formatCurrency(total)}</span>
               </div>

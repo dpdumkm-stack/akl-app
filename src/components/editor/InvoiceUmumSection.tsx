@@ -61,6 +61,17 @@ export default function InvoiceUmumSection({ data, setData, nomorUrut, setNomorU
                 className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-bold text-sm outline-none focus:border-blue-500/50 transition-all" 
               />
             </div>
+
+            <div>
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 block">No. PO / Referensi (Opsional)</label>
+              <input 
+                type="text" 
+                value={data.poNumber || ''} 
+                onChange={(e) => setData(prev => ({ ...prev, poNumber: e.target.value }))} 
+                placeholder="Contoh: PO-2024-001" 
+                className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-bold text-sm outline-none focus:border-blue-500/50 transition-all" 
+              />
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -68,11 +79,12 @@ export default function InvoiceUmumSection({ data, setData, nomorUrut, setNomorU
               <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Jenis Tagihan</label>
               <select 
                 value={data.invoiceType} 
-                onChange={(e) => setData(prev => ({ ...prev, invoiceType: e.target.value as 'DP' | 'PELUNASAN' }))} 
+                onChange={(e) => setData(prev => ({ ...prev, invoiceType: e.target.value as 'DP' | 'PELUNASAN' | 'RETENSI' }))} 
                 className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-bold text-sm outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer"
               >
                 <option value="PELUNASAN">FULL PAYMENT / PELUNASAN</option>
                 <option value="DP">UANG MUKA (DP)</option>
+                <option value="RETENSI">TAGIHAN RETENSI</option>
               </select>
             </div>
 
