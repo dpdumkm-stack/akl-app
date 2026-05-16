@@ -37,6 +37,7 @@ export default function QuotationArchivePage() {
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [printProgress, setPrintProgress] = useState(0);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -224,99 +225,126 @@ export default function QuotationArchivePage() {
                 </div>
 
                 {/* Actions */}
-                <div className="col-span-2 md:col-span-2 flex flex-col justify-center pt-2 md:pt-0 border-t border-white/5 md:border-none">
-                  <div className="flex flex-wrap items-center gap-2 w-full md:justify-end">
-                    {/* PRINT VIEW (INLINE PDF) */}
-                    <button 
-                      onClick={() => window.open(`/api/pdf?id=${q.id}&mode=inline`, '_blank')}
-                      className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-blue-600/10 text-slate-600 hover:text-blue-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95" 
-                      title="Cetak"
-                    >
-                      <Printer className="w-4 h-4 md:w-3.5 md:h-3.5" />
-                    </button>
+                <div className="col-span-2 md:col-span-2 flex justify-end items-center relative pt-2 md:pt-0 border-t border-white/5 md:border-none">
+                  {/* Trigger Button */}
+                  <button 
+                    onClick={() => setOpenMenuId(openMenuId === q.id ? null : q.id)}
+                    className="p-3 bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 rounded-xl border border-white/10 transition-all active:scale-95 flex items-center justify-center shadow-lg"
+                  >
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
 
-                    {/* DOWNLOAD PDF */}
-                    <button 
-                      onClick={() => {
-                        setIsGeneratingPDF(true);
-                        setPrintProgress(0);
-                        const progressInterval = setInterval(() => {
-                          setPrintProgress(prev => {
-                            if (prev >= 99.5) return 99.5;
-                            const diff = prev < 70 ? 3.0 : prev < 90 ? 1.5 : prev < 95 ? 0.8 : 0.2;
-                            return prev + diff;
-                          });
-                        }, 150);
+                  {/* Dropdown Menu */}
+                  {openMenuId === q.id && (
+                    <>
+                      {/* Overlay to close menu when clicking outside */}
+                      <div className="fixed inset-0 z-40" onClick={() => setOpenMenuId(null)} />
+                      
+                      <div className="absolute right-0 top-14 md:top-12 z-50 w-56 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-2">
+                        {/* PRINT VIEW (INLINE PDF) */}
+                        <button 
+                          onClick={() => { setOpenMenuId(null); window.open(`/api/pdf?id=${q.id}&mode=inline`, '_blank'); }}
+                          className="flex items-center gap-3 w-full p-4 text-left hover:bg-slate-800/50 transition-all group"
+                        >
+                          <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-all">
+                            <Printer className="w-4 h-4 text-blue-400" />
+                          </div>
+                          <span className="text-xs font-bold text-slate-300 group-hover:text-blue-400 transition-colors">Cetak Dokumen</span>
+                        </button>
 
-                        fetch(`/api/pdf?id=${q.id}&mode=attachment`)
-                          .then(res => {
-                            if (!res.ok) throw new Error("Gagal");
-                            const contentDisposition = res.headers.get('Content-Disposition');
-                            let filename = `Dokumen_${q.nomorSurat}.pdf`;
-                            if (contentDisposition) {
-                              const match = contentDisposition.match(/filename="(.+)"/);
-                              if (match) filename = match[1];
-                            }
-                            return res.blob().then(blob => ({ blob, filename }));
-                          })
-                          .then(({ blob, filename }) => {
-                            clearInterval(progressInterval);
-                            setPrintProgress(100);
-                            
-                            const url = window.URL.createObjectURL(blob);
-                            const link = document.createElement('a');
-                            link.href = url;
-                            link.download = filename;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            window.URL.revokeObjectURL(url);
-                            
-                            setTimeout(() => {
-                              setIsGeneratingPDF(false);
-                              setPrintProgress(0);
-                            }, 600);
-                          })
-                          .catch(() => {
-                            clearInterval(progressInterval);
-                            setIsGeneratingPDF(false);
-                            showToast("Gagal mengunduh PDF", "error");
-                          });
-                      }}
-                      className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-indigo-600/10 text-slate-600 hover:text-indigo-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95" 
-                      title="Download PDF"
-                    >
-                      <Download className="w-4 h-4 md:w-3.5 md:h-3.5" />
-                    </button>
+                        {/* DOWNLOAD PDF */}
+                        <button 
+                          onClick={() => {
+                            setOpenMenuId(null);
+                            setIsGeneratingPDF(true);
+                            setPrintProgress(0);
+                            const progressInterval = setInterval(() => {
+                              setPrintProgress(prev => {
+                                if (prev >= 99.5) return 99.5;
+                                const diff = prev < 70 ? 3.0 : prev < 90 ? 1.5 : prev < 95 ? 0.8 : 0.2;
+                                return prev + diff;
+                              });
+                            }, 150);
 
-                    {!q.isInvoiced && (
-                      <button 
-                        onClick={() => handleConvertToInvoice(q.id, q.namaKlien)}
-                        className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-emerald-600/10 text-slate-600 hover:text-emerald-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95"
-                        title="Terbitkan Invoice"
-                      >
-                        <Receipt className="w-4 h-4 md:w-3.5 md:h-3.5" />
-                      </button>
-                    )}
+                            fetch(`/api/pdf?id=${q.id}&mode=attachment`)
+                              .then(res => {
+                                if (!res.ok) throw new Error("Gagal");
+                                const contentDisposition = res.headers.get('Content-Disposition');
+                                let filename = `Dokumen_${q.nomorSurat}.pdf`;
+                                if (contentDisposition) {
+                                  const match = contentDisposition.match(/filename="(.+)"/);
+                                  if (match) filename = match[1];
+                                }
+                                return res.blob().then(blob => ({ blob, filename }));
+                              })
+                              .then(({ blob, filename }) => {
+                                clearInterval(progressInterval);
+                                setPrintProgress(100);
+                                
+                                const url = window.URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = filename;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(url);
+                                
+                                setTimeout(() => {
+                                  setIsGeneratingPDF(false);
+                                  setPrintProgress(0);
+                                }, 600);
+                              })
+                              .catch(() => {
+                                clearInterval(progressInterval);
+                                setIsGeneratingPDF(false);
+                                showToast("Gagal mengunduh PDF", "error");
+                              });
+                          }}
+                          className="flex items-center gap-3 w-full p-4 text-left hover:bg-slate-800/50 transition-all border-t border-white/5 group"
+                        >
+                          <div className="p-2 bg-indigo-500/10 rounded-lg group-hover:bg-indigo-500/20 transition-all">
+                            <Download className="w-4 h-4 text-indigo-400" />
+                          </div>
+                          <span className="text-xs font-bold text-slate-300 group-hover:text-indigo-400 transition-colors">Unduh PDF</span>
+                        </button>
 
-                    <button 
-                      onClick={() => router.push(`/quotations/edit/${q.id}`)}
-                      className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-amber-600/10 text-slate-600 hover:text-amber-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95"
-                      title="Edit"
-                    >
-                      <Edit2 className="w-4 h-4 md:w-3.5 md:h-3.5" />
-                    </button>
+                        {!q.isInvoiced && (
+                          <button 
+                            onClick={() => { setOpenMenuId(null); handleConvertToInvoice(q.id, q.namaKlien); }}
+                            className="flex items-center gap-3 w-full p-4 text-left hover:bg-slate-800/50 transition-all border-t border-white/5 group"
+                          >
+                            <div className="p-2 bg-emerald-500/10 rounded-lg group-hover:bg-emerald-500/20 transition-all">
+                              <Receipt className="w-4 h-4 text-emerald-400" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-300 group-hover:text-emerald-400 transition-colors">Terbitkan Invoice</span>
+                          </button>
+                        )}
 
-                    {(session?.user as any)?.role === "OWNER" && (
-                      <button 
-                        onClick={() => handleDelete(q.id, q.nomorSurat)}
-                        className="flex-1 md:flex-none flex justify-center items-center p-3.5 md:p-2 bg-slate-950 hover:bg-red-600/10 text-slate-600 hover:text-red-400 rounded-xl md:rounded-lg transition-all border border-white/5 active:scale-95"
-                        title="Hapus"
-                      >
-                        <Trash2 className="w-4 h-4 md:w-3.5 md:h-3.5" />
-                      </button>
-                    )}
-                  </div>
+                        <button 
+                          onClick={() => { setOpenMenuId(null); router.push(`/quotations/edit/${q.id}`); }}
+                          className="flex items-center gap-3 w-full p-4 text-left hover:bg-slate-800/50 transition-all border-t border-white/5 group"
+                        >
+                          <div className="p-2 bg-amber-500/10 rounded-lg group-hover:bg-amber-500/20 transition-all">
+                            <Edit2 className="w-4 h-4 text-amber-400" />
+                          </div>
+                          <span className="text-xs font-bold text-slate-300 group-hover:text-amber-400 transition-colors">Edit Penawaran</span>
+                        </button>
+
+                        {(session?.user as any)?.role === "OWNER" && (
+                          <button 
+                            onClick={() => { setOpenMenuId(null); handleDelete(q.id, q.nomorSurat); }}
+                            className="flex items-center gap-3 w-full p-4 text-left hover:bg-slate-800/50 transition-all border-t border-white/5 group"
+                          >
+                            <div className="p-2 bg-red-500/10 rounded-lg group-hover:bg-red-500/20 transition-all">
+                              <Trash2 className="w-4 h-4 text-red-400" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-300 group-hover:text-red-400 transition-colors">Hapus Penawaran</span>
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
