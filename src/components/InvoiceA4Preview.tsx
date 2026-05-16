@@ -61,7 +61,8 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl }: InvoiceA4Pre
   const dpp   = subtotal-disc;
   const taxAmt= data.taxApplied?dpp*0.11:0;
   const grand = dpp+taxAmt;
-  const dp    = Number(data.downPayment||0);
+  const downPaymentPercent = Number(data.downPaymentPercent||0);
+  const dp = downPaymentPercent > 0 ? grand * (downPaymentPercent / 100) : Number(data.downPayment||0);
   const isDPMode = data.invoiceType==='DP';
   const isRetensiMode = data.invoiceType==='RETENSI';
   const retentionPercent = Number(data.retentionPercent||0);
@@ -261,7 +262,7 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl }: InvoiceA4Pre
 
                       {dp>0&&!isDPMode&&(
                         <tr>
-                          <td style={{padding:'6px 10px',border:'1px solid #cbd5e1',textAlign:'right',fontWeight:'bold',color:'#d97706',fontSize:'10px',textTransform:'uppercase'}}>DP Dibayar</td>
+                          <td style={{padding:'6px 10px',border:'1px solid #cbd5e1',textAlign:'right',fontWeight:'bold',color:'#d97706',fontSize:'10px',textTransform:'uppercase'}}>DP Dibayar {data.downPaymentPercent ? `(${data.downPaymentPercent}%)` : ''}</td>
                           <td style={{padding:'6px 10px',border:'1px solid #cbd5e1',textAlign:'right',fontWeight:'bold',color:'#d97706'}}>- {rp(dp).replace('Rp ','')}</td>
                         </tr>
                       )}

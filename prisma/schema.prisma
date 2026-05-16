@@ -142,6 +142,7 @@ model Invoice {
   discountAmount    Decimal       @default(0)   
   retentionPercent  Decimal?      
   retentionAmount   Decimal?      
+  downPaymentPercent Decimal?
   downPayment       Decimal       @default(0)   
   poNumber          String?       
   notes             String?       

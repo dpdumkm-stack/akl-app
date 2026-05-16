@@ -151,7 +151,10 @@ export default function InvoiceFormEditor({
     const retentionPercent = Number(data.retentionPercent || 0);
     const retentionAmount = retentionPercent > 0 ? grandTotal * (retentionPercent / 100) : 0;
     
-    const dp = Number(data.downPayment || 0);
+    const downPaymentPercent = Number(data.downPaymentPercent || 0);
+    const calculatedDP = downPaymentPercent > 0 ? grandTotal * (downPaymentPercent / 100) : Number(data.downPayment || 0);
+    const dp = calculatedDP;
+    
     const isDPMode = data.invoiceType === 'DP';
     const isRetensiMode = data.invoiceType === 'RETENSI';
     

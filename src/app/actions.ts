@@ -422,7 +422,10 @@ export async function saveInvoice(data: any) {
     // RETENTION & DP CALCULATION
     const retentionPercent = Number(data.retentionPercent || 0);
     const retentionAmount = retentionPercent > 0 ? grandTotal * (retentionPercent / 100) : 0;
-    const downPayment = Number(data.downPayment || 0);
+    
+    const downPaymentPercent = Number(data.downPaymentPercent || 0);
+    const downPayment = downPaymentPercent > 0 ? grandTotal * (downPaymentPercent / 100) : Number(data.downPayment || 0);
+    
     const invoiceType = data.invoiceType || "PELUNASAN";
     
     let total = 0;
@@ -445,6 +448,7 @@ export async function saveInvoice(data: any) {
       taxApplied: !!data.taxApplied,
       taxRate: Number(data.taxRate) || 0.11,
       discountAmount: discountAmount,
+      downPaymentPercent: Number(data.downPaymentPercent) || null,
       downPayment: downPayment,
       notes: sanitize(data.notes),
       poNumber: data.poNumber ? sanitize(data.poNumber) : null,

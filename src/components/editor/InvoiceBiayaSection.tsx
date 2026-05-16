@@ -75,18 +75,55 @@ export default function InvoiceBiayaSection({ data, setData, subTotal, total }: 
             </div>
 
             <div>
-              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 block">
-                Uang Muka / DP Sudah Dibayar (Rp)
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">Rp</span>
-                <input 
-                  type="number" 
-                  min="0"
-                  value={data.downPayment || ''} 
-                  onChange={(e) => setData(prev => ({ ...prev, downPayment: Number(e.target.value) }))} 
-                  className="w-full bg-slate-950 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-amber-400 font-bold text-sm outline-none focus:border-amber-500/50 transition-all" 
-                />
+              <div className="flex justify-between items-end mb-2">
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block">
+                  Uang Muka / DP Sudah Dibayar
+                </label>
+                {data.invoiceType === 'DP' && (
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const calcDP = (subTotal - Number(data.discountAmount || 0) + (data.taxApplied ? (subTotal - Number(data.discountAmount || 0)) * 0.11 : 0)) * 0.3;
+                      setData(prev => ({ ...prev, downPaymentPercent: 30, downPayment: calcDP }));
+                    }}
+                    className="text-[9px] font-black bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded hover:bg-blue-600 hover:text-white transition-colors"
+                  >
+                    SET 30%
+                  </button>
+                )}
+              </div>
+              
+              <div className="flex gap-3">
+                <div className="relative w-28 shrink-0">
+                  <input 
+                    type="number" 
+                    min="0"
+                    max="100"
+                    value={data.downPaymentPercent || ''} 
+                    onChange={(e) => {
+                      const pct = Number(e.target.value);
+                      const currentGrandTotal = subTotal - Number(data.discountAmount || 0) + (data.taxApplied ? (subTotal - Number(data.discountAmount || 0)) * 0.11 : 0);
+                      setData(prev => ({ ...prev, downPaymentPercent: pct, downPayment: pct > 0 ? currentGrandTotal * (pct / 100) : 0 }));
+                    }} 
+                    placeholder="0"
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl pr-8 pl-3 py-3 text-amber-400 font-bold text-sm outline-none focus:border-amber-500/50 transition-all" 
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">%</span>
+                </div>
+
+                <div className="relative flex-1">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">Rp</span>
+                  <input 
+                    type="number" 
+                    min="0"
+                    value={data.downPayment || ''} 
+                    onChange={(e) => {
+                      // If user manually changes nominal, clear the percentage to avoid confusion
+                      setData(prev => ({ ...prev, downPayment: Number(e.target.value), downPaymentPercent: 0 }));
+                    }} 
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-amber-400 font-bold text-sm outline-none focus:border-amber-500/50 transition-all" 
+                  />
+                </div>
               </div>
             </div>
           </div>

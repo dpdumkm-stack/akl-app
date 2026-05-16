@@ -66,6 +66,7 @@ export interface InvoiceData {
   discountAmount?: number; // total discount
   retentionPercent?: number; // persentase retensi
   retentionAmount?: number; // nilai retensi
+  downPaymentPercent?: number; // persentase uang muka
   downPayment?: number; // uang muka yang sudah dibayar
   poNumber?: string; // nomor PO referensi
   notes?: string; // catatan tambahan
