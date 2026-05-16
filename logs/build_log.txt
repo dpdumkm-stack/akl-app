@@ -27,9 +27,9 @@ Import trace:
     ./src/app/api/invoice/delete/route.ts
 
 
-✓ Compiled successfully in 34.7s
+✓ Compiled successfully in 31.1s
   Running TypeScript ...
-  Finished TypeScript in 19.3s ...
+  Finished TypeScript in 16.6s ...
   Collecting page data using 3 workers ...
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
@@ -38,10 +38,9 @@ Import trace:
 [DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
   Generating static pages using 3 workers (0/32) ...
   Generating static pages using 3 workers (8/32) 
-[DATABASE] Menggunakan database di: C:\Users\p\.gemini\antigravity\scratch\akl-app\database.db
-[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
   Generating static pages using 3 workers (16/32) 
+[INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
   Generating static pages using 3 workers (24/32) 
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
@@ -52,7 +51,7 @@ Import trace:
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
 [INIT] Document sequences synchronized (INV: 7, QUOT: 7)
-✓ Generating static pages using 3 workers (32/32) in 1816ms
+✓ Generating static pages using 3 workers (32/32) in 2.3s
   Finalizing page optimization ...
 
 Route (app)
