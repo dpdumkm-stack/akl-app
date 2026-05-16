@@ -95,16 +95,17 @@ export default function AppUpdater() {
               <Sparkles className="w-7 h-7 text-emerald-400" />
             </div>
             
-            <h3 className="text-white font-black text-xl mb-1 italic">Selamat Datang di v3.1!</h3>
+            <h3 className="text-white font-black text-xl mb-1 italic">Selamat Datang di v3.2!</h3>
             <p className="text-slate-400 text-xs font-medium mb-6">Sistem telah diperbarui untuk pengalaman yang lebih baik.</p>
             
             <div className="space-y-4 mb-8">
               <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
                 <h4 className="text-sm font-bold text-emerald-400 mb-1">Fitur Baru</h4>
                 <ul className="text-[11px] text-slate-300 space-y-2 list-disc pl-4">
-                  <li>Tombol Keluar (Logout) kini tersedia di navigasi atas pada tampilan layar HP (Mobile).</li>
-                  <li>Tombol Buat Penawaran Baru dan Invoice Baru kini muncul dan responsif di tampilan HP.</li>
-                  <li>Sistem pembaruan otomatis yang lebih mulus dengan pemberitahuan pop-up.</li>
+                  <li>Total Refactoring UI/UX Mobile-First pada sistem pengisian data.</li>
+                  <li>Tombol aksi dan target sentuh diperbesar (44px) untuk kenyamanan jempol.</li>
+                  <li>Layout form lebih lega, responsif, dan premium di layar HP.</li>
+                  <li>Perbaikan masalah auto-zoom otomatis pada browser mobile.</li>
                 </ul>
               </div>
             </div>
