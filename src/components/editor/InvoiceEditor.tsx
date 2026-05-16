@@ -5,6 +5,7 @@ import { saveInvoice, getInvoiceNumberAction } from '@/app/actions';
 import InvoiceItemRow from '@/components/editor/InvoiceItemRow';
 import { formatInvoiceNumber } from '@/lib/utils';
 import { Save } from 'lucide-react';
+import TextEditorTrigger from '@/components/TextEditorTrigger';
 
 export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
   const { data: session } = useSession();
@@ -169,7 +170,13 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
         </div>
         <div className="md:col-span-2">
           <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Alamat Klien</label>
-          <textarea value={clientAddress} onChange={e => setClientAddress(e.target.value)} className="w-full p-4 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-white focus:border-blue-500 outline-none transition-all shadow-lg" rows={2} placeholder="Alamat lengkap..." />
+          <TextEditorTrigger
+            value={clientAddress}
+            onChange={setClientAddress}
+            title="Alamat Klien"
+            placeholder="Alamat lengkap klien..."
+            accentColor="blue"
+          />
         </div>
       </div>
 
@@ -209,7 +216,13 @@ export default function InvoiceEditor({ onClose }: { onClose?: () => void }) {
         </div>
         <div className="md:col-span-3">
           <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Catatan Tambahan</label>
-          <textarea value={notes} onChange={e => setNotes(e.target.value)} className="w-full p-4 bg-slate-900 border-2 border-white/10 rounded-2xl text-sm font-black text-white focus:border-blue-500 outline-none shadow-lg transition-all" rows={2} placeholder="Tulis catatan di sini..." />
+          <TextEditorTrigger
+            value={notes}
+            onChange={setNotes}
+            title="Catatan Tambahan"
+            placeholder="Tulis catatan tambahan di sini..."
+            accentColor="emerald"
+          />
         </div>
       </section>
 

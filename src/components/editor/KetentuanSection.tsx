@@ -3,6 +3,7 @@
 import React from "react";
 import { Plus, Trash2, Eye, EyeOff } from "lucide-react";
 import { QuotationData } from "@/lib/types";
+import TextEditorTrigger from "@/components/TextEditorTrigger";
 
 interface KetentuanSectionProps {
     data: QuotationData;
@@ -57,15 +58,17 @@ export default function KetentuanSection({
                     {data.showLingkupKerja && (
                         <div className="space-y-2">
                             {(data.lingkupKerja || []).map((text, idx) => (
-                                <div key={idx} className="flex gap-2 group">
-                                    <textarea 
-                                        rows={2}
-                                        value={text} 
-                                        onChange={(e) => updateArray('lingkupKerja', idx, e.target.value)} 
-                                        className="flex-1 bg-slate-900/80 border-2 border-white/10 rounded-xl p-3 text-xs font-black text-white shadow-lg focus:border-blue-500 focus:bg-slate-900 transition-all resize-none" 
-                                        placeholder="Contoh: Pekerjaan Persiapan..." 
-                                    />
-                                    <button type="button" onClick={() => removeRow('lingkupKerja', idx)} className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100 h-fit"><Trash2 className="w-4 h-4" /></button>
+                                <div key={idx} className="flex gap-2 group items-start">
+                                    <div className="flex-1">
+                                        <TextEditorTrigger
+                                            value={text}
+                                            onChange={(val) => updateArray('lingkupKerja', idx, val)}
+                                            title={`Lingkup Kerja ${idx + 1}`}
+                                            placeholder="Contoh: Pekerjaan Persiapan..."
+                                            accentColor="blue"
+                                        />
+                                    </div>
+                                    <button type="button" onClick={() => removeRow('lingkupKerja', idx)} className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100 mt-1"><Trash2 className="w-4 h-4" /></button>
                                 </div>
                             ))}
                         </div>
@@ -93,15 +96,17 @@ export default function KetentuanSection({
                     {data.showSyaratGaransi && (
                         <div className="space-y-2">
                             {(data.syaratGaransi || []).map((text, idx) => (
-                                <div key={idx} className="flex gap-2 group">
-                                    <textarea 
-                                        rows={2}
-                                        value={text} 
-                                        onChange={(e) => updateArray('syaratGaransi', idx, e.target.value)} 
-                                        className="flex-1 bg-slate-900/80 border-2 border-white/10 rounded-xl p-3 text-xs font-black text-white shadow-lg focus:border-emerald-500 focus:bg-slate-900 transition-all resize-none" 
-                                        placeholder="Contoh: Masa garansi 6 bulan..." 
-                                    />
-                                    <button type="button" onClick={() => removeRow('syaratGaransi', idx)} className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100 h-fit"><Trash2 className="w-4 h-4" /></button>
+                                <div key={idx} className="flex gap-2 group items-start">
+                                    <div className="flex-1">
+                                        <TextEditorTrigger
+                                            value={text}
+                                            onChange={(val) => updateArray('syaratGaransi', idx, val)}
+                                            title={`Syarat Garansi ${idx + 1}`}
+                                            placeholder="Contoh: Masa garansi 6 bulan..."
+                                            accentColor="emerald"
+                                        />
+                                    </div>
+                                    <button type="button" onClick={() => removeRow('syaratGaransi', idx)} className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100 mt-1"><Trash2 className="w-4 h-4" /></button>
                                 </div>
                             ))}
                         </div>

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Trash2 } from 'lucide-react';
 import { InvoiceItemData } from '@/lib/types';
+import TextEditorTrigger from '@/components/TextEditorTrigger';
 
 interface InvoiceItemRowProps {
   index: number;
@@ -16,12 +17,12 @@ export default function InvoiceItemRow({ index, item, onChange, onRemove }: Invo
     <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 mb-3 group relative">
       <div className="md:col-span-7">
         <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Deskripsi Pekerjaan</label>
-        <textarea
+        <TextEditorTrigger
           value={item.description}
-          onChange={e => onChange('description', e.target.value)}
-          rows={1}
-          className="w-full bg-white border border-slate-200 rounded-lg p-2 text-sm outline-none focus:border-blue-500 transition-all"
+          onChange={(val) => onChange('description', val)}
+          title="Deskripsi Pekerjaan"
           placeholder="Contoh: Epoxy Flooring 1000 Micron..."
+          accentColor="blue"
         />
       </div>
       <div className="md:col-span-2">

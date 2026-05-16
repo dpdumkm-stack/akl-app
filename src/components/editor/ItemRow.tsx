@@ -4,6 +4,7 @@ import React from "react";
 import { Search, BookmarkPlus, Trash2, ChevronUp, ChevronDown, X, Copy } from "lucide-react";
 import { QuotationItem, QuotationData } from "@/lib/types";
 import { formatInputNumber, parseInputNumber } from "@/lib/utils";
+import TextEditorTrigger from "@/components/TextEditorTrigger";
 
 interface ItemRowProps {
     item: QuotationItem;
@@ -72,13 +73,14 @@ export default function ItemRow({
                     <button type="button" onClick={() => onMove(item.id, 'down')} className="p-1.5 text-slate-600 hover:text-blue-400 hover:bg-white/5 rounded-lg transition-all"><ChevronDown className="w-4 h-4" /></button>
                 </div>
                 <div className="flex-1 space-y-3">
-                    <div className="space-y-1">
-                        <textarea 
-                            rows={1} 
-                            value={item.deskripsi || ''} 
-                            onChange={(e) => onUpdate(item.id, 'deskripsi', capitalizeWords(e.target.value))} 
-                            className="w-full bg-transparent border-none font-black text-sm sm:text-base p-0 focus:ring-0 text-white resize-none outline-none placeholder:text-slate-600 tracking-tight" 
-                            placeholder={data.isMaterialOnlyMode ? "NAMA MATERIAL..." : "NAMA PEKERJAAN..."} 
+                    <div className="space-y-2">
+                        <TextEditorTrigger
+                            value={item.deskripsi || ''}
+                            onChange={(val) => onUpdate(item.id, 'deskripsi', capitalizeWords(val))}
+                            title={data.isMaterialOnlyMode ? "Nama Material" : "Nama Pekerjaan"}
+                            placeholder={data.isMaterialOnlyMode ? "NAMA MATERIAL..." : "NAMA PEKERJAAN..."}
+                            accentColor="blue"
+                            className="min-h-0"
                         />
                         
                         {item.masterId && (

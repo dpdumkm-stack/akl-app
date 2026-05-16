@@ -4,7 +4,7 @@
 
 
 C:\Users\p\.gemini\antigravity\scratch\akl-app\src\app\invoice\edit\[id]\page.tsx
-  52:6  warning  React Hook useCallback has a missing dependency: 'showToast'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  53:6  warning  React Hook useCallback has a missing dependency: 'showToast'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 C:\Users\p\.gemini\antigravity\scratch\akl-app\src\app\settings\page.tsx
   152:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element

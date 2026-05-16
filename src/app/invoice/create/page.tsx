@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { 
-  ArrowLeft, Save, Plus, X, Search, Database, 
+import { ArrowLeft, Save, Plus, X, Search, Database, 
   TrendingUp, RefreshCw, AlertCircle, Receipt, Eye, Edit3
 } from "lucide-react";
 import { saveInvoice, getInvoiceNumberAction } from "@/app/actions";
@@ -12,6 +11,7 @@ import InvoiceA4Preview from "@/components/InvoiceA4Preview";
 import DocumentPreviewStudio from "@/components/editor/DocumentPreviewStudio";
 import OtorisasiSection from "@/components/editor/OtorisasiSection";
 import { formatInvoiceNumber } from "@/lib/utils";
+import TextEditorTrigger from "@/components/TextEditorTrigger";
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
@@ -190,7 +190,13 @@ export default function CreateInvoicePage() {
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Alamat Penagihan</label>
-                <textarea value={form.clientAddress} onChange={e => setForm(f => ({ ...f, clientAddress: e.target.value }))} rows={2} className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-3 text-white font-medium text-sm outline-none resize-none" />
+                <TextEditorTrigger
+                  value={form.clientAddress}
+                  onChange={(val) => setForm((f: any) => ({ ...f, clientAddress: val }))}
+                  title="Alamat Penagihan"
+                  placeholder="Alamat lengkap klien / perusahaan..."
+                  accentColor="emerald"
+                />
               </div>
             </div>
 
