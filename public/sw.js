@@ -1,4 +1,4 @@
-const CACHE_NAME = 'studio-akl-v2';
+const CACHE_NAME = 'studio-akl-v3';
 
 // Aset-aset inti yang di-cache saat instalasi
 const PRECACHE_ASSETS = [
@@ -13,7 +13,14 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
   );
-  self.skipWaiting();
+  // Hapus otomatis skipWaiting agar kita bisa nampilin Update Banner
+});
+
+// Listener untuk memicu update saat user klik 'Perbarui'
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Activate: hapus cache lama
