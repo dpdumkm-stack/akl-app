@@ -208,7 +208,7 @@ const InvoiceA4Preview = ({ data, isGeneratingPDF, globalLogoUrl }: InvoiceA4Pre
 
                       {/* Subtotal */}
                       <tr style={{backgroundColor:LIGHT}}>
-                        <td colSpan={4} rowSpan={disc>0&&data.taxApplied?5:disc>0||data.taxApplied?4:3}
+                        <td colSpan={4} rowSpan={1 + (disc>0?1:0) + (data.taxApplied?2:0) + (dp>0&&!isDPMode?1:0)}
                           style={{padding:'12px',border:'1px solid #cbd5e1',verticalAlign:'top'}}>
                           <div style={{border:'1px solid #94a3b8',padding:'10px 12px',backgroundColor:'white',borderRadius:'4px',borderLeft:'4px solid '+BLUE}}>
                             <p style={{margin:'0 0 5px 0',fontSize:'9px',fontWeight:'bold',color:'#64748b',textTransform:'uppercase',letterSpacing:'1px'}}>Terbilang:</p>
