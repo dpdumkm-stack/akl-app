@@ -14,8 +14,8 @@ export const metadata = {
     title: "Studio AKL",
   },
   icons: {
-    icon: "/icons/icon-192.jpg",
-    apple: "/icons/icon-192.jpg",
+    icon: "/icons/icon-192.png",
+    apple: "/icons/icon-192.png",
   },
 };
 

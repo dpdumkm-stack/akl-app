@@ -120,7 +120,7 @@ if "%msg%"=="" (
 )
 
 if "%msg%"=="" (
-    set msg="update: perbaikan rutin dan optimasi sistem [auto-commit]"
+    set msg=update: perbaikan rutin dan optimasi sistem [auto-commit]
 )
 
 git commit -m "%msg%"
