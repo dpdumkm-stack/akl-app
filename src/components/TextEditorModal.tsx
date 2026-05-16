@@ -35,6 +35,20 @@ export default function TextEditorModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  const adjustHeight = useCallback(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = 'auto';
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      adjustHeight();
+    }
+  }, [localText, isOpen, adjustHeight]);
+
   const insertFormat = useCallback((prefix: string, suffix: string = "") => {
     const el = textareaRef.current;
     if (!el) return;
@@ -86,7 +100,7 @@ export default function TextEditorModal({
 
   return (
     <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="w-full sm:max-w-lg bg-slate-900 rounded-t-[32px] sm:rounded-[32px] border border-white/10 shadow-2xl ring-1 ring-white/5 flex flex-col h-[95dvh] sm:h-auto sm:max-h-[85vh] animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
+      <div className="w-full sm:max-w-lg bg-slate-900 rounded-t-[32px] sm:rounded-[32px] border border-white/10 shadow-2xl ring-1 ring-white/5 flex flex-col max-h-[95dvh] sm:max-h-[85vh] animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/5">
           <div className="flex items-center gap-3">
@@ -139,13 +153,13 @@ export default function TextEditorModal({
         </div>
 
         {/* Textarea */}
-        <div className="flex-1 px-4 sm:px-6 py-4 overflow-y-auto">
+        <div className="flex-1 px-4 sm:px-6 py-4 overflow-y-auto custom-scrollbar">
           <textarea
             ref={textareaRef}
             value={localText}
             onChange={(e) => setLocalText(e.target.value)}
             placeholder={placeholder}
-            className={`w-full h-full min-h-[200px] sm:min-h-[250px] bg-slate-950/50 border-2 border-white/5 rounded-2xl p-4 text-base sm:text-sm font-medium text-white placeholder:text-slate-700 outline-none resize-none transition-all focus:border-white/10 focus:ring-2 ${accent.ring} leading-relaxed`}
+            className={`w-full min-h-[120px] bg-slate-950/50 border-2 border-white/5 rounded-2xl p-4 text-base sm:text-sm font-medium text-white placeholder:text-slate-700 outline-none resize-none transition-all focus:border-white/10 focus:ring-2 ${accent.ring} leading-relaxed overflow-hidden`}
           />
         </div>
 
