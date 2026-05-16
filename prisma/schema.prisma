@@ -140,7 +140,10 @@ model Invoice {
   taxApplied        Boolean       @default(false)
   taxAmount         Decimal       @default(0)
   discountAmount    Decimal       @default(0)   
+  retentionPercent  Decimal?      
+  retentionAmount   Decimal?      
   downPayment       Decimal       @default(0)   
+  poNumber          String?       
   notes             String?       
   paymentMethod     String        @default("CASH")
   total             Decimal       @default(0)
