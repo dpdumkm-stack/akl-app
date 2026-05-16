@@ -168,7 +168,7 @@ export default function QuotationArchivePage() {
             <div className="col-span-2 text-right">Aksi</div>
           </div>
 
-          <div className="flex flex-col gap-5 p-4 md:p-0 md:block md:divide-y md:divide-white/[0.03]">
+          <div className="flex flex-col gap-3 p-4 md:p-0 md:block md:divide-y md:divide-white/[0.03]">
             {loading ? (
               <div className="py-20 flex flex-col items-center gap-4">
                 <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -182,10 +182,10 @@ export default function QuotationArchivePage() {
                  <p className="text-slate-600 font-medium italic">Tidak ada data penawaran yang ditemukan.</p>
               </div>
             ) : displayData.map(q => (
-              <div key={q.id} className="grid grid-cols-2 md:grid-cols-12 gap-y-6 gap-x-4 md:gap-4 md:items-center p-6 md:px-8 md:py-6 bg-slate-900/60 md:bg-transparent rounded-[32px] md:rounded-none border border-white/5 md:border-none hover:bg-white/[0.02] transition-all group shadow-2xl md:shadow-none">
+              <div key={q.id} className="grid grid-cols-2 md:grid-cols-12 gap-y-4 gap-x-4 md:gap-4 md:items-center p-5 md:px-8 md:py-6 bg-gradient-to-br from-slate-800/60 to-slate-900/60 md:bg-none md:bg-transparent rounded-[28px] md:rounded-none border border-white/10 md:border-none hover:bg-white/[0.04] transition-all group shadow-xl md:shadow-none">
                 {/* Client Info */}
                 <div className="col-span-2 md:col-span-4 flex items-start sm:items-center gap-4">
-                   <div className="w-12 h-12 flex-shrink-0 rounded-2xl bg-slate-950 border border-white/5 flex items-center justify-center text-xs font-black text-slate-500 group-hover:border-blue-500/30 group-hover:text-blue-400 transition-all uppercase">
+                   <div className="w-12 h-12 flex-shrink-0 rounded-2xl bg-blue-900/20 border border-blue-500/20 flex items-center justify-center text-sm font-black text-blue-400 group-hover:border-blue-500/50 group-hover:bg-blue-600/20 group-hover:text-blue-300 transition-all uppercase shadow-inner">
                       {q.namaKlien?.substring(0, 2)}
                    </div>
                    <div className="min-w-0 flex-1">
