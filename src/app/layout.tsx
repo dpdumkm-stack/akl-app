@@ -8,12 +8,19 @@ export const metadata = {
   title: "Studio AKL - Office Suite",
   description: "Aplikasi Penawaran Terintegrasi PT. Apindo Karya Lestari",
   manifest: "/manifest.json",
-  themeColor: "#2563eb",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Studio AKL",
   },
+  icons: {
+    icon: "/icons/icon-192.jpg",
+    apple: "/icons/icon-192.jpg",
+  },
+};
+
+export const viewport = {
+  themeColor: "#2563eb",
 };
 
 export default async function RootLayout({
